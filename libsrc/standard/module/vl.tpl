@@ -3,6 +3,14 @@ Module="VLImage"
 	Verify="ImageType"									Type="1"	ValueSelector="1"	StringEnumValues="ImageType2"
 	Verify="ImageType"									Type="1"	ValueSelector="2"	StringEnumValues="VLImageType3"
 	Name="PhotometricInterpretation"					Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2OrRGBorYBRFULL422orYBRPARTIAL420orYBRRCTorYBRICT"
+
+	Verify="PhotometricInterpretation"				Condition="UncompressedTransferSyntaxAndThreeSamples"					StringEnumValues="PhotometricInterpretationRGB"
+	Verify="PhotometricInterpretation"				Condition="JPEGLSLosslessTransferSyntaxAndThreeSamples"					StringEnumValues="PhotometricInterpretationRGB"
+	Verify="PhotometricInterpretation"				Condition="JPEG2000TransferSyntaxAndThreeSamples"						StringEnumValues="PhotometricInterpretationYBRRCTOrICT"
+	Verify="PhotometricInterpretation"				Condition="JPEG2000LosslessTransferSyntaxAndThreeSamples"				StringEnumValues="PhotometricInterpretationYBRRCT"
+	Verify="PhotometricInterpretation"				Condition="MPEG2TransferSyntax"											StringEnumValues="PhotometricInterpretationYBRPartial420"	# regardless of number of samples (required to be 3 by PS 3.5)
+	Verify="PhotometricInterpretation"				Condition="JPEGLossyTransferSyntaxAndThreeSamples"						StringEnumValues="PhotometricInterpretationYBRFull422"
+
 	Name="BitsAllocated"								Type="1"	BinaryEnumValues="BitsAre8"
 	Name="BitsStored"									Type="1"	BinaryEnumValues="BitsAre8"
 	Name="HighBit"										Type="1"	BinaryEnumValues="BitsAre7"
@@ -22,6 +30,7 @@ Module="VLImage"
 	Name="WindowCenter"									Type="3C"	Condition="PhotometricInterpretationIsMonochrome2"
 	Name="WindowWidth"									Type="1C"	Condition="WindowCenterPresent" 	NotZeroError=""
 	Verify="WindowWidth"											Condition="WindowWidthIsNegative"	ThenErrorMessage="Not permitted to be negative" ShowValueWithMessage="true"
+	Name="ImageLaterality"								Type="3"	StringEnumValues="ImageLaterality"
 	Sequence="AnatomicRegionSequence"					Type="1C"	VM="1"	Condition="MultiFrameIODAndNotSpecimen" mbpo="true"
 		InvokeMacro="CodeSequenceMacro"
 		Sequence="AnatomicRegionModifierSequence"		Type="3"	VM="1-n"
@@ -29,6 +38,11 @@ Module="VLImage"
 		SequenceEnd
 	SequenceEnd
 	InvokeMacro="PrimaryAnatomicStructureMacro"
+	Sequence="ChannelDescriptionCodeSequence"			Type="3"	VM="1-3"
+		InvokeMacro="CodeSequenceMacro"								BaselineContextID="4206"
+	SequenceEnd
+	Name="PixelSpacing"									Type="3"	NotZeroError=""
+	Name="ImagerPixelSpacing"							Type="3"	NotZeroError=""
 ModuleEnd
 
 Module="VLEndoscopicSeriesPseudo"
@@ -87,9 +101,17 @@ Module="OphthalmicPhotographyImage"
 	Verify="SamplesPerPixel"										Condition="PhotometricInterpretationNeedsThreeSamples"	BinaryEnumValues="Three"
 	Name="SamplesPerPixelUsed"							Type="1C"	NoCondition="" BinaryEnumValues="SamplesPerPixelUsedIsTwo"		# condition is real world
 	Name="PhotometricInterpretation"					Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2OrRGBorYBRFULL422orYBRPARTIAL420orYBRRCTorYBRICT"
+
+	Verify="PhotometricInterpretation"				Condition="UncompressedTransferSyntaxAndThreeSamples"					StringEnumValues="PhotometricInterpretationRGB"
+	Verify="PhotometricInterpretation"				Condition="JPEGLSLosslessTransferSyntaxAndThreeSamples"					StringEnumValues="PhotometricInterpretationRGB"
+	Verify="PhotometricInterpretation"				Condition="JPEG2000TransferSyntaxAndThreeSamples"						StringEnumValues="PhotometricInterpretationYBRRCTOrICT"
+	Verify="PhotometricInterpretation"				Condition="JPEG2000LosslessTransferSyntaxAndThreeSamples"				StringEnumValues="PhotometricInterpretationYBRRCT"
+	Verify="PhotometricInterpretation"				Condition="MPEG2TransferSyntax"											StringEnumValues="PhotometricInterpretationYBRPartial420"	# regardless of number of samples (required to be 3 by PS 3.5)
+	Verify="PhotometricInterpretation"				Condition="JPEGLossyTransferSyntaxAndThreeSamples"						StringEnumValues="PhotometricInterpretationYBRFull422"
+
 	Name="PixelRepresentation"							Type="1"	BinaryEnumValues="PixelRepresentationUnsigned"
 	Name="PlanarConfiguration"							Type="1C"	BinaryEnumValues="PlanarConfigurationIsColorByPixel"	Condition="SamplesPerPixelGreaterThanOne"
-	Name="PixelSpacing"									Type="1C"	NoCondition=""		# too hard to check code in Acquisition Device Type Code Sequence :(
+	Name="PixelSpacing"									Type="1C"	NotZeroError=""	NoCondition=""		# too hard to check code in Acquisition Device Type Code Sequence :(
 	Name="ContentDate"									Type="1"
 	Name="ContentTime"									Type="1"
 	Name="AcquisitionDateTime"							Type="1C"	Condition="ImageTypeValue1Original" mbpo="true"
@@ -144,7 +166,6 @@ DefineMacro="OphthalmicAcquisitionParametersMacro" InformationEntity="Image"
 	SequenceEnd
 	Name="EmmetropicMagnification"						Type="2"	NotZeroWarning=""
 	Name="IntraOcularPressure"							Type="2"	NotZeroWarning=""
-	Name="HorizontalFieldOfView"						Type="2"	NotZeroWarning=""
 	Name="PupilDilated"									Type="2"	StringEnumValues="YesNoFull"
 	Sequence="MydriaticAgentSequence"					Type="2C"	VM="0-n"	Condition="PupilDilatedIsYes"
 		Sequence="MydriaticAgentCodeSequence"			Type="1"	VM="1"
@@ -163,6 +184,7 @@ Module="OphthalmicPhotographyAcquisitionParameters"
 	Sequence="PatientEyeMovementCommandCodeSequence"	Type="1C"	VM="1"	Condition="PatientEyeMovementCommandedIsYes"
 		InvokeMacro="CodeSequenceMacro"								BaselineContextID="4201"
 	SequenceEnd
+	Name="HorizontalFieldOfView"						Type="2"	NotZeroWarning=""
 	InvokeMacro="OphthalmicAcquisitionParametersMacro"
 ModuleEnd
 
@@ -228,8 +250,8 @@ Module="OphthalmicTomographyImage"
 ModuleEnd
 
 Module="OphthalmicTomographyAcquisitionParameters"
-	Name="AxialLengthOfTheEye"								Type="2"
-	Name="HorizontalFieldOfView"						Type="2"
+	Name="AxialLengthOfTheEye"							Type="2"	NotZeroWarning=""
+	Name="HorizontalFieldOfView"						Type="2"	NotZeroWarning=""
 	InvokeMacro="OphthalmicAcquisitionParametersMacro"
 ModuleEnd
 
@@ -306,13 +328,14 @@ Module="WholeSlideMicroscopyImage"
 	Name="ImageType"									Type="1"	VM="4"
 	Verify="ImageType"									Type="1"	ValueSelector="0"	StringEnumValues="WholeSlideImageType1"
 	Verify="ImageType"									Type="1"	ValueSelector="1"	StringEnumValues="CommonEnhancedImageAndFrameType2"
-	Verify="ImageType"									Type="1"	ValueSelector="2"	StringEnumValues="WholeSlideImageType3"
-	Verify="ImageType"									Type="1"	ValueSelector="3"	StringEnumValues="WholeSlideImageType4"
+	Verify="ImageType"									Type="1"	ValueSelector="2"	StringDefinedTerms="WholeSlideImageType3"
+	Verify="ImageType"									Type="1"	ValueSelector="3"	StringDefinedTerms="WholeSlideImageType4"
 	Name="ImagedVolumeWidth"							Type="1"	NotZeroError=""
 	Name="ImagedVolumeHeight"							Type="1"	NotZeroError=""
 	Name="ImagedVolumeDepth"							Type="1"	NotZeroError=""
 	Name="TotalPixelMatrixColumns"						Type="1"	NotZeroError=""
 	Name="TotalPixelMatrixRows"							Type="1"	NotZeroError=""
+	Name="TotalPixelMatrixFocalPlanes"					Type="1C"	Condition="DimensionOrganizationTypeIsTILED_FULL"	mbpo="true"	NotZeroError=""
 	Sequence="TotalPixelMatrixOriginSequence"			Type="1"	VM="1"
 		Name="XOffsetInSlideCoordinateSystem"			Type="1"
 		Name="YOffsetInSlideCoordinateSystem"			Type="1"
@@ -322,15 +345,24 @@ Module="WholeSlideMicroscopyImage"
 	Verify="SamplesPerPixel"										Condition="PhotometricInterpretationNeedsOneSample"	BinaryEnumValues="One"
 	Verify="SamplesPerPixel"										Condition="PhotometricInterpretationNeedsThreeSamples"	BinaryEnumValues="Three"
 	Name="PhotometricInterpretation"					Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2OrRGBorYBRFULL422orYBRRCTorYBRICT"
+
+	Verify="PhotometricInterpretation"								Condition="UncompressedTransferSyntaxAndOneSample"			StringEnumValues="PhotometricInterpretationMonochrome2"
+	# it probably isn't intended, but current text actually prohibits compression of monochrome WSI
+	Verify="PhotometricInterpretation"								Condition="UncompressedTransferSyntaxAndThreeSamples"		StringEnumValues="PhotometricInterpretationRGB"
+	Verify="PhotometricInterpretation"								Condition="JPEGLSLosslessTransferSyntaxAndThreeSamples"		StringEnumValues="PhotometricInterpretationRGB"
+	Verify="PhotometricInterpretation"								Condition="JPEG2000LosslessTransferSyntaxAndThreeSamples"	StringEnumValues="PhotometricInterpretationYBRRCTOrRGB"
+	Verify="PhotometricInterpretation"								Condition="JPEG2000TransferSyntaxAndThreeSamples"			StringEnumValues="PhotometricInterpretationYBRRCTOrICTOrRGB"
+	Verify="PhotometricInterpretation"								Condition="JPEGLossyTransferSyntaxAndThreeSamples"			StringEnumValues="PhotometricInterpretationYBRFull422OrRGB"
+
 	Name="PlanarConfiguration"							Type="1C"	BinaryEnumValues="PlanarConfigurationIsColorByPixel"	Condition="SamplesPerPixelGreaterThanOne"
 	Name="NumberOfFrames"								Type="1"
-	Verify="NumberOfFrames"											Condition="ImageTypeValue3LocalizerOrLabel"	BinaryEnumValues="One"
+	Verify="NumberOfFrames"											Condition="ImageTypeValue3LocalizerOrLabelOrOverview"	BinaryEnumValues="One"
 	Name="BitsAllocated"								Type="1"	BinaryEnumValues="BitsAre8Or16"
 	Name="BitsStored"									Type="1"	BinaryEnumValues="BitsAre8Or16"
 	Name="HighBit"										Type="1"	BinaryEnumValues="BitsAre7Or15"
 	Name="PixelRepresentation"							Type="1"	BinaryEnumValues="PixelRepresentationUnsigned"
 	Name="AcquisitionDateTime"							Type="1"
-	Name="AcquisitionDuration"							Type="1"
+	Name="AcquisitionDuration"							Type="3"
 	Name="LossyImageCompression"						Type="1"	StringEnumValues="LossyImageCompression"
 	Name="LossyImageCompressionRatio"					Type="1C"	Condition="LossyImageCompressionIs01"	NotZeroError=""
 	Name="LossyImageCompressionMethod"					Type="1C"	StringDefinedTerms="LossyImageCompressionMethod"	Condition="LossyImageCompressionIs01"
@@ -351,6 +383,7 @@ Module="WholeSlideMicroscopyImage"
 ModuleEnd
 
 Module="OpticalPath"
+	Name="NumberOfOpticalPaths"							Type="1C"	Condition="DimensionOrganizationTypeIsTILED_FULL"	mbpo="true"
 	Sequence="OpticalPathSequence"						Type="1"	VM="1-n"
 		Name="OpticalPathIdentifier"					Type="1"
 		Name="OpticalPathDescription"					Type="3"
@@ -358,6 +391,7 @@ Module="OpticalPath"
 			InvokeMacro="CodeSequenceMacro"
 		SequenceEnd
 		Name="IlluminationWaveLength"					Type="1C"	Condition="IlluminationColorCodeSequenceNotPresent"	mbpo="true"
+		Verify="IlluminationWaveLength"								Condition="IlluminationWaveLengthInvalid"	ThenErrorMessage="Invalid value - required to be greater than zero"
 		Sequence="IlluminationColorCodeSequence"		Type="1C"	VM="1"	Condition="IlluminationWaveLengthNotPresent"	mbpo="true"
 			InvokeMacro="CodeSequenceMacro"
 		SequenceEnd
@@ -413,13 +447,23 @@ DefineMacro="SpecimenReferenceMacro" InformationEntity="FunctionalGroup"
 	SequenceEnd
 MacroEnd
 
+DefineMacro="WholeSlideMicroscopyImageFrameTypeMacro" InformationEntity="FunctionalGroup"
+	Sequence="WholeSlideMicroscopyImageFrameTypeSequence"	Type="1"	VM="1"
+		Name="FrameType"									Type="1"	VM="4"
+		Verify="FrameType"												ValueSelector="0"	StringEnumValues="WholeSlideImageType1"
+		Verify="FrameType"												ValueSelector="1"	StringEnumValues="CommonEnhancedImageAndFrameType2"
+		Verify="FrameType"												ValueSelector="2"	StringDefinedTerms="WholeSlideImageType3"
+		Verify="FrameType"												ValueSelector="3"	StringDefinedTerms="WholeSlideImageType4"
+	SequenceEnd
+MacroEnd
+
 Module="MultiResolutionNavigation"
 	Sequence="ReferencedImageNavigationSequence"		Type="1"	VM="1-n"
 		InvokeMacro="SOPInstanceReferenceMacro"
 		Name="ReferencedFrameNumber"					Type="1"	VM="1"	NotZeroError=""
 		Name="TopLeftHandCornerOfLocalizerArea"			Type="1"
 		Name="BottomRightHandCornerOfLocalizerArea"		Type="1"
-		Name="PixelSpacing"								Type="1"
+		Name="PixelSpacing"								Type="1"	NotZeroError=""
 		Name="ZOffsetInSlideCoordinateSystem"			Type="1"
 		Name="SamplesPerPixel"							Type="1"
 		Name="OpticalPathIdentifier"					Type="1"
@@ -436,19 +480,20 @@ Module="MultiFrameFunctionalGroupsForWholeSlideMicroscopy"
 		InvokeMacro="PixelMeasuresMacro"
 		InvokeMacro="ReferencedImageMacro"				Condition="ReferencedImageMacroOKInSharedFunctionalGroupSequence"
 		InvokeMacro="DerivationImageMacro"				Condition="DerivationImageMacroOKInSharedFunctionalGroupSequence"
-		InvokeMacro="RealWorldValueMappingMacro"		Condition="RealWorldValueMappingMacroOKInSharedFunctionalGroupSequence"
-		InvokeMacro="PlanePositionSlideMacro"			Condition="PlanePositionSlideSequenceNotInPerFrameFunctionalGroupSequence"
-		InvokeMacro="OpticalPathIdentificationMacro"	Condition="OpticalPathIdentificationSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="RealWorldValueMappingMacro"		Condition="RealWorldValueMappingMacroOKInSharedFunctionalGroupSequenceAndPhotometricInterpretationIsMonochrome2"
+		InvokeMacro="PlanePositionSlideMacro"			Condition="NeedPlanePositionSlideMacroInSharedFunctionalGroupSequenceForWholeSlideMicroscopy"
+		InvokeMacro="OpticalPathIdentificationMacro"	Condition="NeedOpticalPathIdentificationMacroInSharedFunctionalGroupSequenceForWholeSlideMicroscopy"
 		InvokeMacro="SpecimenReferenceMacro"			Condition="SpecimenReferenceMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="WholeSlideMicroscopyImageFrameTypeMacro"
 	SequenceEnd
 
-	Sequence="PerFrameFunctionalGroupsSequence"	Type="1"	VM="1-n"
-		InvokeMacro="FrameContentMacro"
+	Sequence="PerFrameFunctionalGroupsSequence"	Type="1C"	VM="1-n"	Condition="PerFrameFunctionalGroupsSequencePresent"
+		InvokeMacro="FrameContentMacro"					Condition="FrameContentMacroPresent"
 		InvokeMacro="ReferencedImageMacro"				Condition="ReferencedImageMacroOKInPerFrameFunctionalGroupSequence"
 		InvokeMacro="DerivationImageMacro"				Condition="DerivationImageMacroOKInPerFrameFunctionalGroupSequence"
-		InvokeMacro="RealWorldValueMappingMacro"		Condition="RealWorldValueMappingMacroOKInPerFrameFunctionalGroupSequence"
-		InvokeMacro="PlanePositionSlideMacro"			Condition="PlanePositionSlideSequenceNotInSharedFunctionalGroupSequence"
-		InvokeMacro="OpticalPathIdentificationMacro"	Condition="OpticalPathIdentificationSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="RealWorldValueMappingMacro"		Condition="RealWorldValueMappingMacroOKInPerFrameFunctionalGroupSequenceAndPhotometricInterpretationIsMonochrome2"
+		InvokeMacro="PlanePositionSlideMacro"			Condition="NeedPlanePositionSlideMacroInPerFrameFunctionalGroupSequenceForWholeSlideMicroscopy"
+		InvokeMacro="OpticalPathIdentificationMacro"	Condition="NeedOpticalPathIdentificationMacroInPerFrameFunctionalGroupSequenceForWholeSlideMicroscopy"
 		InvokeMacro="SpecimenReferenceMacro"			Condition="SpecimenReferenceMacroOKInPerFrameFunctionalGroupSequence"
 	SequenceEnd
 ModuleEnd
@@ -705,7 +750,7 @@ DefineMacro="OphthalmicAxialMeasurementsMacro"
 				InvokeMacro="OphthalmicAxialLengthSegmentalMeasurementsMacro"
 			SequenceEnd
 		SequenceEnd
-		Sequence="OphthalmicAxialLengthMeasurementsSegmentalLengthSequence"			Type="1C"	VM="1"		Condition="OphthalmicAxialLengthMeasurementsTypeIsSegmentalLength"
+		Sequence="OphthalmicAxialLengthMeasurementsSegmentalLengthSequence"			Type="1C"	VM="1-n"	Condition="OphthalmicAxialLengthMeasurementsTypeIsSegmentalLength"
 			InvokeMacro="OphthalmicAxialLengthSegmentalMeasurementsMacro"
 		SequenceEnd
 	SequenceEnd
@@ -730,7 +775,7 @@ DefineMacro="OphthalmicAxialMeasurementsRelatedInformationMacro"
 		Name="OphthalmicAxialLengthDataSourceDescription"				Type="3"
 	SequenceEnd
 	Sequence="OpticalOphthalmicAxialLengthMeasurementsSequence"			Type="1C"	VM="1"		Condition="OphthalmicAxialMeasurementsDeviceTypeIsOptical"
-		Name="SignalToNoiseRatio"										Type="1C"				Condition="OphthalmicAxialLengthMeasurementsTypeAboveIsTotalLength"
+		Name="SignalToNoiseRatio"										Type="3"
 		Sequence="OphthalmicAxialLengthDataSourceCodeSequence"			Type="1"	VM="1"
 			InvokeMacro="CodeSequenceMacro"														DefinedContextID="4240"
 		SequenceEnd
@@ -817,7 +862,15 @@ DefineMacro="IntraocularLensCalculationsMacro"
 	Sequence="RefractiveErrorBeforeRefractiveSurgeryCodeSequence"	Type="2C"	VM="0-1"	Condition="RefractiveProcedureOccurredIsYes"
 		InvokeMacro="CodeSequenceMacro"														DefinedContextID="4238"
 	SequenceEnd
-	Name="CornealSize"												Type="3"
+	Sequence="CornealSizeSequence"									Type="3"	VM="1"
+		Name="CornealSize"											Type="1"
+		Sequence="SourceOfCornealSizeDataCodeSequence"				Type="1"	VM="1"
+			InvokeMacro="CodeSequenceMacro"													DefinedContextID="4240"
+		SequenceEnd
+		Sequence="ReferencedSOPSequence"							Type="1C"	VM="1"		NoCondition="" # too hard to check that SourceOfLensThicknessDataCodeSequence contains (111784, DCM, "Autorefraction Measurements SOP Instance")
+			InvokeMacro="SOPInstanceReferenceMacro"
+		SequenceEnd
+	SequenceEnd
 	Sequence="LensThicknessSequence"								Type="3"	VM="1"
 		Name="LensThickness"										Type="1"
 		Sequence="SourceOfLensThicknessDataCodeSequence"			Type="1"	VM="1"
@@ -917,3 +970,176 @@ DefineMacro="OphthalmicAxialMeasurementsQualityImageSOPInstanceReferenceMacro"
 	Name="ReferencedFrameNumber"	Type="1"
 MacroEnd
 
+Module="VisualFieldStaticPerimetryMeasurementsSeries"
+	Name="Modality"										Type="1"	StringEnumValues="OphthalmicVisualFieldModality"
+	Sequence="ReferencedPerformedProcedureStepSequence"	Type="1C"	VM="1"	Condition="SeriesNeedReferencedPerformedProcedureStepSequence"
+		InvokeMacro="SOPInstanceReferenceMacro"
+	SequenceEnd
+	Sequence="RequestAttributesSequence"				Type="3"	VM="1-n"
+		InvokeMacro="RequestAttributesMacro"
+	SequenceEnd
+	InvokeMacro="PerformedProcedureStepSummaryMacro"
+ModuleEnd
+
+Module="VisualFieldStaticPerimetryTestParameters"
+	Name="VisualFieldHorizontalExtent"						Type="1"
+	Name="VisualFieldVerticalExtent"						Type="1"
+	Name="VisualFieldShape"									Type="1"	StringEnumValues="VisualFieldShape"
+	Sequence="ScreeningTestModeCodeSequence"				Type="1C"	VM="1"	NoCondition="" mbpo="true"
+		InvokeMacro="CodeSequenceMacro"
+	SequenceEnd
+	Name="MaximumStimulusLuminance"							Type="1"
+	Name="BackgroundLuminance"								Type="1"
+	Sequence="StimulusColorCodeSequence"					Type="1"	VM="1"
+		InvokeMacro="CodeSequenceMacro"
+	SequenceEnd
+	Sequence="BackgroundIlluminationColorCodeSequence"		Type="1"	VM="1"
+	InvokeMacro="CodeSequenceMacro"
+	SequenceEnd
+	Name="StimulusArea"										Type="1"
+	Name="StimulusPresentationTime"							Type="1"
+ModuleEnd
+
+Module="VisualFieldStaticPerimetryTestReliability"
+	Sequence="FixationSequence"									Type="1"	VM="1"
+		Sequence="FixationMonitoringCodeSequence"				Type="1"	VM="1-n"
+			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
+		Name="FixationCheckedQuantity"							Type="1C"	NoCondition="" mbpo="true"
+		Name="PatientNotProperlyFixatedQuantity"				Type="1C"	NoCondition="" mbpo="true"
+		Name="ExcessiveFixationLossesDataFlag"					Type="1"	StringEnumValues="YesNoFull"
+		Name="ExcessiveFixationLosses"							Type="1C"	Condition="ExcessiveFixationLossesDataFlagIsYes"
+	SequenceEnd
+	Sequence="VisualFieldCatchTrialSequence"					Type="1"	VM="1"
+		Name="CatchTrialsDataFlag"								Type="1"	StringEnumValues="YesNoFull"
+		Name="NegativeCatchTrialsQuantity"						Type="1C"	Condition="CatchTrialsDataFlagIsYes"
+		Name="FalseNegativesQuantity"							Type="1C"	Condition="CatchTrialsDataFlagIsYes"
+		Name="FalseNegativesEstimateFlag"						Type="1"	StringEnumValues="YesNoFull"
+		Name="FalseNegativesEstimate"							Type="1C"	Condition="FalseNegativesEstimateFlagIsYes"
+		Name="ExcessiveFalseNegativesDataFlag"					Type="1"	StringEnumValues="YesNoFull"
+		Name="ExcessiveFalseNegatives"							Type="1C"	StringEnumValues="YesNoFull" Condition="ExcessiveFalseNegativesDataFlagIsYes"
+		Name="PositiveCatchTrialsQuantity"						Type="1C"	Condition="CatchTrialsDataFlagIsYes"
+		Name="FalsePositivesQuantity"							Type="1C"	Condition="CatchTrialsDataFlagIsYes"
+		Name="FalsePositivesEstimateFlag"						Type="1"	StringEnumValues="YesNoFull"
+		Name="FalsePositivesEstimate"							Type="1C"	Condition="FalsePositivesEstimateFlagIsYes"
+		Name="ExcessiveFalsePositivesDataFlag"					Type="1"	StringEnumValues="YesNoFull"
+		Name="ExcessiveFalsePositives"							Type="1C"	StringEnumValues="YesNoFull" Condition="ExcessiveFalsePositivesDataFlagIsYes"
+	SequenceEnd
+	Name="StimuliRetestingQuantity"								Type="3"
+	Name="PatientReliabilityIndicator"							Type="3"
+	Name="CommentsOnPatientPerformanceOfVisualField"			Type="3"
+	Sequence="VisualFieldTestReliabilityGlobalIndexSequence"	Type="3"	VM="1-n"
+		InvokeMacro="OphthalmicVisualFieldGlobalIndexMacro"
+	SequenceEnd
+ModuleEnd
+
+DefineMacro="OphthalmicVisualFieldGlobalIndexMacro"
+	Sequence="DataObservationSequence"						Type="1"	VM="1"
+		InvokeMacro="ContentItemMacro"
+	SequenceEnd
+	Name="IndexNormalsFlag"									Type="1"	StringEnumValues="YesNoFull"
+	Sequence="IndexProbabilitySequence"						Type="1C"	VM="1" Condition="IndexNormalsFlagIsYes"
+		Name="IndexProbability"								Type="1"
+		InvokeMacro="AlgorithmIdentificationMacro"
+	SequenceEnd
+MacroEnd
+
+Module="VisualFieldStaticPerimetryTestMeasurements"
+	Name="MeasurementLaterality"											Type="1"	StringEnumValues="VisualFieldStaticPerimetryTestMeasurementLaterality"
+	Name="PresentedVisualStimuliDataFlag"									Type="1"	StringEnumValues="YesNoFull"
+	Name="NumberOfVisualStimuli"											Type="1C"	Condition="PresentedVisualStimuliDataFlagIsYes"
+	Name="VisualFieldTestDuration"											Type="1"
+	Name="FovealSensitivityMeasured"										Type="1"	StringEnumValues="YesNoFull"
+	Name="FovealSensitivity"												Type="1C"	Condition="FovealSensitivityMeasuredIsYes"
+	Name="FovealPointNormativeDataFlag"										Type="1"	StringEnumValues="YesNoFull"
+	Name="FovealPointProbabilityValue"										Type="1C"	Condition="FovealPointNormativeDataFlagIsYes"
+	Name="ScreeningBaselineMeasured"										Type="1"	StringEnumValues="YesNoFull"
+	Sequence="ScreeningBaselineMeasuredSequence"							Type="1C"	VM="1-n"	Condition="ScreeningBaselineMeasuredIsYes"
+		Name="ScreeningBaselineType"										Type="1"	StringEnumValues="VisualFieldStaticPerimetryTestMeasurementsScreeningBaselineType"
+		Name="ScreeningBaselineValue"										Type="1"
+	SequenceEnd
+	Name="BlindSpotLocalized"												Type="1"	StringEnumValues="YesNoFull"
+	Name="BlindSpotXCoordinate"												Type="1C"	Condition="BlindSpotLocalizedIsYes"
+	Name="BlindSpotYCoordinate"												Type="1C"	Condition="BlindSpotLocalizedIsYes"
+	Name="MinimumSensitivityValue"											Type="1"
+	Name="TestPointNormalsDataFlag"											Type="1"	StringEnumValues="YesNoFull"
+	Sequence="TestPointNormalsSequence"										Type="1C"	VM="1" Condition="TestPointNormalsDataFlagIsYes"
+		InvokeMacro="DataSetIdentificationMacro"
+	SequenceEnd
+	Sequence="AgeCorrectedSensitivityDeviationAlgorithmSequence"			Type="1C"	VM="1" Condition="TestPointNormalsDataFlagIsYes"
+		InvokeMacro="AlgorithmIdentificationMacro"
+	SequenceEnd
+	Sequence="GeneralizedDefectSensitivityDeviationAlgorithmSequence"		Type="1C"	VM="1" Condition="TestPointNormalsDataFlagIsYes"
+		InvokeMacro="AlgorithmIdentificationMacro"
+	SequenceEnd
+	Sequence="VisualFieldTestPointSequence"									Type="1"	VM="1-n"
+		Name="VisualFieldTestPointXCoordinate"								Type="1"
+		Name="VisualFieldTestPointYCoordinate"								Type="1"
+		Name="StimulusResults"												Type="1"	StringEnumValues="VisualFieldStaticPerimetryTestMeasurementsStimulusResults"
+		Name="SensitivityValue"												Type="1C"	NoCondition="" mbpo="true""
+		Name="RetestStimulusSeen"											Type="3"	StringEnumValues="YesNoFull"
+		Name="RetestSensitivityValue"										Type="3"
+		Name="QuantifiedDefect"												Type="3"
+		Sequence="VisualFieldTestPointNormalsSequence"								Type="1C"	VM="1-n" Condition="TestPointNormalsDataFlagIsYes"
+			Name="AgeCorrectedSensitivityDeviationValue"							Type="1"
+			Name="AgeCorrectedSensitivityDeviationProbabilityValue"					Type="1"
+			Name="GeneralizedDefectCorrectedSensitivityDeviationFlag"				Type="1"	StringEnumValues="YesNoFull"
+			Name="GeneralizedDefectCorrectedSensitivityDeviationValue"				Type="1C"	Condition="GeneralizedDefectCorrectedSensitivityDeviationFlagIsYes"
+			Name="GeneralizedDefectCorrectedSensitivityDeviationProbabilityValue"	Type="1C"	Condition="GeneralizedDefectCorrectedSensitivityDeviationFlagIsYes"
+		SequenceEnd
+	SequenceEnd
+ModuleEnd
+
+Module="VisualFieldStaticPerimetryTestResults"
+	Name="VisualFieldMeanSensitivity"									Type="1C"	NoCondition="" mbpo="true"
+	Name="VisualFieldTestNormalsFlag"									Type="1"	StringEnumValues="YesNoFull"
+	Sequence="ResultsNormalsSequence"									Type="1C"	VM="1"	Condition="VisualFieldTestNormalsFlagIsYes"
+		InvokeMacro="DataSetIdentificationMacro"
+		Name="GlobalDeviationFromNormal"								Type="1"
+		Name="GlobalDeviationProbabilityNormalsFlag"					Type="1"	StringEnumValues="YesNoFull"
+		Sequence="GlobalDeviationProbabilitySequence"					Type="1C"	VM="1"	Condition="GlobalDeviationProbabilityNormalsFlagIsYes"
+			Name="GlobalDeviationProbability"							Type="1"
+			InvokeMacro="AlgorithmIdentificationMacro"
+		SequenceEnd
+		Name="LocalizedDeviationFromNormal"								Type="1"
+		Name="LocalDeviationProbabilityNormalsFlag"						Type="1"	StringEnumValues="YesNoFull"
+		Sequence="LocalizedDeviationProbabilitySequence"				Type="1C"	VM="1"	Condition="LocalDeviationProbabilityNormalsFlagIsYes"
+			Name="LocalizedDeviationProbability"						Type="1"
+			InvokeMacro="AlgorithmIdentificationMacro"
+		SequenceEnd
+	SequenceEnd
+	Name="ShortTermFluctuationCalculated"								Type="1"	StringEnumValues="YesNoFull"
+	Name="ShortTermFluctuation"											Type="1C"	Condition="ShortTermFluctuationCalculatedIsYes"
+	Name="ShortTermFluctuationProbabilityCalculated"					Type="1"	StringEnumValues="YesNoFull"
+	Name="ShortTermFluctuationProbability"								Type="1C"	Condition="ShortTermFluctuationProbabilityCalculatedIsYes"
+	Name="CorrectedLocalizedDeviationFromNormalCalculated"				Type="1"	StringEnumValues="YesNoFull"
+	Name="CorrectedLocalizedDeviationFromNormal"						Type="1C"	Condition="CorrectedLocalizedDeviationFromNormalCalculatedIsYes"
+	Name="CorrectedLocalizedDeviationFromNormalProbabilityCalculated"	Type="1"	StringEnumValues="YesNoFull"
+	Name="CorrectedLocalizedDeviationFromNormalProbability"				Type="1C"	Condition="CorrectedLocalizedDeviationFromNormalProbabilityCalculatedIsYes"
+	Sequence="VisualFieldGlobalResultsIndexSequence"					Type="3"	VM="1-n"
+		InvokeMacro="OphthalmicVisualFieldGlobalIndexMacro"
+	SequenceEnd
+ModuleEnd
+
+Module="OphthalmicPatientClinicalInformationandTestLensParameters"
+	Sequence="OphthalmicPatientClinicalInformationLeftEyeSequence"	Type="1C"	VM="1"	Condition="MeasurementLateralityLeftOrBoth"
+		InvokeMacro="OphthalmicPatientClinicalInformationandTestLensParametersMacro"
+	SequenceEnd
+	Sequence="OphthalmicPatientClinicalInformationRightEyeSequence"	Type="1C"	VM="1"	Condition="MeasurementLateralityRightOrBoth"
+		InvokeMacro="OphthalmicPatientClinicalInformationandTestLensParametersMacro"
+	SequenceEnd
+ModuleEnd
+
+DefineMacro="OphthalmicPatientClinicalInformationandTestLensParametersMacro"
+	Sequence="RefractiveParametersUsedOnPatientSequence"	Type="2"	VM="0-1"
+		Name="SphericalLensPower"							Type="1"
+		Name="CylinderLensPower"							Type="1"
+		Name="CylinderAxis"									Type="1"
+	SequenceEnd
+	Name="PupilSize"										Type="2"
+	Name="PupilDilated"										Type="2"	StringEnumValues="YesNoFull"
+	Name="IntraOcularPressure"								Type="3"
+	Sequence="VisualAcuityMeasurementSequence"				Type="3"	VM="1"
+		InvokeMacro="VisualAcuityMeasurementsMacro"
+	SequenceEnd
+MacroEnd

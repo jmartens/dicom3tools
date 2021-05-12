@@ -1,4 +1,4 @@
-static const char *CopyrightIdentifier(void) { return "@(#)dciodvfy.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+static const char *CopyrightIdentifier(void) { return "@(#)dciodvfy.cc Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "mesgtext.h"
 #include "dcopt.h"
@@ -351,6 +351,12 @@ checkUIDs(AttributeList &list,TextOutputStream &log) {
 							log << endl;
 							success = false;
 						}
+						else if (strlen(value) >= 5 && strncmp(value,"2.999",5) == 0) {
+							log << WMsgDC(ExampleRootForUID) << " - \"" << value << "\" in ";
+							writeTagNumberAndNameToLog(a,list.getDictionary(),log);
+							log << endl;
+							success = false;
+						}
 					}
 				}
 			}
@@ -664,7 +670,7 @@ checkPixelDataIsTheCorrectLength(AttributeList &list,TextOutputStream &log)
 				success=false;
 			}
 		}
-		// else do not check if encapsulated
+		// if encapsulated, a check that fragments are even length is performed during reading in attrmxrd.cc (000514)
 	}
 	
 	return success;
@@ -1780,6 +1786,104 @@ checkCountPerFrameFunctionalGroupsMatchesNumberOfFrames(AttributeList &list,Text
 }
 
 static bool
+checkSegmentNumbersMonotonicallyIncreasingFromOneByOne(AttributeList &list,TextOutputStream &log) {
+//cerr << "checkSegmentNumbersMonotonicallyIncreasingFromOneByOne():" << endl;
+	bool success=true;
+	
+	Attribute *aSegmentSequence = list[TagFromName(SegmentSequence)];
+	if (aSegmentSequence && aSegmentSequence->isSequence()) {
+		AttributeList **aSegmentSequenceLists;
+		int nSegmentSequenceItems;
+		if ((nSegmentSequenceItems=aSegmentSequence->getLists(&aSegmentSequenceLists)) > 0) {
+			int s;
+			for (s=0; s<nSegmentSequenceItems; ++s) {
+				AttributeList *segmentList = aSegmentSequenceLists[s];
+				Attribute *aSegmentNumber = (*segmentList)[TagFromName(SegmentNumber)];
+				Uint16 vSegmentNumber = 0;
+				if (aSegmentNumber) {
+					(void)aSegmentNumber->getValue(0,vSegmentNumber);
+					if (vSegmentNumber != s + 1) {
+						log << EMsgDC(SegmentNumberNotMonotonicallyIncreasingFromOneByOne)
+							<< " - have SegmentSequence item number " << (s+1) << " (from one) with SegmentNumber of " << vSegmentNumber << endl;
+						success = false;
+						break;	// only report first one
+					}
+				}
+			}
+		}
+	}
+	
+	return success;
+}
+
+static bool
+checkReferencedSegmentNumbersHaveTarget(AttributeList &list,TextOutputStream &log) {
+//cerr << "checkReferencedSegmentNumbersHaveTarget():" << endl;
+	bool success=true;
+	
+	Attribute *aSegmentSequence = list[TagFromName(SegmentSequence)];
+	if (aSegmentSequence && aSegmentSequence->isSequence()) {
+		AttributeList **aSegmentSequenceLists;
+		int nSegmentSequenceItems;
+		if ((nSegmentSequenceItems=aSegmentSequence->getLists(&aSegmentSequenceLists)) > 0) {
+			Uint16 segmentNumberTargets[nSegmentSequenceItems];		// set of target SegmentNumbers, even if not numbered sequentially (don't care; checked elsewhere)
+			int s;
+			for (s=0; s<nSegmentSequenceItems; ++s) {
+				AttributeList *segmentList = aSegmentSequenceLists[s];
+				Attribute *aSegmentNumber = (*segmentList)[TagFromName(SegmentNumber)];
+				segmentNumberTargets[s] = 0;
+				if (aSegmentNumber) {
+					(void)aSegmentNumber->getValue(0,segmentNumberTargets[s]);
+				}
+			}
+			
+			// if we were able to build a set of target SegmentNumbers, now check every reference
+	
+			Attribute *aPerFrameFunctionalGroupsSequence = list[TagFromName(PerFrameFunctionalGroupsSequence)];
+			if (aPerFrameFunctionalGroupsSequence && aPerFrameFunctionalGroupsSequence->isSequence() && !aPerFrameFunctionalGroupsSequence->isEmpty()) {
+				AttributeList **aPerFrameFunctionalGroupsSequenceLists;
+				int nPerFrameFunctionalGroupsSequenceItems;
+				if ((nPerFrameFunctionalGroupsSequenceItems=aPerFrameFunctionalGroupsSequence->getLists(&aPerFrameFunctionalGroupsSequenceLists)) > 0) {
+					int f;
+					for (f=0; f<nPerFrameFunctionalGroupsSequenceItems; ++f) {
+						AttributeList *perFrameList = aPerFrameFunctionalGroupsSequenceLists[f];
+						Attribute *aSegmentIdentificationSequence = (*perFrameList)[TagFromName(SegmentIdentificationSequence)];
+						if (aSegmentIdentificationSequence && aSegmentIdentificationSequence->isSequence() && !aSegmentIdentificationSequence->isEmpty()) {
+							AttributeList **aSegmentIdentificationSequenceLists;
+							int nSegmentIdentificationSequenceItems;
+							if ((nSegmentIdentificationSequenceItems=aSegmentIdentificationSequence->getLists(&aSegmentIdentificationSequenceLists)) > 0) {
+								AttributeList *segmentIdentificationSequenceList = aSegmentIdentificationSequenceLists[0];	// should only be one so only check one
+								Attribute *aReferencedSegmentNumber = (*segmentIdentificationSequenceList)[TagFromName(ReferencedSegmentNumber)];
+								Uint16 vReferencedSegmentNumber = 0;
+								if (aReferencedSegmentNumber) {
+									(void)aReferencedSegmentNumber->getValue(0,vReferencedSegmentNumber);
+//cerr << "checkReferencedSegmentNumbersHaveTarget(): checking frame " << (f+1) << endl;
+									bool found = false;
+									for (int i=0; i<nSegmentSequenceItems; ++i) {
+										if (vReferencedSegmentNumber == segmentNumberTargets[i]) {
+//cerr << "checkReferencedSegmentNumbersHaveTarget(): for frame " << (f+1) << " have SegmentNumber for ReferencedSegmentNumber " << vReferencedSegmentNumber << endl;
+											found = true;
+											break;
+										}
+									}
+									if (!found) {
+										log << EMsgDC(ReferencedSegmentNumberNotPresentInSegmentSequence)
+											<< " - have ReferencedSegmentNumber " << vReferencedSegmentNumber << " in SegmentIdentificationSequence for frame " << (f+1) << endl;
+										success = false;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return success;
+}
+
+static bool
 checkCoordinateContentItemsHaveAppropriateChildren(AttributeList &list,TextOutputStream &log) {
 //cerr << "checkCoordinateContentItemsHaveAppropriateChildren():" << endl;
 	bool success=true;
@@ -2197,6 +2301,10 @@ main(int argc, char *argv[])
 	
 	if (!checkCountPerFrameFunctionalGroupsMatchesNumberOfFrames(list,log)) success = false;
 	
+	if (!checkSegmentNumbersMonotonicallyIncreasingFromOneByOne(list,log)) success = false;
+	
+	if (!checkReferencedSegmentNumbersHaveTarget(list,log)) success = false;
+
 	if (!list.validatePrivate(log)) success = false;
 	
 	checkValuesNeededToBuildDicomDirectoryArePresentAndNotEmpty(list,log);	// always only warnings ... do not affect success

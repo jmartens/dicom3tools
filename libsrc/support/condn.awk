@@ -1,4 +1,4 @@
-#  condn.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
+#  condn.awk Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 # create C++ headers from conditions template 
 
 # can set these values on the command line:
@@ -167,6 +167,14 @@ NR==1	{
 			RLENGTH-length("ElementPresentInPathFromRoot=\"")-1);
 	}
 
+	elementpresentinpathfirstitem=0
+	elementpresentinpathfromrootfirstitem=""
+	if (match($0,"ElementPresentInPathFromRootFirstItem=\"[^\"]*\"")) {
+		elementpresentinpathfirstitem=1;
+		elementpresentinpathfromrootfirstitem=substr($0,RSTART+length("ElementPresentInPathFromRootFirstItem=\""),
+			RLENGTH-length("ElementPresentInPathFromRootFirstItem=\"")-1);
+	}
+
 	grouppresent=0;
 	grouppresentmask=""
 	if (match($0,"GroupPresent=\"[^\"]*\"")) {
@@ -313,6 +321,15 @@ NR==1	{
 			# For now we only support descending from root into items of a top level sequence
 			if (length(elementpresentinpathfromroot) > 0) {
 				print "\tcondition" nestinglevel " " operator "=" modifier "(ElementPresentInPathFromRoot(rootlist,TagFromName(" element "),TagFromName(" elementpresentinpathfromroot "))?1:0);"
+			}
+			else {
+				print "Error - Must specify sequence attribute argument for ElementPresentInPathFromRoot " FNR >"/dev/tty"
+			}
+		}
+		if (elementpresentinpathfirstitem) {
+			# For now we only support descending from root into items of a top level sequence
+			if (length(elementpresentinpathfromrootfirstitem) > 0) {
+				print "\tcondition" nestinglevel " " operator "=" modifier "(ElementPresentInPathFromRootFirstItem(rootlist,TagFromName(" element "),TagFromName(" elementpresentinpathfromrootfirstitem "))?1:0);"
 			}
 			else {
 				print "Error - Must specify sequence attribute argument for ElementPresentInPathFromRoot " FNR >"/dev/tty"

@@ -1,4 +1,4 @@
-/* attrtype.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
+/* attrtype.h Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_attrtype__
 #define __Header_attrtype__
 
@@ -180,11 +180,11 @@ public:
 	bool validateVR(TextOutputStream& stream,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const;
 };
 
-class LongTextAttribute : public LongTextAttributeBase {
+class LongTextAttribute : public TextAttributeBase {
 public:
-	LongTextAttribute(Tag t) : LongTextAttributeBase(t) {}
+	LongTextAttribute(Tag t) : TextAttributeBase(t) {}
 	LongTextAttribute(Tag t,const char *v)
-		: LongTextAttributeBase(t,v) {}
+		: TextAttributeBase(t,v) {}
 	const char *	getVR() const	{ return "LT"; }
 	bool validateVR(TextOutputStream& stream,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const;
 };
@@ -221,11 +221,11 @@ public:
 	bool validateVR(TextOutputStream& stream,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const;
 };
 
-class ShortTextAttribute : public TextAttribute {
+class ShortTextAttribute : public TextAttributeBase {
 public:
-	ShortTextAttribute(Tag t) : TextAttribute(t) {}
+	ShortTextAttribute(Tag t) : TextAttributeBase(t) {}
 	ShortTextAttribute(Tag t,const char *v)
-		: TextAttribute(t,v) {}
+		: TextAttributeBase(t,v) {}
 	const char *	getVR() const	{ return "ST"; }
 	bool validateVR(TextOutputStream& stream,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const;
 };
@@ -308,20 +308,20 @@ public:
 	bool validateVR(TextOutputStream& stream,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const;
 };
 
-class UniversalResourceAttribute : public LongTextAttributeBase {
+class UniversalResourceAttribute : public TextAttributeBase {
 public:
-	UniversalResourceAttribute(Tag t) : LongTextAttributeBase(t) {}
+	UniversalResourceAttribute(Tag t) : TextAttributeBase(t) {}
 	UniversalResourceAttribute(Tag t,const char *v)
-		: LongTextAttributeBase(t,v) {}
+		: TextAttributeBase(t,v) {}
 	const char *	getVR() const	{ return "UR"; }
 	bool validateVR(TextOutputStream& stream,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const;
 };
 
-class UnlimitedTextAttribute : public LongTextAttributeBase {
+class UnlimitedTextAttribute : public TextAttributeBase {
 public:
-	UnlimitedTextAttribute(Tag t) : LongTextAttributeBase(t) {}
+	UnlimitedTextAttribute(Tag t) : TextAttributeBase(t) {}
 	UnlimitedTextAttribute(Tag t,const char *v)
-		: LongTextAttributeBase(t,v) {}
+		: TextAttributeBase(t,v) {}
 	const char *	getVR() const	{ return "UT"; }
 	bool validateVR(TextOutputStream& stream,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const;
 };

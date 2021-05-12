@@ -35,6 +35,8 @@ Module="GraphicAnnotation"
 			Name="BoundingBoxTextHorizontalJustification"	Type="1C"	Condition="BoundingBoxTopLeftHandCornerPresent"	StringEnumValues="BoundingBoxTextHorizontalJustification"
 			Name="AnchorPoint"								Type="1C"	Condition="AnchorPointNeeded" mbpo="true"
 			Name="AnchorPointVisibility"					Type="1C"	Condition="AnchorPointPresent"	StringEnumValues="YesNoLetter"
+			Name="TrackingID"								Type="1C"	Condition="TrackingUIDIsPresent"
+			Name="TrackingUID"								Type="1C"	Condition="TrackingIDIsPresent"
 		SequenceEnd
 		Sequence="GraphicObjectSequence"					Type="1C"	VM="1-n"	Condition="RequireGraphicObjectSequence"
 			Name="GraphicAnnotationUnits"					Type="1"	StringEnumValues="AnnotationUnits"
@@ -46,6 +48,8 @@ Module="GraphicAnnotation"
 			Verify="GraphicData"										VM="8"	Condition="GraphicTypeIsELLIPSE"
 			Name="GraphicType"								Type="1"	StringEnumValues="GraphicType"
 			Name="GraphicFilled"							Type="1C"	NoCondition=""	StringEnumValues="YesNoLetter"	# very hard to check
+			Name="TrackingID"								Type="1C"	Condition="TrackingUIDIsPresent"
+			Name="TrackingUID"								Type="1C"	Condition="TrackingIDIsPresent"
 		SequenceEnd
 	SequenceEnd
 ModuleEnd

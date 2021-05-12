@@ -1,5 +1,5 @@
-(0014,0023) VERS="DICONDE"	VR="ST"   VM="1"	Keyword="CADFileFormatRetired"								Name="CAD File Format (Retired)"
-(0014,0024) VERS="DICONDE"	VR="ST"   VM="1"	Keyword="ComponentReferenceSystemRetired"					Name="Component Reference System (Retired)"
+(0014,0023) VERS="DICONDE"	VR="ST"   VM="1"	Keyword="CADFileFormat"										Name="CAD File Format (Retired)"
+(0014,0024) VERS="DICONDE"	VR="ST"   VM="1"	Keyword="ComponentReferenceSystem"							Name="Component Reference System (Retired)"
 (0014,0025) VERS="DICONDE"	VR="ST"   VM="1"	Keyword="ComponentManufacturingProcedure"					Name="Component Manufacturing Procedure"
 (0014,0028) VERS="DICONDE"	VR="ST"   VM="1"	Keyword="ComponentManufacturer"								Name="Component Manufacturer"
 (0014,0030) VERS="DICONDE"	VR="DS"   VM="1-n"	Keyword="MaterialThickness"									Name="Material Thickness"

@@ -319,7 +319,7 @@ DefineMacro="XRayFramePixelDataPropertiesMacro" InformationEntity="FunctionalGro
 		Verify="FrameType"												ValueSelector="3"	StringEnumValues="EnhancedXAXRFImageType4"
 		Name="PixelIntensityRelationship"					Type="1"	StringDefinedTerms="XAXRFPixelIntensityRelationship"
 		Name="PixelIntensityRelationshipSign"				Type="1"	BinaryEnumValues="PixelIntensityRelationshipSign"
-		Name="ImagerPixelSpacing"							Type="1C"	Condition="ImageTypeValue1IsOriginal" mbpo="true"
+		Name="ImagerPixelSpacing"							Type="1C"	NotZeroError=""	Condition="ImageTypeValue1IsOriginal" mbpo="true"
 		Name="GeometricalProperties"						Type="1"	StringEnumValues="XAXRFGeometricalProperties"
 		Name="GeometricMaximumDistortion"					Type="2C" 	Condition="GeometricalPropertiesIsNonUniform"
 		Name="ImageProcessingApplied"						Type="1"	StringDefinedTerms="XAXRFImageProcessingApplied"
@@ -355,7 +355,7 @@ MacroEnd
 DefineMacro="XRayProjectionPixelCalibrationMacro" InformationEntity="FunctionalGroup"
 	Sequence="ProjectionPixelCalibrationSequence"				Type="1"	VM="1"
 		Name="DistanceObjectToTableTop"							Type="2"
-		Name="ObjectPixelSpacingInCenterOfBeam"					Type="1C"	Condition="DistanceObjectToTableTopNotEmpty"
+		Name="ObjectPixelSpacingInCenterOfBeam"					Type="1C"	NotZeroError=""	Condition="DistanceObjectToTableTopNotEmpty"
 		Name="TableHeight"										Type="1C"	Condition="ImageTypeValue1Original"
 		Name="BeamAngle"										Type="1C"	Condition="ImageTypeValue1Original"
 	SequenceEnd
@@ -662,7 +662,7 @@ Module="XRay3DAngiographicImageContributingSources"
 		Name="AcquisitionDeviceProcessingDescription"		Type="1C"	NoCondition=""	# if present and have an equal value in the contributing SOP Instances :(
 		Name="AcquisitionDeviceProcessingCode"				Type="1C"	NoCondition=""	# if present and have an equal value in the contributing SOP Instances :(
 		Name="PlaneIdentification"							Type="1C"	NoCondition=""	StringEnumValues="PlaneIdentification"	# if present and have an equal value in the contributing SOP Instances :(
-		Name="ImagerPixelSpacing"							Type="1C"	NoCondition=""	# if present and have an equal value in the contributing SOP Instances :(
+		Name="ImagerPixelSpacing"							Type="1C"	NotZeroError=""	NoCondition=""	# if present and have an equal value in the contributing SOP Instances :(
 	SequenceEnd
 ModuleEnd
 
@@ -672,7 +672,7 @@ Module="XRay3DCraniofacialImageContributingSources"
 		InvokeMacro="ContributingImageSourcesMacro"
 		Name="AcquisitionDeviceProcessingDescription"		Type="1C"	NoCondition=""	# if present and have an equal value in the contributing SOP Instances :(
 		Name="AcquisitionDeviceProcessingCode"				Type="1C"	NoCondition=""	# if present and have an equal value in the contributing SOP Instances :(
-		Name="ImagerPixelSpacing"							Type="1C"	NoCondition=""	# if present and have an equal value in the contributing SOP Instances :(
+		Name="ImagerPixelSpacing"							Type="1C"	NotZeroError=""	NoCondition=""	# if present and have an equal value in the contributing SOP Instances :(
 	SequenceEnd
 ModuleEnd
 

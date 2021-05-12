@@ -1,4 +1,4 @@
-static const char *CopyrightIdentifier(void) { return "@(#)attrmxrd.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+static const char *CopyrightIdentifier(void) { return "@(#)attrmxrd.cc Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrtype.h"
 #include "attrnew.h"
 #include "attrmxls.h"
@@ -271,6 +271,7 @@ ReadableAttributeList::skipEncapsulatedData(void)
 {
 //cerr << "ReadableAttributeList::skipEncapsulatedData: start" << endl;
 	bool showoffset=verbose;
+	bool oddlengthfragmentencountered=false;
 	// See libsrc/include/pixeldat/unencap.h for details of GE bug
 	while (1) {
 //cerr << "ReadableAttributeList::skipEncapsulatedData: looping" << endl;
@@ -293,6 +294,11 @@ ReadableAttributeList::skipEncapsulatedData(void)
 			return;
 		}
 		byteoffset+=4;
+		
+		if (!oddlengthfragmentencountered && vl%2 != 0) {
+			errorstream << WMsgDC(EncapsulatedPixelDataFragmentNotEvenLength) << endl;	// (000514)
+			oddlengthfragmentencountered=true;	// only report this once
+		}
 
 		if (verbose) {
 			writebase(tag,"",vl); (*log) << endl;

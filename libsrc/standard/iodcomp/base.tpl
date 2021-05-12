@@ -69,6 +69,7 @@ CompositeIOD="CTImage"			Condition="CTImageInstance"
 		Module="Device"						Usage="U"	Condition="NeedModuleDevice"
 		Module="Specimen"					Usage="U"	Condition="NeedModuleSpecimen"
 		Module="CTImage"					Usage="M"
+		Module="MultienergyCTImage"			Usage="C"	Condition="IsMultienergyCTAcquisition"
 		Module="OverlayPlane"				Usage="U"	Condition="NeedModuleOverlayPlane"
 		Module="VOILUT"						Usage="U"	Condition="NeedModuleVOILUT"
 		Module="SOPCommon"					Usage="M"
@@ -816,6 +817,40 @@ CompositeIOD="EncapsulatedCDA"					Condition="EncapsulatedCDAInstance"
 	InformationEntityEnd
 CompositeIODEnd
 
+CompositeIOD="EncapsulatedSTL"					Condition="EncapsulatedSTLInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"			Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"						Usage="M"
+		Module="ClinicalTrialSubject"			Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd
+	InformationEntity="Study"
+		Module="GeneralStudy"					Usage="M"
+		Module="PatientStudy"					Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"				Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="EncapsulatedDocumentSeries"		Usage="M"
+		Module="EncapsulatedDocumentSTLSeriesPseudo"	Usage="M"
+		Module="ClinicalTrialSeries"			Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="FrameOfReference"				Usage="M"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"				Usage="M"
+		Module="EnhancedGeneralEquipment"		Usage="M"
+	InformationEntityEnd
+	InformationEntity="EncapsulatedDocument"
+		Module="EncapsulatedDocument"			Usage="M"
+		Module="EncapsulatedDocumentSTLPseudo"	Usage="M"
+		Module="Manufacturing3DModel"			Usage="M"
+		Module="SOPCommon"						Usage="M"
+		Module="CommonInstanceReference"		Usage="C"	Condition="NeedModuleCommonInstanceReference"	# really should check if contained references are present :(
+	InformationEntityEnd
+CompositeIODEnd
+
 CompositeIOD="RealWorldValueMapping"				Condition="RealWorldValueMappingInstance"
 	InformationEntity="File"
 		Module="FileMetaInformation"			Usage="C"	Condition="NeedModuleFileMetaInformation"
@@ -926,6 +961,7 @@ CompositeIOD="ParametricMap" Condition="ParametricMapInstance"
 		Module="MultiFrameFunctionalGroupsCommon"						Usage="M"
 		Module="MultiFrameFunctionalGroupsForParametricMap"				Usage="M"
 		Module="MultiFrameDimension"									Usage="M"
+		Module="PaletteColorLookupTable"								Usage="C"	Condition="PixelPresentationIsColorRangeAndPaletteColorLookupTableUIDAbsent"
 		Module="CardiacSynchronization"									Usage="U"	Condition="NeedModuleCardiacSynchronization"
 		Module="RespiratorySynchronization"								Usage="U"	Condition="NeedModuleRespiratorySynchronization"
 		Module="BulkMotionSynchronization"								Usage="U"	Condition="NeedModuleBulkMotion"

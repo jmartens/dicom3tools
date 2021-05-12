@@ -1,4 +1,4 @@
-/* pq.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
+/* pq.h Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_pq__
 #define __Header_pq__
 

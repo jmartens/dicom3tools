@@ -143,6 +143,7 @@ Module="MultiFrameFunctionalGroupsForEnhancedPETImage"
 		InvokeMacro="PETFrameCorrectionFactorsMacro"	Condition="NeedPETFrameCorrectionFactorsMacroInSharedFunctionalGroupSequence"
 		InvokeMacro="PETReconstructionMacro"	Condition="NeedPETReconstructionMacroInSharedFunctionalGroupSequence"
 		InvokeMacro="PETTableDynamicsMacro"	Condition="NeedPETTableDynamicsMacroInSharedFunctionalGroupSequence"
+		InvokeMacro="TemporalPositionMacro"					Condition="TemporalPositionMacroOKInSharedFunctionalGroupSequence"
 	SequenceEnd
 	Sequence="PerFrameFunctionalGroupsSequence"	Type="1"	VM="1-n"
 		InvokeMacro="PixelMeasuresMacro"		Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequence"
@@ -166,6 +167,7 @@ Module="MultiFrameFunctionalGroupsForEnhancedPETImage"
 		InvokeMacro="PETFrameCorrectionFactorsMacro"	Condition="NeedPETFrameCorrectionFactorsMacroInPerFrameFunctionalGroupSequence"
 		InvokeMacro="PETReconstructionMacro"	Condition="NeedPETReconstructionMacroInPerFrameFunctionalGroupSequence"
 		InvokeMacro="PETTableDynamicsMacro"	Condition="NeedPETTableDynamicsMacroInPerFrameFunctionalGroupSequence"
+		InvokeMacro="TemporalPositionMacro"			Condition="TemporalPositionMacroOKInPerFrameFunctionalGroupSequence"
 	SequenceEnd
 ModuleEnd
 
@@ -184,8 +186,8 @@ Module="MultiFrameFunctionalGroupsForLegacyConvertedEnhancedPETImage"
 		InvokeMacro="RespiratorySynchronizationMacro"		Condition="RespiratorySynchronizationMacroOKInSharedFunctionalGroupSequence"
 		InvokeMacro="IrradiationEventIdentificationMacro"	Condition="IrradiationEventIdentificationMacroOKInSharedFunctionalGroupSequence"
 		InvokeMacro="PETFrameTypeMacro"						Condition="PETFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="TemporalPositionMacro"					Condition="TemporalPositionMacroOKInSharedFunctionalGroupSequence"
 		InvokeMacro="UnassignedSharedConvertedAttributesMacro"
-		InvokeMacro="ImageFrameConversionSourceMacro"		Condition="ConversionSourceAttributesSequenceNotInPerFrameFunctionalGroupSequence"
 	SequenceEnd
 
 	Sequence="PerFrameFunctionalGroupsSequence"				Type="1"	VM="1-n"
@@ -203,8 +205,9 @@ Module="MultiFrameFunctionalGroupsForLegacyConvertedEnhancedPETImage"
 		InvokeMacro="RespiratorySynchronizationMacro"		Condition="RespiratorySynchronizationMacroOKInPerFrameFunctionalGroupSequence"
 		InvokeMacro="IrradiationEventIdentificationMacro"	Condition="IrradiationEventIdentificationMacroOKInPerFrameFunctionalGroupSequence"
 		InvokeMacro="PETFrameTypeMacro"						Condition="PETFrameTypeSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="TemporalPositionMacro"					Condition="TemporalPositionMacroOKInPerFrameFunctionalGroupSequence"
 		InvokeMacro="UnassignedPerFrameConvertedAttributesMacro"
-		InvokeMacro="ImageFrameConversionSourceMacro"		Condition="ConversionSourceAttributesSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="ImageFrameConversionSourceMacro"		Condition="ImageFrameConversionSourceMacroPresentInPerFrameFunctionalGroupSequence"
 	SequenceEnd
 ModuleEnd
 

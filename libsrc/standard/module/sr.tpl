@@ -76,6 +76,9 @@ DefineMacro="IdentifiedPersonOrDeviceMacro"
 		InvokeMacro="CodeSequenceMacro"
 	SequenceEnd
 	Name="InstitutionalDepartmentName"						Type="3"
+	Sequence="InstitutionalDepartmentTypeCodeSequence"		Type="3"	VM="1"
+		InvokeMacro="CodeSequenceMacro"									BaselineContextID="7030"
+	SequenceEnd
 MacroEnd
 
 DefineMacro="NumericMeasurementMacro"
@@ -253,6 +256,9 @@ Module="SRDocumentGeneral"
 		Name="InstitutionName"										Type="2"
 		Sequence="InstitutionCodeSequence"							Type="2"	VM="0-1"
 			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
+		Sequence="ResponsibleGroupCodeSequence"						Type="3"	VM="1"
+			InvokeMacro="CodeSequenceMacro"										BaselineContextID="7030"
 		SequenceEnd
 	SequenceEnd
 	Sequence="PredecessorDocumentsSequence"							Type="1C"	VM="1-n"	NoCondition=""	# real world

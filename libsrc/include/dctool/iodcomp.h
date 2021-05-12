@@ -1,4 +1,4 @@
-/* iodcomp.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
+/* iodcomp.h Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_iodcomp__
 #define __Header_iodcomp__
 

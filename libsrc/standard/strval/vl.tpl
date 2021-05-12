@@ -43,7 +43,7 @@ StringValues="PhotometricInterpretationMonochrome2OrRGBorYBRFULL422orYBRRCTorYBR
 
 StringValues="AcquisitionContextValueTypes" {
 	TEXT,
-	NUM,
+	NUMERIC,
 	CODE,
 	DATE,
 	TIME,
@@ -78,6 +78,12 @@ StringValues="OphthalmologyImageLaterality"	{
 }
 
 StringValues="OphthalmicRefractiveMeasurementLaterality"	{
+	R = Right,
+	L = Left,
+	B = Both left and right
+}
+
+StringValues="VisualFieldStaticPerimetryTestMeasurementLaterality"	{
 	R = Right,
 	L = Left,
 	B = Both left and right
@@ -118,7 +124,8 @@ StringValues="WholeSlideImageType1" {
 StringValues="WholeSlideImageType3" {
 	LOCALIZER,
 	VOLUME,
-	LABEL
+	LABEL,
+	OVERVIEW
 }
 
 StringValues="WholeSlideImageType4" {
@@ -220,4 +227,23 @@ StringValues="OphthalmicAxialMeasurementsQualityImageSOPClassUIDs" {
 	1.2.840.10008.5.1.4.1.1.7.4 = Multi-frame True Color SecondaryCapture Image Storage
 }
 
+StringValues="VisualFieldStaticPerimetryTestMeasurementsScreeningBaselineType" {
+	CENTRAL,
+	PERIPHERAL
+}
 
+StringValues="VisualFieldStaticPerimetryTestMeasurementsStimulusResults" {
+	SEEN,
+	NOT SEEN,
+	SEEN AT MAX
+}
+
+StringValues="VisualFieldShape" {
+	RECTANGLE,
+	CIRCLE,
+	ELLIPSE
+}
+
+StringValues="OphthalmicVisualFieldModality" {
+	OPV
+}

@@ -464,7 +464,7 @@ CompositeIOD="VLWholeSlideMicroscopyImage"		Condition="VLWholeSlideMicroscopyIma
 		Module="WholeSlideMicroscopyImage"					Usage="M"
 		Module="OpticalPath"								Usage="M"
 		Module="MultiResolutionNavigation"					Usage="C"	Condition="ImageTypeValue3Localizer"
-		Module="SlideLabel"									Usage="C"	Condition="ImageTypeValue3Label"
+		Module="SlideLabel"									Usage="C"	Condition="NeedModuleSlideLabel"
 		Module="SOPCommon"									Usage="M"
 		Module="CommonInstanceReference"					Usage="M"
 		Module="FrameExtraction"							Usage="C"	Condition="NeedModuleFrameExtraction"
@@ -472,184 +472,237 @@ CompositeIOD="VLWholeSlideMicroscopyImage"		Condition="VLWholeSlideMicroscopyIma
 CompositeIODEnd
 
 CompositeIOD="LensometryMeasurements" Condition="LensometryMeasurementsInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"						Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
 	InformationEntity="Patient"
-		Module="Patient"	Usage="M"
-		Module="ClinicalTrialSubject"	Usage="U"
+		Module="Patient"									Usage="M"
+		Module="ClinicalTrialSubject"						Usage="U"	Condition="NeedModuleClinicalTrialSubject"
 	InformationEntityEnd
 	InformationEntity="Study"
-		Module="GeneralStudy"	Usage="M"
-		Module="PatientStudy"	Usage="U"
-		Module="ClinicalTrialStudy"	Usage="U"
+		Module="GeneralStudy"								Usage="M"
+		Module="PatientStudy"								Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"							Usage="U"	Condition="NeedModuleClinicalTrialStudy"
 	InformationEntityEnd
 	InformationEntity="Series"
-		Module="GeneralSeries"	Usage="M"
-		Module="LensometryMeasurementsSeries"	Usage="M"
-		Module="ClinicalTrialSeries"	Usage="U"
+		Module="GeneralSeries"								Usage="M"
+		Module="LensometryMeasurementsSeries"				Usage="M"
+		Module="ClinicalTrialSeries"						Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
 	InformationEntity="Equipment"
-		Module="GeneralEquipment"	Usage="M"
-		Module="EnhancedGeneralEquipment"	Usage="M"
+		Module="GeneralEquipment"							Usage="M"
+		Module="EnhancedGeneralEquipment"					Usage="M"
 	InformationEntityEnd
 	InformationEntity="Measurements"
 		Module="GeneralOphthalmicRefractiveMeasurements"	Usage="M"
-		Module="LensometryMeasurements"	Usage="M"
-		Module="SOPCommon"	Usage="M"
+		Module="LensometryMeasurements"						Usage="M"
+		Module="SOPCommon"									Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
 
 CompositeIOD="AutorefractionMeasurements" Condition="AutorefractionMeasurementsInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"						Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
 	InformationEntity="Patient"
-		Module="Patient"	Usage="M"
-		Module="ClinicalTrialSubject"	Usage="U"
+		Module="Patient"									Usage="M"
+		Module="ClinicalTrialSubject"						Usage="U"	Condition="NeedModuleClinicalTrialSubject"
 	InformationEntityEnd
 	InformationEntity="Study"
-		Module="GeneralStudy"	Usage="M"
-		Module="PatientStudy"	Usage="U"
-		Module="ClinicalTrialStudy"	Usage="U"
+		Module="GeneralStudy"								Usage="M"
+		Module="PatientStudy"								Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"							Usage="U"	Condition="NeedModuleClinicalTrialStudy"
 	InformationEntityEnd
 	InformationEntity="Series"
-		Module="GeneralSeries"	Usage="M"
-		Module="AutorefractionMeasurementsSeries"	Usage="M"
-		Module="ClinicalTrialSeries"	Usage="U"
+		Module="GeneralSeries"								Usage="M"
+		Module="AutorefractionMeasurementsSeries"			Usage="M"
+		Module="ClinicalTrialSeries"						Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
 	InformationEntity="Equipment"
-		Module="GeneralEquipment"	Usage="M"
-		Module="EnhancedGeneralEquipment"	Usage="M"
+		Module="GeneralEquipment"							Usage="M"
+		Module="EnhancedGeneralEquipment"					Usage="M"
 	InformationEntityEnd
 	InformationEntity="Measurements"
 		Module="GeneralOphthalmicRefractiveMeasurements"	Usage="M"
-		Module="AutorefractionMeasurements"	Usage="M"
-		Module="SOPCommon"	Usage="M"
+		Module="AutorefractionMeasurements"					Usage="M"
+		Module="SOPCommon"									Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
 
 CompositeIOD="KeratometryMeasurements" Condition="KeratometryMeasurementsInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"						Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
 	InformationEntity="Patient"
-		Module="Patient"	Usage="M"
-		Module="ClinicalTrialSubject"	Usage="U"
+		Module="Patient"									Usage="M"
+		Module="ClinicalTrialSubject"						Usage="U"	Condition="NeedModuleClinicalTrialSubject"
 	InformationEntityEnd
 	InformationEntity="Study"
-		Module="GeneralStudy"	Usage="M"
-		Module="PatientStudy"	Usage="U"
-		Module="ClinicalTrialStudy"	Usage="U"
+		Module="GeneralStudy"								Usage="M"
+		Module="PatientStudy"								Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"							Usage="U"	Condition="NeedModuleClinicalTrialStudy"
 	InformationEntityEnd
 	InformationEntity="Series"
-		Module="GeneralSeries"	Usage="M"
-		Module="KeratometryMeasurementsSeries"	Usage="M"
-		Module="ClinicalTrialSeries"	Usage="U"
+		Module="GeneralSeries"								Usage="M"
+		Module="KeratometryMeasurementsSeries"				Usage="M"
+		Module="ClinicalTrialSeries"						Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
 	InformationEntity="Equipment"
-		Module="GeneralEquipment"	Usage="M"
-		Module="EnhancedGeneralEquipment"	Usage="M"
+		Module="GeneralEquipment"							Usage="M"
+		Module="EnhancedGeneralEquipment"					Usage="M"
 	InformationEntityEnd
 	InformationEntity="Measurements"
 		Module="GeneralOphthalmicRefractiveMeasurements"	Usage="M"
-		Module="KeratometryMeasurements"	Usage="M"
-		Module="SOPCommon"	Usage="M"
+		Module="KeratometryMeasurements"					Usage="M"
+		Module="SOPCommon"									Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
 
 CompositeIOD="SubjectiveRefractionMeasurements" Condition="SubjectiveRefractionMeasurementsInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"						Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
 	InformationEntity="Patient"
-		Module="Patient"	Usage="M"
-		Module="ClinicalTrialSubject"	Usage="U"
+		Module="Patient"									Usage="M"
+		Module="ClinicalTrialSubject"						Usage="U"	Condition="NeedModuleClinicalTrialSubject"
 	InformationEntityEnd
 	InformationEntity="Study"
-		Module="GeneralStudy"	Usage="M"
-		Module="PatientStudy"	Usage="U"
-		Module="ClinicalTrialStudy"	Usage="U"
+		Module="GeneralStudy"								Usage="M"
+		Module="PatientStudy"								Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"							Usage="U"	Condition="NeedModuleClinicalTrialStudy"
 	InformationEntityEnd
 	InformationEntity="Series"
-		Module="GeneralSeries"	Usage="M"
-		Module="SubjectiveRefractionMeasurementsSeries"	Usage="M"
-		Module="ClinicalTrialSeries"	Usage="U"
+		Module="GeneralSeries"								Usage="M"
+		Module="SubjectiveRefractionMeasurementsSeries"		Usage="M"
+		Module="ClinicalTrialSeries"						Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
 	InformationEntity="Equipment"
-		Module="GeneralEquipment"	Usage="M"
-		Module="EnhancedGeneralEquipment"	Usage="M"
+		Module="GeneralEquipment"							Usage="M"
+		Module="EnhancedGeneralEquipment"					Usage="M"
 	InformationEntityEnd
 	InformationEntity="Measurements"
 		Module="GeneralOphthalmicRefractiveMeasurements"	Usage="M"
-		Module="SubjectiveRefractionMeasurements"	Usage="M"
-		Module="SOPCommon"	Usage="M"
+		Module="SubjectiveRefractionMeasurements"			Usage="M"
+		Module="SOPCommon"									Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
 
 CompositeIOD="VisualAcuityMeasurements" Condition="VisualAcuityMeasurementsInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"						Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
 	InformationEntity="Patient"
-		Module="Patient"	Usage="M"
-		Module="ClinicalTrialSubject"	Usage="U"
+		Module="Patient"									Usage="M"
+		Module="ClinicalTrialSubject"						Usage="U"	Condition="NeedModuleClinicalTrialSubject"
 	InformationEntityEnd
 	InformationEntity="Study"
-		Module="GeneralStudy"	Usage="M"
-		Module="PatientStudy"	Usage="U"
-		Module="ClinicalTrialStudy"	Usage="U"
+		Module="GeneralStudy"								Usage="M"
+		Module="PatientStudy"								Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"							Usage="U"	Condition="NeedModuleClinicalTrialStudy"
 	InformationEntityEnd
 	InformationEntity="Series"
-		Module="GeneralSeries"	Usage="M"
-		Module="VisualAcuityMeasurementsSeries"	Usage="M"
-		Module="ClinicalTrialSeries"	Usage="U"
+		Module="GeneralSeries"								Usage="M"
+		Module="VisualAcuityMeasurementsSeries"				Usage="M"
+		Module="ClinicalTrialSeries"						Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
 	InformationEntity="Equipment"
-		Module="GeneralEquipment"	Usage="M"
-		Module="EnhancedGeneralEquipment"	Usage="M"
+		Module="GeneralEquipment"							Usage="M"
+		Module="EnhancedGeneralEquipment"					Usage="M"
 	InformationEntityEnd
 	InformationEntity="Measurements"
 		Module="GeneralOphthalmicRefractiveMeasurements"	Usage="M"
-		Module="VisualAcuityMeasurements"	Usage="M"
-		Module="SOPCommon"	Usage="M"
+		Module="VisualAcuityMeasurements"					Usage="M"
+		Module="SOPCommon"									Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
 
 CompositeIOD="OphthalmicAxialMeasurements" Condition="OphthalmicAxialMeasurementsInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"						Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
 	InformationEntity="Patient"
-		Module="Patient"	Usage="M"
-		Module="ClinicalTrialSubject"	Usage="U"
+		Module="Patient"									Usage="M"
+		Module="ClinicalTrialSubject"						Usage="U"	Condition="NeedModuleClinicalTrialSubject"
 	InformationEntityEnd
 	InformationEntity="Study"
-		Module="GeneralStudy"	Usage="M"
-		Module="PatientStudy"	Usage="U"
-		Module="ClinicalTrialStudy"	Usage="U"
+		Module="GeneralStudy"								Usage="M"
+		Module="PatientStudy"								Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"							Usage="U"	Condition="NeedModuleClinicalTrialStudy"
 	InformationEntityEnd
 	InformationEntity="Series"
-		Module="GeneralSeries"	Usage="M"
-		Module="OphthalmicAxialMeasurementsSeries"	Usage="M"
-		Module="ClinicalTrialSeries"	Usage="U"
+		Module="GeneralSeries"								Usage="M"
+		Module="OphthalmicAxialMeasurementsSeries"			Usage="M"
+		Module="ClinicalTrialSeries"						Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
 	InformationEntity="Equipment"
-		Module="GeneralEquipment"	Usage="M"
-		Module="EnhancedGeneralEquipment"	Usage="M"
+		Module="GeneralEquipment"							Usage="M"
+		Module="EnhancedGeneralEquipment"					Usage="M"
 	InformationEntityEnd
 	InformationEntity="Measurements"
-		Module="OphthalmicAxialMeasurements"	Usage="M"
+		Module="OphthalmicAxialMeasurements"				Usage="M"
 		Module="GeneralOphthalmicRefractiveMeasurements"	Usage="M"
-		Module="SOPCommon"	Usage="M"
+		Module="SOPCommon"									Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
 
 CompositeIOD="IntraocularLensCalculations" Condition="IntraocularLensCalculationsInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"						Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
 	InformationEntity="Patient"
-		Module="Patient"	Usage="M"
-		Module="ClinicalTrialSubject"	Usage="U"
+		Module="Patient"									Usage="M"
+		Module="ClinicalTrialSubject"						Usage="U"	Condition="NeedModuleClinicalTrialSubject"
 	InformationEntityEnd
 	InformationEntity="Study"
-		Module="GeneralStudy"	Usage="M"
-		Module="PatientStudy"	Usage="U"
-		Module="ClinicalTrialStudy"	Usage="U"
+		Module="GeneralStudy"								Usage="M"
+		Module="PatientStudy"								Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"							Usage="U"	Condition="NeedModuleClinicalTrialStudy"
 	InformationEntityEnd
 	InformationEntity="Series"
-		Module="GeneralSeries"	Usage="M"
-		Module="IntraocularLensCalculationsSeries"	Usage="M"
-		Module="ClinicalTrialSeries"	Usage="U"
+		Module="GeneralSeries"								Usage="M"
+		Module="IntraocularLensCalculationsSeries"			Usage="M"
+		Module="ClinicalTrialSeries"						Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
 	InformationEntity="Equipment"
-		Module="GeneralEquipment"	Usage="M"
-		Module="EnhancedGeneralEquipment"	Usage="M"
+		Module="GeneralEquipment"							Usage="M"
+		Module="EnhancedGeneralEquipment"					Usage="M"
 	InformationEntityEnd
 	InformationEntity="Measurements"
-		Module="IntraocularLensCalculations"	Usage="M"
+		Module="IntraocularLensCalculations"				Usage="M"
 		Module="GeneralOphthalmicRefractiveMeasurements"	Usage="M"
-		Module="SOPCommon"	Usage="M"
+		Module="SOPCommon"									Usage="M"
+	InformationEntityEnd
+CompositeIODEnd
+
+CompositeIOD="OphthalmicVisualFieldStaticPerimetryMeasurements" Condition="OphthalmicVisualFieldStaticPerimetryMeasurementsInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"						Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"									Usage="M"
+		Module="ClinicalTrialSubject"						Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd
+	InformationEntity="Study"
+		Module="GeneralStudy"								Usage="M"
+		Module="PatientStudy"								Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"							Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="GeneralSeries"									Usage="M"
+		Module="ClinicalTrialSeries"							Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+		Module="VisualFieldStaticPerimetryMeasurementsSeries"	Usage="M"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"							Usage="M"
+		Module="EnhancedGeneralEquipment"					Usage="M"
+	InformationEntityEnd
+	InformationEntity="Measurements"
+		Module="VisualFieldStaticPerimetryTestParameters"					Usage="M"
+		Module="VisualFieldStaticPerimetryTestReliability"					Usage="M"
+		Module="VisualFieldStaticPerimetryTestMeasurements"					Usage="M"
+		Module="VisualFieldStaticPerimetryTestResults"						Usage="M"
+		Module="OphthalmicPatientClinicalInformationandTestLensParameters"	Usage="U"
+		Module="SOPCommon"													Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
 

@@ -1,4 +1,4 @@
-/* strtype.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
+/* strtype.h Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_strtype__
 #define __Header_strtype__
 

@@ -1,4 +1,4 @@
-static const char *CopyrightIdentifier(void) { return "@(#)attrtypv.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+static const char *CopyrightIdentifier(void) { return "@(#)attrtypv.cc Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #if USESTANDARDHEADERSWITHOUTEXTENSION == 1
 #include <cctype>
 #else
@@ -311,7 +311,12 @@ DateStringAttribute::validateVR(TextOutputStream& log,SpecificCharacterSetInfo *
 				ok=false;
 			}
 			++p;
-			if (*p == '.' && l == 10) ++p;
+			if (*p == '.' && l == 10) {
+				// CP 714 (000513)
+				writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
+				ok=false;
+				++p;
+			}
 			if (*p != '0' &&  *p != '1') {
 				writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
 				ok=false;
@@ -322,7 +327,12 @@ DateStringAttribute::validateVR(TextOutputStream& log,SpecificCharacterSetInfo *
 				ok=false;
 			}
 			++p;
-			if (*p == '.' && l == 10) ++p;
+			if (*p == '.' && l == 10) {
+				// CP 714 (000513)
+				writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
+				ok=false;
+				++p;
+			}
 			if (*p != '0' &&  *p != '1' &&  *p != '2' &&  *p != '3') {
 				writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
 				ok=false;
@@ -838,7 +848,12 @@ TimeStringAttribute::validateVR(TextOutputStream& log,SpecificCharacterSetInfo *
 			}
 			++p;
 			if (*p) {	// Not just HH
-				if (*p == ':') ++p;
+				if (*p == ':') {
+					// CP 714 (000513)
+					writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
+					ok=false;
+					++p;
+				}
 				if (*p != '0' &&  *p != '1' &&  *p != '2' &&  *p != '3' &&  *p != '4' &&  *p != '5') {
 					writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
 					ok=false;
@@ -850,7 +865,12 @@ TimeStringAttribute::validateVR(TextOutputStream& log,SpecificCharacterSetInfo *
 				}
 				++p;
 				if (*p) {	// Not just HHMM
-					if (*p == ':') ++p;
+					if (*p == ':') {
+						// CP 714 (000513)
+						writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
+						ok=false;
+						++p;
+					}
 					if (*p != '0' &&  *p != '1' &&  *p != '2' &&  *p != '3' &&  *p != '4' &&  *p != '5') {
 						writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
 						ok=false;

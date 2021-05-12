@@ -1,4 +1,4 @@
-static const char *CopyrightIdentifier(void) { return "@(#)attrmxls.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+static const char *CopyrightIdentifier(void) { return "@(#)attrmxls.cc Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrtype.h"
 #include "attrlsln.h"
 #include "attrmxls.h"
@@ -152,7 +152,11 @@ validateUsed(AttributeList& list,TextOutputStream &log)
 		Attribute *a=listi();
 		Assert(a);
 		Tag t = a->getTag();
-		if (!t.isPrivateGroup()) {
+		if (!t.isPrivateGroup()
+		  && t != TagFromName(ModifiedAttributesSequence)
+		  && t != TagFromName(UnassignedSharedConvertedAttributesSequence)
+		  && t != TagFromName(UnassignedPerFrameConvertedAttributesSequence)
+		  ) {	// any Attribute may be present in ModifiedAttributesSequence (000533), UnassignedSharedConvertedAttributesSequence or UnassignedPerFrameConvertedAttributesSequence (000534), so do not warn about them
 			if (!::loopOverListsInSequencesWithLog(a,log,&::validateUsed))
 				succeeded=false;
 		}

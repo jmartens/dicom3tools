@@ -1,4 +1,4 @@
-/* attrnew.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
+/* attrnew.h Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_attrnew__
 #define __Header_attrnew__
 

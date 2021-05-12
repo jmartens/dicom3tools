@@ -1,6 +1,10 @@
 # Conditions to detect Composite IOD presence ...
 #
 
+Condition="TractographyResultsInstance"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="TractographyResultsStorageSOPClassUID"
+ConditionEnd
+
 Condition="ParametricMapInstance"
 	Element="SOPClassUID"		StringConstantFromRootAttribute="ParametricMapStorageSOPClassUID"
 ConditionEnd
@@ -64,6 +68,10 @@ ConditionEnd
 
 Condition="EncapsulatedCDAInstance"
 	Element="SOPClassUID"		StringConstantFromRootAttribute="EncapsulatedCDAStorageSOPClassUID"
+ConditionEnd
+
+Condition="EncapsulatedSTLInstance"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="EncapsulatedSTLStorageSOPClassUID"
 ConditionEnd
 
 Condition="OphthalmicPhotography8BitImageInstance"
@@ -364,6 +372,10 @@ Condition="CardiacElectrophysiologyWaveformInstance"
 	Element="SOPClassUID"		StringConstantFromRootAttribute="CardiacElectrophysiologyWaveformStorageSOPClassUID"
 ConditionEnd
 
+Condition="RespiratoryWaveformInstance"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="RespiratoryWaveformStorageSOPClassUID"
+ConditionEnd
+
 Condition="CRImageInstance"
 	Element="SOPClassUID"		StringConstantFromRootAttribute="ComputedRadiographyImageStorageSOPClassUID"
 ConditionEnd
@@ -472,6 +484,10 @@ Condition="IntraocularLensCalculationsInstance"
 	Element="SOPClassUID"		StringConstantFromRootAttribute="IntraocularLensCalculationsStorageSOPClassUID"
 ConditionEnd
 
+Condition="OphthalmicVisualFieldStaticPerimetryMeasurementsInstance"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="OphthalmicVisualFieldStaticPerimetryMeasurementsStorageSOPClassUID"
+ConditionEnd
+
 Condition="BreastProjectionXRayImageInstance"
 	Element="SOPClassUID"						StringConstantFromRootAttribute="BreastProjectionXRayImageStorageForPresentationSOPClassUID"
 	Element="SOPClassUID"		Operator="Or"	StringConstantFromRootAttribute="BreastProjectionXRayImageStorageForProcessingSOPClassUID"
@@ -552,10 +568,10 @@ Condition="NeedModuleOverlayPlane"
 	Element="OverlayDescriptorRed"		ElementPresent="0xff00"
 	Element="OverlayDescriptorGreen"	ElementPresent="0xff00"
 	Element="OverlayDescriptorBlue"		ElementPresent="0xff00"
-	Element="OverlayGray"			ElementPresent="0xff00"
-	Element="OverlayRed"			ElementPresent="0xff00"
-	Element="OverlayGreen"			ElementPresent="0xff00"
-	Element="OverlayBlue"			ElementPresent="0xff00"
+	Element="OverlaysGray"			ElementPresent="0xff00"
+	Element="OverlaysRed"			ElementPresent="0xff00"
+	Element="OverlaysGreen"			ElementPresent="0xff00"
+	Element="OverlaysBlue"			ElementPresent="0xff00"
 	Element="OverlayDescription"		ElementPresent="0xff00"
 	Element="OverlayLabel"			ElementPresent="0xff00"
 ConditionEnd
@@ -777,7 +793,7 @@ Condition="AcquisitionContextItemIsPersonName"
 ConditionEnd
 
 Condition="AcquisitionContextItemIsTextValue"
-	Element="ValueType"			Operator="Or"	StringValue="TEXT"
+	Element="ValueType"						StringValue="TEXT"
 	(
 		Element="Date"										Modifier="Not" ElementPresent=""
 		Element="Time"						Operator="And"	Modifier="Not" ElementPresent=""
@@ -930,7 +946,7 @@ Condition="ModalityIsCTOrMR"
 ConditionEnd
 
 Condition="PatientOrientationRequired"
-	# General Image Module: "Required if image does not require Image Orientation (Patient) (0020,0037) and Image Position (Patient) (0020,0032)."
+	# General Image Module: "Required if image does not require Image Orientation (Patient) (0020,0037) and Image Position (Patient) (0020,0032) or Image Orientation (Slide) (0048,0102)."
 	Element="SOPClassUID"			               Modifier="Not" StringConstantFromRootAttribute="EnhancedMRImageStorageSOPClassUID"
 	Element="SOPClassUID"			Operator="And" Modifier="Not" StringConstantFromRootAttribute="EnhancedMRColorImageStorageSOPClassUID"
 	Element="SOPClassUID"			Operator="And" Modifier="Not" StringConstantFromRootAttribute="LegacyConvertedEnhancedMRImageStorageSOPClassUID"
@@ -947,11 +963,12 @@ Condition="PatientOrientationRequired"
 	Element="SOPClassUID"			Operator="And" Modifier="Not" StringConstantFromRootAttribute="ParametricMapStorageSOPClassUID"
 	# not required for RT dose, since either needed for grid (image) or not an image hence not applicable
 	Element="SOPClassUID"			Operator="And" Modifier="Not" StringConstantFromRootAttribute="RTDoseStorageSOPClassUID"
+	Element="SOPClassUID"			Operator="And" Modifier="Not" StringConstantFromRootAttribute="VLWholeSlideMicroscopyImageStorageSOPClassUID"
 	(
 		Element="SOPClassUID"				StringConstantFromRootAttribute="SegmentationStorageSOPClassUID"
 		(
 			Element="PlaneOrientationSequence"					ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-			Element="PlaneOrientationSequence"	Operator="Or"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="PlaneOrientationSequence"	Operator="Or"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		) Operator="And"
 	) Operator="And" Modifier="Not"
 ConditionEnd
@@ -967,9 +984,9 @@ Condition="DXPatientOrientationRequired"
 	) Operator="Or" Modifier="Not"
 ConditionEnd
 
-Condition="MRIsNotEchoPlanarNotSegmentedKSpace"
+Condition="MRIsNotEchoPlanarOrIsSegmentedKSpace"
 	Element="ScanningSequence"						Modifier="Not" ValueSelector="*"	StringValue="EP"
-	Element="SequenceVariant"		Operator="Or"	Modifier="Not" ValueSelector="*"	StringValue="SK"
+	Element="SequenceVariant"		Operator="Or"	               ValueSelector="*"	StringValue="SK"
 ConditionEnd
 
 Condition="MRIsInversionRecovery"
@@ -993,6 +1010,22 @@ Condition="ModalityLUTSequenceNotPresent"
 	Element="ModalityLUTSequence"		Modifier="Not" ElementPresent=""
 ConditionEnd
 
+Condition="RescaleSlopePresentAndNotIdentity"
+	Element="RescaleSlope"			ElementPresent=""
+	(
+		Element="RescaleIntercept"					BinaryValue="!= 0"
+		Element="RescaleSlope"		Operator="Or"	BinaryValue="!= 1"
+	) Operator="And"
+ConditionEnd
+
+Condition="RescaleInterceptPresentAndNotIdentity"
+	Element="RescaleIntercept"		ElementPresent=""
+	(
+		Element="RescaleIntercept"					BinaryValue="!= 0"
+		Element="RescaleSlope"		Operator="Or"	BinaryValue="!= 1"
+	) Operator="And"
+ConditionEnd
+
 Condition="RescaleInterceptPresent"
 	Element="RescaleIntercept"		ElementPresent=""
 ConditionEnd
@@ -1006,18 +1039,31 @@ Condition="RescaleTypeIsPresentAndNotHU"
 	Element="RescaleType"			Operator="And" Modifier="Not" StringValue="HU"
 ConditionEnd
 
-Condition="RescaleTypeIsPresentAndNotHUAndImageIsOriginalNotLocalizer"
-	Element="RescaleType"			ElementPresent=""
-	Element="RescaleType"			Operator="And" Modifier="Not" StringValue="HU"
-	Element="ImageType"				Operator="And" ValueSelector="0" StringValue="ORIGINAL"
-	Element="ImageType"				Operator="And" Modifier="Not" ValueSelector="2" StringValue="LOCALIZER"
+Condition="MultienergyAcquisitionOrRescaleTypeIsPresentAndNotHU"
+	Element="MultienergyCTAcquisition"	StringValueFromRootAttribute="YES"
+	Element="RescaleType"				Operator="Or"  ElementPresent=""
+	Element="RescaleType"				Operator="And" Modifier="Not" StringValue="HU"
 ConditionEnd
 
-Condition="RescaleTypeIsPresentAndIsHUAndImageIsOriginalLocalizer"
-	Element="RescaleType"			ElementPresent=""
-	Element="RescaleType"			Operator="And" StringValue="HU"
-	Element="ImageType"				Operator="And" ValueSelector="0" StringValue="ORIGINAL"
-	Element="ImageType"				Operator="And" ValueSelector="2" StringValue="LOCALIZER"
+Condition="RescaleTypeIsPresentAndNotHUAndImageIsOriginalNotLocalizerAndNotMultienergyAcquisition"
+	Element="RescaleType"				ElementPresent=""
+	Element="RescaleType"				Operator="And" Modifier="Not" StringValue="HU"
+	Element="ImageType"					Operator="And" ValueSelector="0" StringValue="ORIGINAL"
+	Element="ImageType"					Operator="And" Modifier="Not" ValueSelector="2" StringValue="LOCALIZER"
+	Element="MultienergyCTAcquisition"	Operator="And" Modifier="Not" StringValueFromRootAttribute="YES"
+ConditionEnd
+
+Condition="RescaleTypeIsPresentAndIsHUAndImageIsOriginalLocalizerAndNotMultienergyAcquisition"
+	Element="RescaleType"				ElementPresent=""
+	Element="RescaleType"				Operator="And" StringValue="HU"
+	Element="ImageType"					Operator="And" ValueSelector="0" StringValue="ORIGINAL"
+	Element="ImageType"					Operator="And" ValueSelector="2" StringValue="LOCALIZER"
+	Element="MultienergyCTAcquisition"	Operator="And" Modifier="Not" StringValueFromRootAttribute="YES"
+ConditionEnd
+
+Condition="KVPNotEmptyWhenAlsoPresentInMultienergyCTAcquisitionSequence"
+	Element="KVP"						ValuePresent=""
+	Element="KVP"						Operator="And" ElementPresentInPathFromRoot="MultienergyCTAcquisitionSequence"
 ConditionEnd
 
 Condition="WindowCenterPresent"
@@ -2652,6 +2698,18 @@ Condition="ImageTypeValue1OriginalOrMixed"
 	Element="ImageType"		ValueSelector="0"	StringValueFromRootAttribute="MIXED"
 ConditionEnd
 
+Condition="ImageTypeValue1OriginalOrMixedAndNotLegacyConvertedOrWholeSlide"
+	Element="SOPClassUID"						Modifier="Not" StringConstantFromRootAttribute="LegacyConvertedEnhancedCTImageStorageSOPClassUID"
+	Element="SOPClassUID"		Operator="And"	Modifier="Not" StringConstantFromRootAttribute="LegacyConvertedEnhancedMRImageStorageSOPClassUID"
+	Element="SOPClassUID"		Operator="And"	Modifier="Not" StringConstantFromRootAttribute="LegacyConvertedEnhancedPETImageStorageSOPClassUID"
+	Element="SOPClassUID"		Operator="And"	Modifier="Not" StringConstantFromRootAttribute="VLWholeSlideMicroscopyImageStorageSOPClassUID"
+	(
+		Element="ImageType"		ValueSelector="0"	StringValueFromRootAttribute="ORIGINAL"
+		Element="ImageType"		ValueSelector="0"	StringValueFromRootAttribute="MIXED"
+	) Operator="And"
+}
+ConditionEnd
+
 Condition="ImageTypeValue1OriginalOrMixedAndNotLegacyConverted"
 	Element="SOPClassUID"						Modifier="Not" StringConstantFromRootAttribute="LegacyConvertedEnhancedCTImageStorageSOPClassUID"
 	Element="SOPClassUID"		Operator="And"	Modifier="Not" StringConstantFromRootAttribute="LegacyConvertedEnhancedMRImageStorageSOPClassUID"
@@ -2684,7 +2742,6 @@ ConditionEnd
 Condition="ImageTypeValue1OriginalAndNotLegacyConvertedPET"
 	Element="ImageType"			ValueSelector="0"	StringValueFromRootAttribute="ORIGINAL"
 	Element="SOPClassUID"		Operator="And"	Modifier="Not" StringConstantFromRootAttribute="LegacyConvertedEnhancedPETImageStorageSOPClassUID"
-}
 ConditionEnd
 
 Condition="ImageTypeValue1OriginalOrMixedAndRectilinear"
@@ -2715,12 +2772,30 @@ Condition="ConcatenationUIDIsPresent"
 	Element="ConcatenationUID"				ElementPresent=""
 ConditionEnd
 
+Condition="InConcatenationTotalNumberIsLessThanOrEqualToOne"
+	Element="InConcatenationTotalNumber"	BinaryValue="<= 1"
+ConditionEnd
+
+Condition="ConcatenationAttributesArePresentAndTotalNumberIfPresentGreaterThanOne"
+	(
+		Element="ConcatenationFrameOffsetNumber"					  ElementPresent=""
+		Element="ConcatenationUID"						Operator="Or" ElementPresent=""
+		Element="SOPInstanceUIDOfConcatenationSource"	Operator="Or" ElementPresent=""
+		Element="InConcatenationNumber"					Operator="Or" ElementPresent=""
+		Element="InConcatenationTotalNumber"			Operator="Or" ElementPresent=""
+	)
+	(
+		Element="InConcatenationTotalNumber"		Modifier="Not"ElementPresent=""
+		Element="InConcatenationTotalNumber"		Operator="Or" BinaryValue="> 1"
+	) Operator="And"
+ConditionEnd
+
 Condition="ReferencedImageSequenceIsPresent"
 	Element="ReferencedImageSequence"			ElementPresent=""
 ConditionEnd
 
 Condition="ReferencedImageSequenceIsPresentInFunctionalGroups"
-	Element="ReferencedImageSequence"					ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ReferencedImageSequence"					ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="ReferencedImageSequence"	Operator="Or"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -2729,7 +2804,7 @@ Condition="SourceImageSequenceIsPresent"
 ConditionEnd
 
 Condition="SourceImageSequenceIsPresentInFunctionalGroups"
-	Element="SourceImageSequence"						ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="SourceImageSequence"						ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="SourceImageSequence"		Operator="Or"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -2798,17 +2873,17 @@ ConditionEnd
 
 Condition="DerivationImageFunctionalGroupPresent"
 	Element="DerivationImageSequence"			ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="DerivationImageSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="DerivationImageSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="DerivationImageFunctionalGroupNotPresent"
 	Element="DerivationImageSequence"			Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="DerivationImageSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="DerivationImageSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="DerivationImageFunctionalGroupNotPresentOrFrameOfReferenceUIDPresent"
 	Element="DerivationImageSequence"			Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="DerivationImageSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="DerivationImageSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FrameOfReferenceUID"				Operator="Or" ElementPresent=""
 ConditionEnd
 
@@ -2817,7 +2892,7 @@ Condition="RadiopharmaceuticalUsageSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="RadiopharmaceuticalUsageSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="RadiopharmaceuticalUsageSequence"	Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RadiopharmaceuticalUsageSequence"	Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="SegmentIdentificationSequenceNotInSharedFunctionalGroupSequence"
@@ -2825,15 +2900,15 @@ Condition="SegmentIdentificationSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="SegmentIdentificationSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="SegmentIdentificationSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="SegmentIdentificationSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PixelMeasuresOrPlanePositionOrPlaneOrientationSequenceIsPresent"
-	Element="PixelMeasuresSequence"						  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelMeasuresSequence"						  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PixelMeasuresSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -2844,9 +2919,9 @@ ConditionEnd
 Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
 	Element="PixelMeasuresSequence"				Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	(
-		Element="PixelMeasuresSequence"				ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PixelMeasuresSequence"				ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		(
-			Element="DerivationImageSequence"					  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="DerivationImageSequence"					  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="DerivationImageSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		) Operator="Or" Modifier="Not"
 	) Operator="And"
@@ -2855,35 +2930,35 @@ ConditionEnd
 Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequenceAndPlanePositionSequenceOrPlaneOrientationSequencePresent"
 	Element="PixelMeasuresSequence"				Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	(
-		Element="PlanePositionSequence"						  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlanePositionSequence"						  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	) Operator="And"
 ConditionEnd
 
 
 Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="PixelMeasuresSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelMeasuresSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
-	Element="PixelMeasuresSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelMeasuresSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		Element="PixelMeasuresSequence"				ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		(
-			Element="DerivationImageSequence"					  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="DerivationImageSequence"					  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="DerivationImageSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		) Operator="Or" Modifier="Not"
 	) Operator="And"
 ConditionEnd
 
 Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequenceAndPlanePositionSequenceOrPlaneOrientationSequencePresent"
-	Element="PixelMeasuresSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelMeasuresSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
-		Element="PlanePositionSequence"						  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlanePositionSequence"						  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	) Operator="And"
 ConditionEnd
@@ -2896,9 +2971,9 @@ ConditionEnd
 Condition="PlanePositionSequenceNotInSharedFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
 	Element="PlanePositionSequence"				Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	(
-		Element="PlanePositionSequence"				ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlanePositionSequence"				ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		(
-			Element="DerivationImageSequence"					  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="DerivationImageSequence"					  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="DerivationImageSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		) Operator="Or" Modifier="Not"
 	) Operator="And"
@@ -2907,34 +2982,34 @@ ConditionEnd
 Condition="PlanePositionSequenceNotInSharedFunctionalGroupSequenceAndPixelMeasuresSequenceOrPlaneOrientationSequencePresent"
 	Element="PlanePositionSequence"				Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	(
-		Element="PixelMeasuresSequence"						  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PixelMeasuresSequence"						  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PixelMeasuresSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	) Operator="And"
 ConditionEnd
 
 Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="PlanePositionSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlanePositionSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
-	Element="PlanePositionSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlanePositionSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		Element="PlanePositionSequence"				ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		(
-			Element="DerivationImageSequence"					  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="DerivationImageSequence"					  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="DerivationImageSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		) Operator="Or" Modifier="Not"
 	) Operator="And"
 ConditionEnd
 
 Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequenceAndPixelMeasuresSequenceOrPlaneOrientationSequencePresent"
-	Element="PlanePositionSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlanePositionSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
-		Element="PixelMeasuresSequence"						  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PixelMeasuresSequence"						  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PixelMeasuresSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PlaneOrientationSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	) Operator="And"
 ConditionEnd
@@ -2948,9 +3023,9 @@ ConditionEnd
 Condition="PlaneOrientationSequenceNotInSharedFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
 	Element="PlaneOrientationSequence"			Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	(
-		Element="PlaneOrientationSequence"				ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlaneOrientationSequence"				ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		(
-			Element="DerivationImageSequence"					  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="DerivationImageSequence"					  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="DerivationImageSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		) Operator="Or" Modifier="Not"
 	) Operator="And"
@@ -2959,34 +3034,34 @@ ConditionEnd
 Condition="PlaneOrientationSequenceNotInSharedFunctionalGroupSequenceAndPixelMeasuresSequenceOrPlanePositionSequencePresent"
 	Element="PlaneOrientationSequence"			Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	(
-		Element="PixelMeasuresSequence"						  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PixelMeasuresSequence"						  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PixelMeasuresSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	) Operator="And"
 ConditionEnd
 
 Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="PlaneOrientationSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlaneOrientationSequence"			Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
-	Element="PlaneOrientationSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlaneOrientationSequence"			Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		Element="PlaneOrientationSequence"				ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		(
-			Element="DerivationImageSequence"					  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="DerivationImageSequence"					  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="DerivationImageSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		) Operator="Or" Modifier="Not"
 	) Operator="And"
 ConditionEnd
 
 Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequenceAndPixelMeasuresSequenceOrPlanePositionSequencePresent"
-	Element="PlaneOrientationSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlaneOrientationSequence"			Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
-		Element="PixelMeasuresSequence"						  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PixelMeasuresSequence"						  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PixelMeasuresSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	) Operator="And"
 ConditionEnd
@@ -2994,24 +3069,24 @@ ConditionEnd
 Condition="DerivationImageSequenceNotInSharedFunctionalGroupSequenceAndPixelMeasuresPlanePositionPlaneOrientationNotPresentInEitherMBPO"
 	Element="DerivationImageSequence"			Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	(
-		Element="DerivationImageSequence"				ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="DerivationImageSequence"				ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		(
-			Element="PixelMeasuresSequence"						  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="PixelMeasuresSequence"						  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="PixelMeasuresSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-			Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		) Operator="Or" Modifier="Not"
 	) Operator="And"
 ConditionEnd
 
 Condition="DerivationImageSequenceNotInPerFrameFunctionalGroupSequenceAndPixelMeasuresPlanePositionPlaneOrientationNotPresentInEitherMBPO"
-	Element="DerivationImageSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="DerivationImageSequence"			Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		Element="DerivationImageSequence"				ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		(
-			Element="PixelMeasuresSequence"						  ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="PixelMeasuresSequence"						  ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="PixelMeasuresSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-			Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+			Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 			Element="PlanePositionSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 		) Operator="Or" Modifier="Not"
 	) Operator="And"
@@ -3020,7 +3095,7 @@ ConditionEnd
 
 Condition="FrameAnatomyMacroOKInPerFrameFunctionalGroupSequence"
 	Element="FrameAnatomySequence"				Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FrameAnatomySequence"				Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameAnatomySequence"				Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FrameAnatomySequenceNotInSharedFunctionalGroupSequence"
@@ -3028,12 +3103,12 @@ Condition="FrameAnatomySequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="FrameAnatomyMacroOKInSharedFunctionalGroupSequence"
-	Element="FrameAnatomySequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameAnatomySequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FrameAnatomySequence"				Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FrameAnatomySequenceNotInPerFrameFunctionalGroupSequence"
-	Element="FrameAnatomySequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameAnatomySequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PixelValueTransformationSequenceNotInSharedFunctionalGroupSequence"
@@ -3046,11 +3121,11 @@ Condition="PixelValueTransformationSequenceNotInSharedFunctionalGroupSequenceAnd
 ConditionEnd
 
 Condition="PixelValueTransformationSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="PixelValueTransformationSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelValueTransformationSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PixelValueTransformationSequenceNotInPerFrameFunctionalGroupSequenceAndPhotometricInterpretationIsMonochrome2"
-	Element="PixelValueTransformationSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelValueTransformationSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PhotometricInterpretation"				Operator="And" StringValueFromRootAttribute="MONOCHROME2"
 ConditionEnd
 
@@ -3059,7 +3134,7 @@ Condition="MRImageFrameTypeSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="MRImageFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="MRImageFrameTypeSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRImageFrameTypeSequence"			Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="MRSpectroscopyFrameTypeSequenceNotInSharedFunctionalGroupSequence"
@@ -3067,7 +3142,7 @@ Condition="MRSpectroscopyFrameTypeSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="MRSpectroscopyFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="MRSpectroscopyFrameTypeSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRSpectroscopyFrameTypeSequence"			Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PETFrameTypeSequenceNotInSharedFunctionalGroupSequence"
@@ -3075,16 +3150,30 @@ Condition="PETFrameTypeSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="PETFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="PETFrameTypeSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETFrameTypeSequence"			Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 # more specific conditions for particular macros that have to also be only in one or the other functional groups sequences ...
+
+Condition="NeedRealWorldValueMappingMacroInSharedFunctionalGroupSequenceIfMultienergy"
+	Element="MultienergyCTAcquisition"					StringValueFromRootAttribute="YES"
+	Element="RealWorldValueMappingSequence"				Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="RealWorldValueMappingSequence"				Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="NeedRealWorldValueMappingMacroInPerFrameFunctionalGroupSequenceIfMultienergy"
+	Element="MultienergyCTAcquisition"					StringValueFromRootAttribute="YES"
+	Element="RealWorldValueMappingSequence"				Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="RealWorldValueMappingSequence"				Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+ConditionEnd
+
+
 
 Condition="NeedCardiacSynchronizationMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="CardiacSynchronizationTechnique"			Operator="And" ElementPresentInRoot=""
 	Element="CardiacSynchronizationTechnique"			Operator="And" Modifier="Not" StringValueFromRootAttribute="NONE"
-	Element="CardiacSynchronizationSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CardiacSynchronizationSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3093,14 +3182,14 @@ Condition="NeedCardiacSynchronizationMacroInPerFrameFunctionalGroupSequence"
 	Element="CardiacSynchronizationTechnique"			Operator="And" ElementPresentInRoot=""
 	Element="CardiacSynchronizationTechnique"			Operator="And" Modifier="Not" StringValueFromRootAttribute="NONE"
 	Element="CardiacSynchronizationSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CardiacSynchronizationSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 
 Condition="NeedCardiacSynchronizationMacroInSharedFunctionalGroupSequenceRegardlessOfImageType"
 	Element="CardiacSynchronizationTechnique"			ElementPresentInRoot=""
 	Element="CardiacSynchronizationTechnique"			Operator="And" Modifier="Not" StringValueFromRootAttribute="NONE"
-	Element="CardiacSynchronizationSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CardiacSynchronizationSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3108,7 +3197,7 @@ Condition="NeedCardiacSynchronizationMacroInPerFrameFunctionalGroupSequenceRegar
 	Element="CardiacSynchronizationTechnique"			ElementPresentInRoot=""
 	Element="CardiacSynchronizationTechnique"			Operator="And" Modifier="Not" StringValueFromRootAttribute="NONE"
 	Element="CardiacSynchronizationSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CardiacSynchronizationSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 
@@ -3118,7 +3207,7 @@ Condition="NeedRespiratorySynchronizationMacroInSharedFunctionalGroupSequence"
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="NONE"
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="REALTIME"
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="BREATH_HOLD"
-	Element="RespiratorySynchronizationSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="RespiratorySynchronizationSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3129,7 +3218,7 @@ Condition="NeedRespiratorySynchronizationMacroInPerFrameFunctionalGroupSequence"
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="REALTIME"
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="BREATH_HOLD"
 	Element="RespiratorySynchronizationSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="RespiratorySynchronizationSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 
@@ -3138,7 +3227,7 @@ Condition="NeedRespiratorySynchronizationMacroInSharedFunctionalGroupSequenceReg
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="NONE"
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="REALTIME"
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="BREATH_HOLD"
-	Element="RespiratorySynchronizationSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="RespiratorySynchronizationSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3148,12 +3237,12 @@ Condition="NeedRespiratorySynchronizationMacroInPerFrameFunctionalGroupSequenceR
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="REALTIME"
 	Element="RespiratoryMotionCompensationTechnique"	Operator="And" Modifier="Not" StringValueFromRootAttribute="BREATH_HOLD"
 	Element="RespiratorySynchronizationSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="RespiratorySynchronizationSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 
 Condition="NeedPatientPhysiologicalStateMacroInSharedFunctionalGroupSequence"
-	Element="PatientPhysiologicalStateSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PatientPhysiologicalStateSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		Element="ImageType"									ValueSelector="2" StringValueFromRootAttribute="REST"
 		Element="ImageType"									Operator="Or" ValueSelector="2" StringValueFromRootAttribute="STRESS"
@@ -3167,25 +3256,25 @@ Condition="NeedPatientPhysiologicalStateMacroInPerFrameFunctionalGroupSequence"
 		Element="ImageType"									ValueSelector="2" StringValueFromRootAttribute="REST"
 		Element="ImageType"									Operator="Or" ValueSelector="2" StringValueFromRootAttribute="STRESS"
 	) Operator="And"
-	Element="PatientPhysiologicalStateSequence"				Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PatientPhysiologicalStateSequence"				Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRTimingAndRelatedParametersMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="MRTimingAndRelatedParametersSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRTimingAndRelatedParametersSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRTimingAndRelatedParametersSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRTimingAndRelatedParametersMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="MRTimingAndRelatedParametersSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRTimingAndRelatedParametersSequence"	Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRTimingAndRelatedParametersSequence"	Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRFOVGeometryMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="GeometryOfKSpaceTraversal"		Operator="And" StringValueFromRootAttribute="RECTILINEAR"
-	Element="MRFOVGeometrySequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRFOVGeometrySequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRFOVGeometrySequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3193,13 +3282,13 @@ Condition="NeedMRFOVGeometryMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="GeometryOfKSpaceTraversal"		Operator="And" StringValueFromRootAttribute="RECTILINEAR"
 	Element="MRFOVGeometrySequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRFOVGeometrySequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRFOVGeometrySequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRSpectroscopyFOVGeometryMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="GeometryOfKSpaceTraversal"		Operator="And" StringValueFromRootAttribute="RECTILINEAR"
-	Element="MRSpectroscopyFOVGeometrySequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRSpectroscopyFOVGeometrySequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRSpectroscopyFOVGeometrySequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3207,73 +3296,73 @@ Condition="NeedMRSpectroscopyFOVGeometryMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="GeometryOfKSpaceTraversal"		Operator="And" StringValueFromRootAttribute="RECTILINEAR"
 	Element="MRSpectroscopyFOVGeometrySequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRSpectroscopyFOVGeometrySequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRSpectroscopyFOVGeometrySequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMREchoMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="MREchoSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MREchoSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MREchoSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMREchoMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="MREchoSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MREchoSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MREchoSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRModifierMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="MRModifierSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRModifierSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRModifierSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRModifierMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="MRModifierSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRModifierSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRModifierSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRImagingModifierMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="MRImagingModifierSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRImagingModifierSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRImagingModifierSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRImagingModifierMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="MRImagingModifierSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRImagingModifierSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRImagingModifierSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRReceiveCoilMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="MRReceiveCoilSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRReceiveCoilSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRReceiveCoilSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRReceiveCoilMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="MRReceiveCoilSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRReceiveCoilSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRReceiveCoilSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRTransmitCoilMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="MRTransmitCoilSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRTransmitCoilSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRTransmitCoilSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRTransmitCoilMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="MRTransmitCoilSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRTransmitCoilSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRTransmitCoilSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRDiffusionMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="AcquisitionContrast"			Operator="And" StringValueFromRootAttribute="DIFFUSION"
-	Element="MRDiffusionSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRDiffusionSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRDiffusionSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3281,13 +3370,13 @@ Condition="NeedMRDiffusionMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="AcquisitionContrast"			Operator="And" StringValueFromRootAttribute="DIFFUSION"
 	Element="MRDiffusionSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRDiffusionSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRDiffusionSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRSpatialSaturationMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="SpatialPresaturation"					Operator="And" StringValueFromRootAttribute="SLAB"
-	Element="MRSpatialSaturationSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRSpatialSaturationSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRSpatialSaturationSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3295,37 +3384,37 @@ Condition="NeedMRSpatialSaturationMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="SpatialPresaturation"					Operator="And" StringValueFromRootAttribute="SLAB"
 	Element="MRSpatialSaturationSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRSpatialSaturationSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRSpatialSaturationSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRAveragesMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="MRAveragesSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRAveragesSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRAveragesSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRAveragesMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="MRAveragesSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRAveragesSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRAveragesSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRMetaboliteMapMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"					       ValueSelector="2" StringValueFromRootAttribute="METABOLITE_MAP"
-	Element="MRMetaboliteMapSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRMetaboliteMapSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRMetaboliteMapSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRMetaboliteMapMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"					       ValueSelector="2" StringValueFromRootAttribute="METABOLITE_MAP"
 	Element="MRMetaboliteMapSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRMetaboliteMapSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRMetaboliteMapSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRVelocityEncodingMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="PhaseContrast"				Operator="And" StringValueFromRootAttribute="YES"
-	Element="MRVelocityEncodingSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRVelocityEncodingSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRVelocityEncodingSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3333,19 +3422,19 @@ Condition="NeedMRVelocityEncodingMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="PhaseContrast"				Operator="And" StringValueFromRootAttribute="YES"
 	Element="MRVelocityEncodingSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRVelocityEncodingSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRVelocityEncodingSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRArterialSpinLabelingMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="2" StringValueFromRootAttribute="ASL"
-	Element="MRArterialSpinLabelingSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRArterialSpinLabelingSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="MRArterialSpinLabelingSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedMRArterialSpinLabelingMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="2" StringValueFromRootAttribute="ASL"
 	Element="MRArterialSpinLabelingSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="MRArterialSpinLabelingSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="MRArterialSpinLabelingSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PhaseContrastIsYes"
@@ -3354,18 +3443,18 @@ ConditionEnd
 
 Condition="NeedPETFrameAcquisitionMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
-	Element="PETFrameAcquisitionSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETFrameAcquisitionSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PETFrameAcquisitionSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPETFrameAcquisitionMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
 	Element="PETFrameAcquisitionSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PETFrameAcquisitionSequence"	Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETFrameAcquisitionSequence"	Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPETDetectorMotionDetailsMacroInSharedFunctionalGroupSequence"
-	Element="PETDetectorMotionDetailsSequence"	Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETDetectorMotionDetailsSequence"	Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		Element="ImageType"						ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
 		Element="TypeOfDetectorMotion"			Operator="And" Modifier="Not" StringValueFromRootAttribute="STATIONARY"
@@ -3379,47 +3468,47 @@ Condition="NeedPETDetectorMotionDetailsMacroInPerFrameFunctionalGroupSequence"
 		Element="ImageType"						ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
 		Element="TypeOfDetectorMotion"			Operator="And" Modifier="Not" StringValueFromRootAttribute="STATIONARY"
 	) Operator="And"
-	Element="PETDetectorMotionDetailsSequence"	Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETDetectorMotionDetailsSequence"	Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPETPositionMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
-	Element="PETPositionSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETPositionSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PETPositionSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPETPositionMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
 	Element="PETPositionSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PETPositionSequence"	Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETPositionSequence"	Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPETFrameCorrectionFactorsMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
-	Element="PETFrameCorrectionFactorsSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETFrameCorrectionFactorsSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PETFrameCorrectionFactorsSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPETFrameCorrectionFactorsMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
 	Element="PETFrameCorrectionFactorsSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PETFrameCorrectionFactorsSequence"	Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETFrameCorrectionFactorsSequence"	Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPETReconstructionMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
-	Element="PETReconstructionSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETReconstructionSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PETReconstructionSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPETReconstructionMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
 	Element="PETReconstructionSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PETReconstructionSequence"	Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETReconstructionSequence"	Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPETTableDynamicsMacroInSharedFunctionalGroupSequence"
-	Element="PETTableDynamicsSequence"	Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETTableDynamicsSequence"	Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		Element="ImageType"				ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
 		Element="TableMotion"			Operator="And" StringValueFromRootAttribute="DYNAMIC"
@@ -3433,7 +3522,7 @@ Condition="NeedPETTableDynamicsMacroInPerFrameFunctionalGroupSequence"
 		Element="ImageType"				ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
 		Element="TableMotion"			Operator="And" StringValueFromRootAttribute="DYNAMIC"
 	) Operator="And"
-	Element="PETTableDynamicsSequence"	Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PETTableDynamicsSequence"	Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="LossyImageCompressionIs01"
@@ -3504,14 +3593,14 @@ ConditionEnd
 
 Condition="NeedContrastBolusUsageMacroInSharedFunctionalGroupSequence"
 	Element="ContrastBolusAgentSequence"		ElementPresentInRoot=""
-	Element="ContrastBolusUsageSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ContrastBolusUsageSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="ContrastBolusUsageSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedContrastBolusUsageMacroInPerFrameFunctionalGroupSequence"
 	Element="ContrastBolusAgentSequence"		ElementPresentInRoot=""
 	Element="ContrastBolusUsageSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="ContrastBolusUsageSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ContrastBolusUsageSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="ParametricMapFrameTypeSequenceNotInSharedFunctionalGroupSequence"
@@ -3519,7 +3608,7 @@ Condition="ParametricMapFrameTypeSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="ParametricMapFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="ParametricMapFrameTypeSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ParametricMapFrameTypeSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="CTImageFrameTypeSequenceNotInSharedFunctionalGroupSequence"
@@ -3527,96 +3616,96 @@ Condition="CTImageFrameTypeSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="CTImageFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="CTImageFrameTypeSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTImageFrameTypeSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTAcquisitionTypeMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="CTAcquisitionTypeSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTAcquisitionTypeSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CTAcquisitionTypeSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTAcquisitionTypeMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="CTAcquisitionTypeSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CTAcquisitionTypeSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTAcquisitionTypeSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTAcquisitionDetailsMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="CTAcquisitionDetailsSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTAcquisitionDetailsSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CTAcquisitionDetailsSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTAcquisitionDetailsMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="CTAcquisitionDetailsSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CTAcquisitionDetailsSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTAcquisitionDetailsSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTTableDynamicsMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="CTTableDynamicsSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTTableDynamicsSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CTTableDynamicsSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTTableDynamicsMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="CTTableDynamicsSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CTTableDynamicsSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTTableDynamicsSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTPositionMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="CTPositionSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTPositionSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CTPositionSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTPositionMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="CTPositionSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CTPositionSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTPositionSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTGeometryMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="CTGeometrySequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTGeometrySequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CTGeometrySequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTGeometryMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="CTGeometrySequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CTGeometrySequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTGeometrySequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTReconstructionMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="CTReconstructionSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTReconstructionSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CTReconstructionSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTReconstructionMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="CTReconstructionSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CTReconstructionSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTReconstructionSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTExposureMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="CTExposureSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTExposureSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CTExposureSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTExposureMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="CTExposureSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CTExposureSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTExposureSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedCTXRayDetailsMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
-	Element="CTXRayDetailsSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTXRayDetailsSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CTXRayDetailsSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -3624,17 +3713,37 @@ Condition="NeedCTXRayDetailsMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0" Modifier="Not" StringValueFromRootAttribute="DERIVED"
 	Element="AcquisitionType"			Operator="And" Modifier="Not" StringValueFromRootAttribute="CONSTANT_ANGLE"
 	Element="CTXRayDetailsSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CTXRayDetailsSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTXRayDetailsSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="CTAdditionalXRaySourceMacroInSharedFunctionalGroupSequence"
-	Element="CTAdditionalXRaySourceSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTAdditionalXRaySourceSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CTAdditionalXRaySourceSequence"		Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="CTAdditionalXRaySourceMacroInPerFrameFunctionalGroupSequence"
 	Element="CTAdditionalXRaySourceSequence"		Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CTAdditionalXRaySourceSequence"		Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CTAdditionalXRaySourceSequence"		Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="MultienergyCTProcessingMacroInSharedFunctionalGroupSequence"
+	Element="MultienergyCTProcessingSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="MultienergyCTProcessingSequence"		Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="MultienergyCTProcessingMacroInPerFrameFunctionalGroupSequence"
+	Element="MultienergyCTProcessingSequence"		Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="MultienergyCTProcessingSequence"		Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="MultienergyCTCharacteristicsMacroInSharedFunctionalGroupSequence"
+	Element="MultienergyCTCharacteristicsSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="MultienergyCTCharacteristicsSequence"		Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="MultienergyCTCharacteristicsMacroInPerFrameFunctionalGroupSequence"
+	Element="MultienergyCTCharacteristicsSequence"		Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="MultienergyCTCharacteristicsSequence"		Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="AcquisitionTypeConstantAngle"
@@ -3705,14 +3814,14 @@ Condition="JPEG2000LosslessTransferSyntaxButNotYBR_RCT"
 	Element="PhotometricInterpretation"			Operator="And"	Modifier="Not" StringValue="YBR_RCT"
 ConditionEnd
 
-Condition="JPEG2000TransferSyntaxButNotYBR_RCTorYBR_ICT"
+Condition="JPEG2000TransferSyntaxButNotYBR_RCTOrYBR_ICT"
 	Element="TransferSyntaxUID"					StringValue="1.2.840.10008.1.2.4.91"
 	Element="PhotometricInterpretation"			Operator="And"	Modifier="Not" StringValue="YBR_RCT"
 	Element="PhotometricInterpretation"			Operator="And"	Modifier="Not" StringValue="YBR_ICT"
 ConditionEnd
 
-Condition="JPEGLossyTransferSyntaxAndThreeSamples"
-	Element="SamplesPerPixel"						BinaryValue="== 3"
+Condition="JPEGLossyTransferSyntaxAndOneSample"
+	Element="SamplesPerPixel"							BinaryValue="== 1"
 	(
 		Element="TransferSyntaxUID"						StringValue="1.2.840.10008.1.2.4.50"
 		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.51"
@@ -3730,8 +3839,27 @@ Condition="JPEGLossyTransferSyntaxAndThreeSamples"
 	) Operator="And"
 ConditionEnd
 
-Condition="JPEGLosslessTransferSyntaxAndThreeSamples"
-	Element="SamplesPerPixel"						BinaryValue="== 3"
+Condition="JPEGLossyTransferSyntaxAndThreeSamples"
+	Element="SamplesPerPixel"							BinaryValue="== 3"
+	(
+		Element="TransferSyntaxUID"						StringValue="1.2.840.10008.1.2.4.50"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.51"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.52"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.53"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.54"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.55"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.56"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.59"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.60"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.61"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.62"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.63"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.64"
+	) Operator="And"
+ConditionEnd
+
+Condition="JPEGLosslessTransferSyntaxAndOneSample"
+	Element="SamplesPerPixel"							BinaryValue="== 1"
 	(
 		Element="TransferSyntaxUID"						StringValue="1.2.840.10008.1.2.4.57"
 		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.58"
@@ -3741,22 +3869,69 @@ Condition="JPEGLosslessTransferSyntaxAndThreeSamples"
 	) Operator="And"
 ConditionEnd
 
-Condition="JPEG2000LosslessTransferSyntaxAndThreeSamples"
-	Element="TransferSyntaxUID"					StringValue="1.2.840.10008.1.2.4.90"
-	Element="SamplesPerPixel"			Operator="And"	BinaryValue="== 3"
-ConditionEnd
-
-Condition="JPEG2000TransferSyntaxAndThreeSamples"
-	Element="SamplesPerPixel"				BinaryValue="== 3"
+Condition="JPEGLosslessTransferSyntaxAndThreeSamples"
+	Element="SamplesPerPixel"							BinaryValue="== 3"
 	(
-		Element="TransferSyntaxUID"							StringValue="1.2.840.10008.1.2.4.90"
-		Element="TransferSyntaxUID"			Operator="Or"	StringValue="1.2.840.10008.1.2.4.91"
+		Element="TransferSyntaxUID"						StringValue="1.2.840.10008.1.2.4.57"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.58"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.65"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.66"
+		Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.70"
 	) Operator="And"
 ConditionEnd
 
+Condition="JPEGLSLosslessTransferSyntaxAndOneSample"
+	Element="SamplesPerPixel"							BinaryValue="== 1"
+	Element="TransferSyntaxUID"			Operator="And"	StringValue="1.2.840.10008.1.2.4.80"
+ConditionEnd
+
+Condition="JPEGLSLosslessTransferSyntaxAndThreeSamples"
+	Element="SamplesPerPixel"							BinaryValue="== 3"
+	Element="TransferSyntaxUID"			Operator="And"	StringValue="1.2.840.10008.1.2.4.80"
+ConditionEnd
+
+Condition="JPEGLSNearLosslessTransferSyntaxAndOneSample"
+	Element="SamplesPerPixel"							BinaryValue="== 1"
+	Element="TransferSyntaxUID"			Operator="And"	StringValue="1.2.840.10008.1.2.4.81"
+ConditionEnd
+
+Condition="JPEGLSNearLosslessTransferSyntaxAndThreeSamples"
+	Element="SamplesPerPixel"							BinaryValue="== 3"
+	Element="TransferSyntaxUID"			Operator="And"	StringValue="1.2.840.10008.1.2.4.81"
+ConditionEnd
+
+Condition="JPEG2000LosslessTransferSyntaxAndOneSample"
+	Element="SamplesPerPixel"							BinaryValue="== 1"
+	Element="TransferSyntaxUID"			Operator="And"	StringValue="1.2.840.10008.1.2.4.90"
+ConditionEnd
+
+Condition="JPEG2000LosslessTransferSyntaxAndThreeSamples"
+	Element="SamplesPerPixel"							BinaryValue="== 3"
+	Element="TransferSyntaxUID"			Operator="And"	StringValue="1.2.840.10008.1.2.4.90"
+ConditionEnd
+
+Condition="JPEG2000TransferSyntaxAndOneSample"
+	Element="SamplesPerPixel"							BinaryValue="== 1"
+	Element="TransferSyntaxUID"			Operator="And"	StringValue="1.2.840.10008.1.2.4.91"
+ConditionEnd
+
+Condition="JPEG2000TransferSyntaxAndThreeSamples"
+	Element="SamplesPerPixel"							BinaryValue="== 3"
+	Element="TransferSyntaxUID"			Operator="And"	StringValue="1.2.840.10008.1.2.4.91"
+ConditionEnd
+
 Condition="MPEG2TransferSyntax"
-	Element="TransferSyntaxUID"						StringValue="1.2.840.10008.1.2.4.100"
-	Element="TransferSyntaxUID"		Operator="Or"	StringValue="1.2.840.10008.1.2.4.101"
+	Element="TransferSyntaxUID"							StringValue="1.2.840.10008.1.2.4.100"
+	Element="TransferSyntaxUID"			Operator="Or"	StringValue="1.2.840.10008.1.2.4.101"
+ConditionEnd
+
+Condition="UncompressedTransferSyntaxAndOneSample"
+	Element="SamplesPerPixel"				BinaryValue="== 1"
+	(
+		Element="TransferSyntaxUID"							StringValue="1.2.840.10008.1.2"
+		Element="TransferSyntaxUID"			Operator="Or"	StringValue="1.2.840.10008.1.2.1"
+		Element="TransferSyntaxUID"			Operator="Or"	StringValue="1.2.840.10008.1.2.2"
+	) Operator="And"
 ConditionEnd
 
 Condition="UncompressedTransferSyntaxAndThreeSamples"
@@ -3768,9 +3943,14 @@ Condition="UncompressedTransferSyntaxAndThreeSamples"
 	) Operator="And"
 ConditionEnd
 
+Condition="RLETransferSyntaxAndOneSample"
+	Element="SamplesPerPixel"								BinaryValue="== 1"
+	Element="TransferSyntaxUID"				Operator="And"	StringValue="1.2.840.10008.1.2.5"
+ConditionEnd
+
 Condition="RLETransferSyntaxAndThreeSamples"
-	Element="TransferSyntaxUID"					StringValue="1.2.840.10008.1.2.5"
-	Element="SamplesPerPixel"			Operator="And"	BinaryValue="== 3"
+	Element="SamplesPerPixel"								BinaryValue="== 3"
+	Element="TransferSyntaxUID"				Operator="And"	StringValue="1.2.840.10008.1.2.5"
 ConditionEnd
 
 Condition="MPEG2TransferSyntaxAndNotThreeSamples"
@@ -4357,70 +4537,70 @@ Condition="ObserverTypeIsDevice"
 ConditionEnd
 
 Condition="PlanePositionSequenceOKInSharedFunctionalGroupSequence"
-	Element="PlanePositionSequence"					Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlanePositionSequence"					Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PlanePositionSequence"					Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PlanePositionSequenceOKInPerFrameFunctionalGroupSequence"
 	Element="PlanePositionSequence"					Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PlanePositionSequence"					Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlanePositionSequence"					Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 
 Condition="PlaneOrientationSequenceOKInSharedFunctionalGroupSequence"
-	Element="PlaneOrientationSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlaneOrientationSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PlaneOrientationSequence"				Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PlaneOrientationSequenceOKInPerFrameFunctionalGroupSequence"
 	Element="PlaneOrientationSequence"				Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PlaneOrientationSequence"				Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PlaneOrientationSequence"				Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 
 Condition="PixelValueTransformationSequenceOKInSharedFunctionalGroupSequence"
-	Element="PixelValueTransformationSequence"		Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelValueTransformationSequence"		Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PixelValueTransformationSequence"		Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PixelValueTransformationSequenceOKInPerFrameFunctionalGroupSequence"
 	Element="PixelValueTransformationSequence"		Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PixelValueTransformationSequence"		Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelValueTransformationSequence"		Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FrameVOILUTMacroOKInSharedFunctionalGroupSequence"
-	Element="FrameVOILUTSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameVOILUTSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FrameVOILUTSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FrameVOILUTMacroOKInSharedFunctionalGroupSequenceAndPhotometricInterpretationIsMonochrome2"
-	Element="FrameVOILUTSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameVOILUTSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FrameVOILUTSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	Element="PhotometricInterpretation"			Operator="And"	StringValueFromRootAttribute="MONOCHROME2"
 ConditionEnd
 
 Condition="FrameVOILUTMacroOKInPerFrameFunctionalGroupSequence"
 	Element="FrameVOILUTSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FrameVOILUTSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameVOILUTSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FrameVOILUTMacroOKInPerFrameFunctionalGroupSequenceAndPhotometricInterpretationIsMonochrome2"
 	Element="FrameVOILUTSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FrameVOILUTSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameVOILUTSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PhotometricInterpretation"			Operator="And"	StringValueFromRootAttribute="MONOCHROME2"
 ConditionEnd
 
 Condition="RealWorldValueMappingSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="RealWorldValueMappingSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RealWorldValueMappingSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="RealWorldValueMappingMacroOKInSharedFunctionalGroupSequence"
-	Element="RealWorldValueMappingSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RealWorldValueMappingSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="RealWorldValueMappingSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="RealWorldValueMappingMacroOKInSharedFunctionalGroupSequenceAndPhotometricInterpretationIsMonochrome2"
-	Element="RealWorldValueMappingSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RealWorldValueMappingSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="RealWorldValueMappingSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	Element="PhotometricInterpretation"					Operator="And"	StringValueFromRootAttribute="MONOCHROME2"
 ConditionEnd
@@ -4431,175 +4611,183 @@ ConditionEnd
 
 Condition="RealWorldValueMappingMacroOKInPerFrameFunctionalGroupSequence"
 	Element="RealWorldValueMappingSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="RealWorldValueMappingSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RealWorldValueMappingSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="RealWorldValueMappingMacroOKInPerFrameFunctionalGroupSequenceAndPhotometricInterpretationIsMonochrome2"
 	Element="RealWorldValueMappingSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="RealWorldValueMappingSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RealWorldValueMappingSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PhotometricInterpretation"					Operator="And"	StringValueFromRootAttribute="MONOCHROME2"
 ConditionEnd
 
 Condition="ReferencedImageMacroOKInSharedFunctionalGroupSequence"
-	Element="ReferencedImageSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ReferencedImageSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="ReferencedImageSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="ReferencedImageMacroOKInPerFrameFunctionalGroupSequence"
 	Element="ReferencedImageSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="ReferencedImageSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ReferencedImageSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="DerivationImageMacroOKInSharedFunctionalGroupSequence"
-	Element="DerivationImageSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="DerivationImageSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="DerivationImageSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="DerivationImageMacroOKInPerFrameFunctionalGroupSequence"
 	Element="DerivationImageSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="DerivationImageSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="DerivationImageSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="CardiacSynchronizationMacroOKInSharedFunctionalGroupSequence"
-	Element="CardiacSynchronizationSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CardiacSynchronizationSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="CardiacSynchronizationMacroOKInPerFrameFunctionalGroupSequence"
 	Element="CardiacSynchronizationSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CardiacSynchronizationSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FramePixelShiftMacroOKInSharedFunctionalGroupSequence"
-	Element="FramePixelShiftSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FramePixelShiftSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FramePixelShiftSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FramePixelShiftMacroOKInPerFrameFunctionalGroupSequence"
 	Element="FramePixelShiftSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FramePixelShiftSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FramePixelShiftSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FrameDisplayShutterMacroOKInSharedFunctionalGroupSequence"
-	Element="FrameDisplayShutterSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameDisplayShutterSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FrameDisplayShutterSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FrameDisplayShutterMacroOKInPerFrameFunctionalGroupSequence"
 	Element="FrameDisplayShutterSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FrameDisplayShutterSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameDisplayShutterSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="RespiratorySynchronizationMacroOKInSharedFunctionalGroupSequence"
-	Element="RespiratorySynchronizationSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="RespiratorySynchronizationSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="RespiratorySynchronizationMacroOKInPerFrameFunctionalGroupSequence"
 	Element="RespiratorySynchronizationSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="RespiratorySynchronizationSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayFrameCharacteristicsMacroOKInSharedFunctionalGroupSequence"
-	Element="XAXRFFrameCharacteristicsSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XAXRFFrameCharacteristicsSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="XAXRFFrameCharacteristicsSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayFrameCharacteristicsMacroOKInPerFrameFunctionalGroupSequence"
 	Element="XAXRFFrameCharacteristicsSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="XAXRFFrameCharacteristicsSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XAXRFFrameCharacteristicsSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayExposureControlSensingRegionsMacroOKInSharedFunctionalGroupSequence"
-	Element="ExposureControlSensingRegionsSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ExposureControlSensingRegionsSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="ExposureControlSensingRegionsSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayExposureControlSensingRegionsMacroOKInPerFrameFunctionalGroupSequence"
 	Element="ExposureControlSensingRegionsSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="ExposureControlSensingRegionsSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ExposureControlSensingRegionsSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayCalibrationDeviceUsageMacroOKInSharedFunctionalGroupSequence"
-	Element="CalibrationSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CalibrationSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CalibrationSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayCalibrationDeviceUsageMacroOKInPerFrameFunctionalGroupSequence"
 	Element="CalibrationSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CalibrationSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CalibrationSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayObjectThicknessMacroOKInSharedFunctionalGroupSequence"
-	Element="ObjectThicknessSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ObjectThicknessSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="ObjectThicknessSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayObjectThicknessMacroOKInPerFrameFunctionalGroupSequence"
 	Element="ObjectThicknessSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="ObjectThicknessSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ObjectThicknessSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayFrameAcquisitionMacroOKInSharedFunctionalGroupSequence"
-	Element="FrameAcquisitionSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameAcquisitionSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FrameAcquisitionSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayFrameAcquisitionMacroOKInPerFrameFunctionalGroupSequence"
 	Element="FrameAcquisitionSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FrameAcquisitionSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameAcquisitionSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 
 Condition="XRayIsocenterReferenceSystemMacroOKInSharedFunctionalGroupSequence"
-	Element="IsocenterReferenceSystemSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IsocenterReferenceSystemSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="IsocenterReferenceSystemSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	Element="CArmPositionerTabletopRelationship"			Operator="And"	StringValueFromRootAttribute="YES"
 ConditionEnd
 
 Condition="XRayIsocenterReferenceSystemMacroOKInPerFrameFunctionalGroupSequence"
 	Element="IsocenterReferenceSystemSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="IsocenterReferenceSystemSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IsocenterReferenceSystemSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CArmPositionerTabletopRelationship"			Operator="And"	StringValueFromRootAttribute="YES"
 ConditionEnd
 
 
 Condition="PatientOrientationInFrameMacroOKInSharedFunctionalGroupSequence"
-	Element="PatientOrientationInFrameSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PatientOrientationInFrameSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PatientOrientationInFrameSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PatientOrientationInFrameMacroOKInPerFrameFunctionalGroupSequence"
 	Element="PatientOrientationInFrameSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PatientOrientationInFrameSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PatientOrientationInFrameSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
-
 Condition="TemporalPositionMacroOKInSharedFunctionalGroupSequence"
-	Element="TemporalPositionSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="TemporalPositionSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="TemporalPositionSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CardiacSynchronizationSequence"		Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CardiacSynchronizationSequence"		Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
-	Element="RespiratorySynchronizationSequence"	Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="RespiratorySynchronizationSequence"	Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="TemporalPositionMacroOKInPerFrameFunctionalGroupSequence"
 	Element="TemporalPositionSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="TemporalPositionSequence"				Operator="And"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
-	Element="CardiacSynchronizationSequence"		Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CardiacSynchronizationSequence"		Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
-	Element="RespiratorySynchronizationSequence"	Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="RespiratorySynchronizationSequence"	Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="TemporalPositionSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
+Condition="TemporalPositionMacroOKInSharedFunctionalGroupSequenceAndNotCardiacOrRespiratoryEvent"
+	Element="TemporalPositionSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="TemporalPositionSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"		Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"		Operator="And"	Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"	Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"	Operator="And"	Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="TemporalPositionMacroOKInPerFrameFunctionalGroupSequenceAndNotCardiacOrRespiratoryEvent"
+	Element="TemporalPositionSequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="TemporalPositionSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"		Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="CardiacSynchronizationSequence"		Operator="And"	Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"	Operator="And"	Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="RespiratorySynchronizationSequence"	Operator="And"	Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+ConditionEnd
 
 Condition="FrameVOILUTSequenceNotInSharedFunctionalGroupSequence"
 	Element="FrameVOILUTSequence"				Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FrameVOILUTSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="FrameVOILUTSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameVOILUTSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 
@@ -4608,18 +4796,18 @@ Condition="ImageDataTypeSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="ImageDataTypeSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="ImageDataTypeSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ImageDataTypeSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 
 Condition="IrradiationEventIdentificationMacroOKInSharedFunctionalGroupSequence"
-	Element="IrradiationEventIdentificationSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IrradiationEventIdentificationSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="IrradiationEventIdentificationSequence"				Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="IrradiationEventIdentificationMacroOKInPerFrameFunctionalGroupSequence"
 	Element="IrradiationEventIdentificationSequence"				Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="IrradiationEventIdentificationSequence"				Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IrradiationEventIdentificationSequence"				Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="IrradiationEventIdentificationSequenceNotInSharedFunctionalGroupSequence"
@@ -4627,7 +4815,7 @@ Condition="IrradiationEventIdentificationSequenceNotInSharedFunctionalGroupSeque
 ConditionEnd
 
 Condition="IrradiationEventIdentificationSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="IrradiationEventIdentificationSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IrradiationEventIdentificationSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="ConversionSourceAttributesSequenceNotInSharedFunctionalGroupSequence"
@@ -4635,7 +4823,7 @@ Condition="ConversionSourceAttributesSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="ConversionSourceAttributesSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="ConversionSourceAttributesSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ConversionSourceAttributesSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FramePixelDataPropertiesSequenceNotInSharedFunctionalGroupSequence"
@@ -4643,35 +4831,35 @@ Condition="FramePixelDataPropertiesSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="FramePixelDataPropertiesSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="FramePixelDataPropertiesSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FramePixelDataPropertiesSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPixelIntensityRelationshipLUTMacroInSharedFunctionalGroupSequence"
 	Element="PixelIntensityRelationship"			StringValueFromRootAttribute="LOG"
-	Element="PixelIntensityRelationshipLUTSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelIntensityRelationshipLUTSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PixelIntensityRelationshipLUTSequence"	Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPixelIntensityRelationshipLUTMacroInPerFrameFunctionalGroupSequence"
 	Element="PixelIntensityRelationship"			StringValueFromRootAttribute="LOG"
 	Element="PixelIntensityRelationshipLUTSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PixelIntensityRelationshipLUTSequence"	Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelIntensityRelationshipLUTSequence"	Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPatientOrientationInFrameMacroInSharedFunctionalGroupSequence"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
-	Element="PatientOrientationInFrameSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PatientOrientationInFrameSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PatientOrientationInFrameSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedPatientOrientationInFrameMacroInPerFrameFunctionalGroupSequence"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
 	Element="PatientOrientationInFrameSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PatientOrientationInFrameSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PatientOrientationInFrameSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FieldOfViewSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="FieldOfViewSequence"					Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FieldOfViewSequence"					Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="FieldOfViewSequenceNotInSharedFunctionalGroupSequence"
@@ -4680,54 +4868,54 @@ ConditionEnd
 
 Condition="NeedXRayFieldOfViewMacroInSharedFunctionalGroupSequence"
 	Element="IsocenterReferenceSystemSequence"		ElementPresentInRoot=""
-	Element="FieldOfViewSequence"					Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FieldOfViewSequence"					Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FieldOfViewSequence"					Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedXRayFieldOfViewMacroInPerFrameFunctionalGroupSequence"
 	Element="IsocenterReferenceSystemSequence"		ElementPresentInRoot=""
 	Element="FieldOfViewSequence"					Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FieldOfViewSequence"					Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FieldOfViewSequence"					Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayFrameDetectorParametersMacroOKInSharedFunctionalGroupSequence"
-	Element="FrameDetectorParametersSequence"	Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameDetectorParametersSequence"	Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FrameDetectorParametersSequence"	Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayFrameDetectorParametersMacroOKInPerFrameFunctionalGroupSequence"
 	Element="FrameDetectorParametersSequence"	Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FrameDetectorParametersSequence"	Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameDetectorParametersSequence"	Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedXRayFrameDetectorParametersMacroInSharedFunctionalGroupSequence"
 	Element="XRayReceptorType"					StringValueFromRootAttribute="DIGITAL_DETECTOR"
-	Element="FrameDetectorParametersSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameDetectorParametersSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FrameDetectorParametersSequence"	Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedXRayFrameDetectorParametersMacroInPerFrameFunctionalGroupSequence"
 	Element="XRayReceptorType"					StringValueFromRootAttribute="DIGITAL_DETECTOR"
 	Element="FrameDetectorParametersSequence"	Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FrameDetectorParametersSequence"	Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameDetectorParametersSequence"	Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedXRayProjectionPixelCalibrationMacroInSharedFunctionalGroupSequence"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
-	Element="ProjectionPixelCalibrationSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ProjectionPixelCalibrationSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="ProjectionPixelCalibrationSequence"		Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedXRayProjectionPixelCalibrationMacroInPerFrameFunctionalGroupSequence"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
 	Element="ProjectionPixelCalibrationSequence"		Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="ProjectionPixelCalibrationSequence"		Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ProjectionPixelCalibrationSequence"		Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedXRayPositionerMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0"	StringValueFromRootAttribute="ORIGINAL"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
-	Element="PositionerPositionSequence"				Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PositionerPositionSequence"				Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PositionerPositionSequence"				Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -4735,13 +4923,13 @@ Condition="NeedXRayPositionerMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0"	StringValueFromRootAttribute="ORIGINAL"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
 	Element="PositionerPositionSequence"				Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PositionerPositionSequence"				Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PositionerPositionSequence"				Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedXRayTablePositionMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0"	StringValueFromRootAttribute="ORIGINAL"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
-	Element="TablePositionSequence"						Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="TablePositionSequence"						Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="TablePositionSequence"						Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -4749,11 +4937,11 @@ Condition="NeedXRayTablePositionMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0"	StringValueFromRootAttribute="ORIGINAL"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
 	Element="TablePositionSequence"						Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="TablePositionSequence"						Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="TablePositionSequence"						Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="CollimatorShapeSequenceSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="CollimatorShapeSequence"					Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CollimatorShapeSequence"					Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="CollimatorShapeSequenceSequenceNotInSharedFunctionalGroupSequence"
@@ -4762,28 +4950,28 @@ ConditionEnd
 
 Condition="NeedXRayCollimatorMacroInSharedFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0"	StringValueFromRootAttribute="ORIGINAL"
-	Element="CollimatorShapeSequence"					Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CollimatorShapeSequence"					Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="CollimatorShapeSequence"					Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedXRayCollimatorMacroInPerFrameFunctionalGroupSequence"
 	Element="ImageType"									ValueSelector="0"	StringValueFromRootAttribute="ORIGINAL"
 	Element="CollimatorShapeSequence"					Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="CollimatorShapeSequence"					Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="CollimatorShapeSequence"					Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 # should really check for ProjectionPixelCalibrationSequence in either shared or per-frame sequence, but cannot ... 
 
 Condition="NeedXRayGeometryMacroInSharedFunctionalGroupSequence"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
-	Element="XRayGeometrySequence"						Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XRayGeometrySequence"						Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="XRayGeometrySequence"						Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedXRayGeometryMacroInPerFrameFunctionalGroupSequence"
 	Element="CArmPositionerTabletopRelationship"		StringValueFromRootAttribute="YES"
 	Element="XRayGeometrySequence"						Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="XRayGeometrySequence"						Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XRayGeometrySequence"						Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="ResponsiblePersonIsPresentWithValue"
@@ -5063,7 +5251,7 @@ ConditionEnd
 
 Condition="UnwantedPixelAspectRatioWhenPerFramePixelMeasuresMacro"
 	Element="PixelAspectRatio"					ElementPresent=""
-	Element="PixelMeasuresSequence"				Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PixelMeasuresSequence"				Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 # find libsrc/standard/module -name '*.tpl' -exec grep InvokeMacro '{}' ';' | grep FunctionalGroupSequence | sed -e 's/^.*InvokeMacro="//' -e 's/Macro".*$/Sequence/' | sort -u | xargs -L1 dcdict -k
@@ -5240,6 +5428,7 @@ Condition="CodeValueIllegalOrDeprecated"
 ConditionEnd
 
 Condition="CodingSchemeDesignatorDeprecated"
+	Element="CodingSchemeDesignator"		StringValue="SRT"
 	Element="CodingSchemeDesignator"		StringValue="SNM3"
 	Element="CodingSchemeDesignator"		StringValue="99SDM"
 ConditionEnd
@@ -5269,13 +5458,13 @@ Condition="CodeValueAndLongCodeValueAbsent"
 ConditionEnd
 
 Condition="NeedOphthalmicFrameLocationMacroInSharedFunctionalGroupSequence"
-	Element="OphthalmicFrameLocationSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="OphthalmicFrameLocationSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="OphthalmicFrameLocationSequence"		Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedOphthalmicFrameLocationMacroInPerFrameFunctionalGroupSequence"
 	Element="OphthalmicFrameLocationSequence"		Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="OphthalmicFrameLocationSequence"		Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="OphthalmicFrameLocationSequence"		Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 # should check AcquisitionDeviceTypeCodeSequence contains (A-00FBE, SRT, ”Optical Coherence Tomography Scanner”) ... too hard for now :(
@@ -5295,7 +5484,7 @@ Condition="XRay3DFrameTypeSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="XRay3DFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="XRay3DFrameTypeSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XRay3DFrameTypeSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="NeedModulePatientOrientation"
@@ -5422,11 +5611,22 @@ ConditionEnd
 # checking AnatomicRegionSequence is probably futile, since ImageLaterality rather than laterality is generally used for those IODs :(
 # also don't try to check Segmentation objects that contain AnatomicRegionSequence nested within SegmentSequence instead of top level :(
 # and don't try to check specimens, since Primary Anatomic Sequence deeply nested and inside and optional sequence :(
+# and assume cardiac, respiratory and voice (but not all audio) waveforms are not a paired body part (though hemodynamic waveforms might be)
 Condition="LateralityRequired"
 	Element="ImageLaterality"						Modifier="Not" ElementPresent=""
+	Element="MeasurementLaterality"					Operator="And" Modifier="Not" ElementPresent=""
 	Element="FrameAnatomySequence"					Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="FrameAnatomySequence"					Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="FrameAnatomySequence"					Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="SegmentSequence"						Operator="And" Modifier="Not" ElementPresent=""
+	Element="SOPClassUID"							Operator="And" Modifier="Not" StringConstantFromRootAttribute="BasicVoiceStorageSOPClassUID"
+	Element="SOPClassUID"							Operator="And" Modifier="Not" StringConstantFromRootAttribute="TwelveLeadECGStorageSOPClassUID"
+	Element="SOPClassUID"							Operator="And" Modifier="Not" StringConstantFromRootAttribute="GeneralECGStorageSOPClassUID"
+	Element="SOPClassUID"							Operator="And" Modifier="Not" StringConstantFromRootAttribute="AmbulatoryECGStorageSOPClassUID"
+	Element="SOPClassUID"							Operator="And" Modifier="Not" StringConstantFromRootAttribute="CardiacElectrophysiologyWaveformStorageSOPClassUID"
+	Element="SOPClassUID"							Operator="And" Modifier="Not" StringConstantFromRootAttribute="RespiratoryWaveformStorageSOPClassUID"
+	Element="Modality"								Operator="And" Modifier="Not" StringValue="ECG"
+	Element="Modality"								Operator="And" Modifier="Not" StringValue="EPS"
+	Element="Modality"								Operator="And" Modifier="Not" StringValue="RESP"
 	Element="SpecimenDescriptionSequence"			Operator="And" Modifier="Not" ElementPresent=""
 	(
 		Element="BodyPartExamined"					              StringValue="ABDOMEN"
@@ -5718,7 +5918,7 @@ Condition="InstancesAreReferencedAndStudiesContainingOtherReferencedInstancesSeq
 	Element="StudiesContainingOtherReferencedInstancesSequence"		Modifier="Not" ElementPresent=""
 	(
 		Element="ReferencedSOPInstanceUID"							ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="StereoPairsSequence"
 		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="RegistrationSequence"
 		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="DeformableRegistrationSequence"
@@ -5731,7 +5931,7 @@ Condition="InstancesAreReferencedAndReferencedSeriesSequenceAbsent"
 	Element="ReferencedSeriesSequence"								Modifier="Not" ElementPresent=""
 	(
 		Element="ReferencedSOPInstanceUID"							ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="StereoPairsSequence"
 		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="RegistrationSequence"
 		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="DeformableRegistrationSequence"
@@ -6063,6 +6263,17 @@ Condition="WindowWidthIsNegative"
 	Element="WindowWidth"						BinaryValue="< 0"
 ConditionEnd
 
+Condition="WindowWidthIsZeroAndSigmoid"
+	Element="WindowWidth"						BinaryValue="== 0"
+	Element="VOILUTFunction"					Operator="And"	StringValue="SIGMOID"
+ConditionEnd
+
+Condition="WindowWidthIsLessThanOneAndNotExact"
+	Element="WindowWidth"						BinaryValue="< 1"
+	Element="VOILUTFunction"					Operator="And"	Modifier="Not" StringValue="LINEAR_EXACT"
+	Element="VOILUTFunction"					Operator="And"	Modifier="Not" StringValue="SIGMOID"
+ConditionEnd
+
 Condition="IVUSAcquisitionIsMotorized"
 	Element="IVUSAcquisition"				StringValueFromRootAttribute="MOTORIZED"
 ConditionEnd
@@ -6076,7 +6287,7 @@ Condition="IntravascularOCTFrameTypeSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="IntravascularOCTFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="IntravascularOCTFrameTypeSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IntravascularOCTFrameTypeSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="IntravascularFrameContentSequenceNotInSharedFunctionalGroupSequence"
@@ -6084,7 +6295,7 @@ Condition="IntravascularFrameContentSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="IntravascularFrameContentSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="IntravascularFrameContentSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IntravascularFrameContentSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="IntravascularFrameContentSequenceNotInSharedFunctionalGroupSequenceAndAcquisitionIsMeasured"
@@ -6093,7 +6304,7 @@ Condition="IntravascularFrameContentSequenceNotInSharedFunctionalGroupSequenceAn
 ConditionEnd
 
 Condition="IntravascularFrameContentSequenceNotInPerFrameFunctionalGroupSequenceAndAcquisitionIsMeasured"
-	Element="IntravascularFrameContentSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IntravascularFrameContentSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="IVUSAcquisition"								Operator="And" StringValueFromRootAttribute="MEASURED"
 ConditionEnd
 
@@ -6102,7 +6313,7 @@ Condition="IntravascularOCTFrameContentSequenceNotInSharedFunctionalGroupSequenc
 ConditionEnd
 
 Condition="IntravascularOCTFrameContentSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="IntravascularOCTFrameContentSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IntravascularOCTFrameContentSequence"			Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="PresentationIntentTypeIsForProcessing"
@@ -6199,9 +6410,9 @@ Condition="UltrasoundAcquisitionGeometryIsApex"
 ConditionEnd
 
 Condition="NeedPatientFrameOfReferenceSource"
-	Element="ImagePositionPatient"							ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ImagePositionPatient"							ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="ImagePositionPatient"			Operator="Or"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="ImageOrientationPatient"		Operator="Or"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ImageOrientationPatient"		Operator="Or"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="ImageOrientationPatient"		Operator="Or"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -6273,36 +6484,45 @@ Condition="NeedModuleOpticalPath"
 ConditionEnd
 
 Condition="SpecimenReferenceMacroOKInSharedFunctionalGroupSequence"
-	Element="SpecimenReferenceSequence"				Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="SpecimenReferenceSequence"				Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="SpecimenReferenceSequence"				Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="SpecimenReferenceMacroOKInPerFrameFunctionalGroupSequence"
 	Element="SpecimenReferenceSequence"				Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="SpecimenReferenceSequence"				Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="SpecimenReferenceSequence"				Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
-
-Condition="PlanePositionSlideSequenceNotInSharedFunctionalGroupSequence"
-	Element="PlanePositionSlideSequence"			Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+Condition="NeedPlanePositionSlideMacroInSharedFunctionalGroupSequenceForWholeSlideMicroscopy"
+	Element="PlanePositionSlideSequence"			Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="DimensionOrganizationType"				Operator="And"	Modifier="Not"	ValueSelector="0"	StringValueFromRootAttribute="TILED_FULL"
 ConditionEnd
 
-Condition="PlanePositionSlideSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="PlanePositionSlideSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+Condition="NeedPlanePositionSlideMacroInPerFrameFunctionalGroupSequenceForWholeSlideMicroscopy"
+	Element="PlanePositionSlideSequence"			Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="DimensionOrganizationType"				Operator="And"	Modifier="Not"	ValueSelector="0"	StringValueFromRootAttribute="TILED_FULL"
 ConditionEnd
 
+Condition="NeedOpticalPathIdentificationMacroInSharedFunctionalGroupSequenceForWholeSlideMicroscopy"
+	Element="OpticalPathIdentificationSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	(
+		Element="OpticalPathIdentificationSequence"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+		Element="DimensionOrganizationType"			Operator="Or"	Modifier="Not"	ValueSelector="0"	StringValueFromRootAttribute="TILED_FULL"
+	) Operator="And"
+ConditionEnd
 
-Condition="OpticalPathIdentificationSequenceNotInSharedFunctionalGroupSequence"
+Condition="NeedOpticalPathIdentificationMacroInPerFrameFunctionalGroupSequenceForWholeSlideMicroscopy"
 	Element="OpticalPathIdentificationSequence"		Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	(
+		Element="OpticalPathIdentificationSequence"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+		Element="DimensionOrganizationType"			Operator="Or"	Modifier="Not"	ValueSelector="0"	StringValueFromRootAttribute="TILED_FULL"
+	) Operator="And"
 ConditionEnd
 
-Condition="OpticalPathIdentificationSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="OpticalPathIdentificationSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
-ConditionEnd
-
-Condition="ImageTypeValue3LocalizerOrLabel"
+Condition="ImageTypeValue3LocalizerOrLabelOrOverview"
 	Element="ImageType"												ValueSelector="2"	StringValue="LOCALIZER"
 	Element="ImageType"								Operator="Or"	ValueSelector="2"	StringValue="LABEL"
+	Element="ImageType"								Operator="Or"	ValueSelector="2"	StringValue="OVERVIEW"
 ConditionEnd
 
 Condition="ExtendedDepthOfFieldIsYes"
@@ -6333,40 +6553,44 @@ Condition="SpatialTransformOfDoseIsRigidOrNonRigid"
 	Element="SpatialTransformOfDose"				StringValue="NON_RIGID"
 ConditionEnd
 
-# does not check that EVERY PerFrameFunctionalGroupsSequence item has it, if not in Shared, but better than no check at all :(
-Condition="PixelSpacingNotPresentInEitherSharedOrPerFrameFunctionalGroupsAndVolumetricPropertiesIsNotDistortedSampledOrSegmentationWithFrameOfReference"
-	Element="PixelSpacing"											Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PixelSpacing"							Operator="And"	Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+Condition="PixelSpacingRequiredInPixelMeasures"
 	(
-		(
-			Element="VolumetricProperties"							Modifier="Not" StringValueFromRootAttribute="DISTORTED"
-			Element="VolumetricProperties"			Operator="And"	Modifier="Not" StringValueFromRootAttribute="SAMPLED"
-		) Operator="Or"
-		(
-			Element="SOPClassUID"									StringConstantFromRootAttribute="SegmentationStorageSOPClassUID"
-			Element="FrameOfReferenceUID"			Operator="And"	ElementPresentInRoot=""
-		) Operator="Or"
-	) Operator="And"
+		Element="VolumetricProperties"									ElementPresentInRoot=""
+		Element="VolumetricProperties"					Operator="And"	Modifier="Not" StringValueFromRootAttribute="DISTORTED"
+		Element="VolumetricProperties"					Operator="And"	Modifier="Not" StringValueFromRootAttribute="SAMPLED"
+	) Operator="Or"
+	(
+		Element="SOPClassUID"											StringConstantFromRootAttribute="SegmentationStorageSOPClassUID"
+		Element="FrameOfReferenceUID"					Operator="And"	ElementPresentInRoot=""
+	) Operator="Or"
+	(
+		Element="SOPClassUID"											StringConstantFromRootAttribute="OphthalmicTomographyImageStorageSOPClassUID"
+		Element="OphthalmicVolumetricPropertiesFlag"	Operator="And"	StringValueFromRootAttribute="YES"
+	) Operator="Or"
+	Element="SOPClassUID"								Operator="Or"	StringConstantFromRootAttribute="OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorageSOPClassUID"
 ConditionEnd
 
-# does not check that EVERY PerFrameFunctionalGroupsSequence item has it, if not in Shared, but better than no check at all :(
-Condition="SliceThicknessNotPresentInEitherSharedOrPerFrameFunctionalGroupsAndVolumetricPropertiesIsVolumeOrSampledOrSegmentationWithFrameOfReference"
-	Element="SliceThickness"										Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="SliceThickness"						Operator="And"	Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+Condition="SliceThicknessRequiredInPixelMeasures"
 	(
-		Element="VolumetricProperties"								StringValueFromRootAttribute="VOLUME"
-		Element="VolumetricProperties"				Operator="Or"	StringValueFromRootAttribute="SAMPLED"
-		(
-			Element="SOPClassUID"									StringConstantFromRootAttribute="SegmentationStorageSOPClassUID"
-			Element="FrameOfReferenceUID"			Operator="And"	ElementPresentInRoot=""
-		) Operator="Or"
-	) Operator="And"
+		Element="VolumetricProperties"									ElementPresentInRoot=""
+		Element="VolumetricProperties"					Operator="And"	Modifier="Not" StringValueFromRootAttribute="DISTORTED"
+		Element="VolumetricProperties"					Operator="And"	Modifier="Not" StringValueFromRootAttribute="SAMPLED"
+	) Operator="Or"
+	(
+		Element="SOPClassUID"											StringConstantFromRootAttribute="SegmentationStorageSOPClassUID"
+		Element="FrameOfReferenceUID"					Operator="And"	ElementPresentInRoot=""
+	) Operator="Or"
+	(
+		Element="SOPClassUID"											StringConstantFromRootAttribute="OphthalmicTomographyImageStorageSOPClassUID"
+		Element="OphthalmicVolumetricPropertiesFlag"	Operator="And"	StringValueFromRootAttribute="YES"
+	) Operator="Or"
+	Element="SOPClassUID"								Operator="Or"	StringConstantFromRootAttribute="OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorageSOPClassUID"
 ConditionEnd
 
 #cannot actually check FrameType in corresponding per-frame functional group item, so check ImageType instead :(
 Condition="ImagePositionPatientNotPresentInEitherSharedOrPerFrameFunctionalGroupsAndEitherFrameTypeIsOriginalAndVolumetricPropertiesIsNotDistortedOrSegmentationWithFrameOfReference"
 	Element="ImagePositionPatient"									Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="ImagePositionPatient"					Operator="And"	Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ImagePositionPatient"					Operator="And"	Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		(
 			Element="ImageType"										ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
@@ -6382,7 +6606,7 @@ ConditionEnd
 #cannot actually check FrameType in corresponding per-frame functional group item, so check ImageType instead :(
 Condition="ImageOrientationPatientNotPresentInEitherSharedOrPerFrameFunctionalGroupsAndEitherFrameTypeIsOriginalAndVolumetricPropertiesIsNotDistortedOrSegmentationWithFrameOfReference"
 	Element="ImageOrientationPatient"								Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="ImageOrientationPatient"				Operator="And"	Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="ImageOrientationPatient"				Operator="And"	Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		(
 			Element="ImageType"										ValueSelector="0" StringValueFromRootAttribute="ORIGINAL"
@@ -6547,7 +6771,7 @@ Condition="ReferencedSegmentNumberPresentAndReferencedSOPClassUIDIsNotSegmentati
 ConditionEnd
 
 Condition="NeedDerivationImageMacroInSharedFunctionalGroupSequenceForBreastProjection"
-	Element="DerivationImageSequence"				Modifier="Not"	ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="DerivationImageSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	(
 		Element="ImageType"							ValueSelector="0"	StringValueFromRootAttribute="DERIVED"
 		(
@@ -6570,30 +6794,30 @@ ConditionEnd
 
 # real world ... treat as U ...
 Condition="NeedBreastXRayPositionerMacroInSharedFunctionalGroupSequence"
-	Element="PositionerPositionSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PositionerPositionSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PositionerPositionSequence"			Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 # real world ... treat as U ...
 Condition="NeedBreastXRayPositionerMacroInPerFrameFunctionalGroupSequence"
 	Element="PositionerPositionSequence"			Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="PositionerPositionSequence"			Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="PositionerPositionSequence"			Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 # real world ... treat as U ...
 Condition="NeedBreastXRayDetectorMacroInSharedFunctionalGroupSequence"
-	Element="DetectorPositionSequence"				Operator="And" Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="DetectorPositionSequence"				Operator="And" Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="DetectorPositionSequence"				Operator="Or" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 # real world ... treat as U ...
 Condition="NeedBreastXRayDetectorMacroInPerFrameFunctionalGroupSequence"
 	Element="DetectorPositionSequence"				Operator="And" Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="DetectorPositionSequence"				Operator="Or" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="DetectorPositionSequence"				Operator="Or" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayGeometrySequenceNotInPerFrameFunctionalGroupSequence"
-	Element="XRayGeometrySequence"					Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XRayGeometrySequence"					Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayGeometrySequenceNotInSharedFunctionalGroupSequence"
@@ -6601,7 +6825,7 @@ Condition="XRayGeometrySequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="XRayAcquisitionDoseSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="XRayAcquisitionDoseSequence"			Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XRayAcquisitionDoseSequence"			Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayAcquisitionDoseSequenceNotInSharedFunctionalGroupSequence"
@@ -6609,7 +6833,7 @@ Condition="XRayAcquisitionDoseSequenceNotInSharedFunctionalGroupSequence"
 ConditionEnd
 
 Condition="IsocenterReferenceSystemSequenceNotInPerFrameFunctionalGroupSequence"
-	Element="IsocenterReferenceSystemSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="IsocenterReferenceSystemSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="IsocenterReferenceSystemSequenceNotInSharedFunctionalGroupSequence"
@@ -6618,21 +6842,21 @@ ConditionEnd
 
 Condition="XRayGridMacroOKInPerFrameFunctionalGroupSequence"
 	Element="XRayGridSequence"						Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="XRayGridSequence"						Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XRayGridSequence"						Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayGridMacroOKInSharedFunctionalGroupSequence"
-	Element="XRayGridSequence"						Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XRayGridSequence"						Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="XRayGridSequence"						Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayFilterMacroOKInPerFrameFunctionalGroupSequence"
 	Element="XRayFilterSequence"					Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-	Element="XRayFilterSequence"					Operator="And" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XRayFilterSequence"					Operator="And" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
 Condition="XRayFilterMacroOKInSharedFunctionalGroupSequence"
-	Element="XRayFilterSequence"					Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="XRayFilterSequence"					Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="XRayFilterSequence"					Operator="And" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 ConditionEnd
 
@@ -6704,12 +6928,324 @@ Condition="PixelPresentationIsColorRangeAndPaletteColorLookupTableModuleAbsent"
 	) Operator="And" Modifier="Not"
 ConditionEnd
 
+Condition="PixelPresentationIsColorRangeAndPaletteColorLookupTableUIDAbsent"
+	Element="PixelPresentation"								StringValue="COLOR_RANGE"
+	Element="PaletteColorLookupTableUID"					Operator="And" Modifier="Not" ElementPresent=""
+ConditionEnd
+
 Condition="StoredValueColorRangeSequenceNotInPerFrameFunctionalGroupSequenceAndPixelPresentationIsColorRange"
-	Element="StoredValueColorRangeSequence"		Modifier="Not" ElementPresentInPathFromRoot="PerFrameFunctionalGroupsSequence"
+	Element="StoredValueColorRangeSequence"		Modifier="Not" ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="PixelPresentation"					Operator="And" StringValueFromRootAttribute="COLOR_RANGE"
 ConditionEnd
 
-Condition="StoredValueColorRangeSequenceeNotInSharedFunctionalGroupSequenceAndPixelPresentationIsColorRange"
+Condition="StoredValueColorRangeSequenceNotInSharedFunctionalGroupSequenceAndPixelPresentationIsColorRange"
 	Element="StoredValueColorRangeSequence"		Modifier="Not" ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
 	Element="PixelPresentation"					Operator="And" StringValueFromRootAttribute="COLOR_RANGE"
 ConditionEnd
+
+Condition="WaterEquivalentDiameterIsPresent"
+	Element="WaterEquivalentDiameter"			ElementPresent=""
+ConditionEnd
+
+Condition="CTDIvolIsPresentButCTDIPhantomTypeCodeSequenceIsNot"
+	Element="CTDIvol"							ElementPresent=""
+	Element="CTDIPhantomTypeCodeSequence"		Operator="And" Modifier="Not" ElementPresent=""
+ConditionEnd
+
+Condition="UnassignedSharedConvertedAttributesMacroPresentInSharedFunctionalGroupSequence"
+	Element="UnassignedSharedConvertedAttributesSequence"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="UnassignedPerFrameConvertedAttributesMacroPresentInPerFrameFunctionalGroupSequence"
+	Element="UnassignedPerFrameConvertedAttributesSequence"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="ImageFrameConversionSourceMacroPresentInPerFrameFunctionalGroupSequence"
+	Element="ConversionSourceAttributesSequence"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="IlluminationWaveLengthInvalid"
+	Element="IlluminationWaveLength"	BinaryValue="<= 0"
+ConditionEnd
+
+Condition="NeedModuleSlideLabel"
+	Element="ImageType"					ValueSelector="2"	StringValue="LABEL"
+	Element="BarcodeValue"				ElementPresent=""
+	Element="LabelText"					ElementPresent=""
+ConditionEnd
+
+Condition="LongitudinalTemporalOffsetFromEventIsPresent"
+	Element="LongitudinalTemporalOffsetFromEvent"			ElementPresent=""
+ConditionEnd
+
+Condition="NeedRecommendedDisplayCIELabValueListInTrackSequence"
+	Element="RecommendedDisplayCIELabValue"					Modifier="Not"	ElementPresent=""
+	Element="RecommendedDisplayCIELabValue"	Operator="And"	Modifier="Not"	ElementPresentAbove=""
+ConditionEnd
+
+Condition="NeedRecommendedDisplayCIELabValueInTrackSequence"
+	Element="RecommendedDisplayCIELabValueList"					Modifier="Not"	ElementPresent=""
+	Element="RecommendedDisplayCIELabValue"		Operator="And"	Modifier="Not"	ElementPresentAbove=""
+ConditionEnd
+
+Condition="NeedRecommendedDisplayCIELabValueInTrackSetSequence"
+	Element="RecommendedDisplayCIELabValueList"				Modifier="Not" ElementPresentWithin="TrackSequence"
+	Element="RecommendedDisplayCIELabValue"	Operator="And"	Modifier="Not" ElementPresentWithin="TrackSequence"
+ConditionEnd
+
+Condition="PerFrameFunctionalGroupsSequencePresent"
+	Element="PerFrameFunctionalGroupsSequence"	ElementPresent=""
+ConditionEnd
+
+Condition="FrameContentMacroPresent"
+	Element="FrameContentSequence"	ElementPresent=""
+ConditionEnd
+
+Condition="DimensionOrganizationTypeIsTILED_FULL"
+	Element="DimensionOrganizationType"		ValueSelector="0"	StringValueFromRootAttribute="TILED_FULL"
+ConditionEnd
+
+Condition="DimensionOrganizationTypeIsNotTILED_FULL"
+	Element="DimensionOrganizationType"		Modifier="Not"	ValueSelector="0"	StringValueFromRootAttribute="TILED_FULL"
+ConditionEnd
+
+Condition="DimensionOrganizationTypeIsTILED_FULLAndTotalPixelMatrixFocalPlanesGreaterThanOne"
+	Element="DimensionOrganizationType"		ValueSelector="0"	StringValueFromRootAttribute="TILED_FULL"
+	Element="TotalPixelMatrixFocalPlanes"	Operator="And" BinaryValue="> 1"
+ConditionEnd
+
+Condition="ReferencedSOPClassUIDIsSegmentationStorage"
+	Element="ReferencedSOPClassUID"		StringConstant="SegmentationStorageSOPClassUID"
+ConditionEnd
+
+Condition="ReferencedSOPClassUIDIsSpatialFiducialsStorage"
+	Element="ReferencedSOPClassUID"		StringConstant="SpatialFiducialsStorageSOPClassUID"
+ConditionEnd
+
+Condition="ReferencedSOPClassUIDIsRTStructureSetStorage"
+	Element="ReferencedSOPClassUID"		StringConstant="RTStructureSetStorageSOPClassUID"
+ConditionEnd
+
+Condition="ExcessiveFalsePositivesDataFlagIsYes"
+	Element="ExcessiveFalsePositivesDataFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="FalsePositivesEstimateFlagIsYes"
+	Element="FalsePositivesEstimateFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="ExcessiveFalseNegativesDataFlagIsYes"
+	Element="ExcessiveFalseNegativesDataFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="FalseNegativesEstimateFlagIsYes"
+	Element="FalseNegativesEstimateFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="CatchTrialsDataFlagIsYes"
+	Element="CatchTrialsDataFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="ExcessiveFixationLossesDataFlagIsYes"
+	Element="ExcessiveFixationLossesDataFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="IndexNormalsFlagIsYes"
+	Element="IndexNormalsFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="TestPointNormalsDataFlagIsYes"
+	Element="TestPointNormalsDataFlag"		StringValueFromRootAttribute="YES"
+ConditionEnd
+
+Condition="GeneralizedDefectCorrectedSensitivityDeviationFlagIsYes"
+	Element="GeneralizedDefectCorrectedSensitivityDeviationFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="BlindSpotLocalizedIsYes"
+	Element="BlindSpotLocalized"		StringValue="YES"
+ConditionEnd
+
+Condition="ScreeningBaselineMeasuredIsYes"
+	Element="ScreeningBaselineMeasured"		StringValue="YES"
+ConditionEnd
+
+Condition="FovealPointNormativeDataFlagIsYes"
+	Element="FovealPointNormativeDataFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="FovealSensitivityMeasuredIsYes"
+	Element="FovealSensitivityMeasured"		StringValue="YES"
+ConditionEnd
+
+Condition="PresentedVisualStimuliDataFlagIsYes"
+	Element="PresentedVisualStimuliDataFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="LocalDeviationProbabilityNormalsFlagIsYes"
+	Element="LocalDeviationProbabilityNormalsFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="GlobalDeviationProbabilityNormalsFlagIsYes"
+	Element="GlobalDeviationProbabilityNormalsFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="VisualFieldTestNormalsFlagIsYes"
+	Element="VisualFieldTestNormalsFlag"		StringValue="YES"
+ConditionEnd
+
+Condition="ShortTermFluctuationCalculatedIsYes"
+	Element="ShortTermFluctuationCalculated"		StringValue="YES"
+ConditionEnd
+
+Condition="ShortTermFluctuationProbabilityCalculatedIsYes"
+	Element="ShortTermFluctuationProbabilityCalculated"		StringValue="YES"
+ConditionEnd
+
+Condition="CorrectedLocalizedDeviationFromNormalCalculatedIsYes"
+	Element="CorrectedLocalizedDeviationFromNormalCalculated"		StringValue="YES"
+ConditionEnd
+
+Condition="CorrectedLocalizedDeviationFromNormalProbabilityCalculatedIsYes"
+	Element="CorrectedLocalizedDeviationFromNormalProbabilityCalculated"		StringValue="YES"
+ConditionEnd
+
+Condition="MeasurementLateralityLeftOrBoth"
+	Element="MeasurementLaterality"		StringValue="L"
+	Element="MeasurementLaterality"		StringValue="B"
+ConditionEnd
+
+Condition="MeasurementLateralityRightOrBoth"
+	Element="MeasurementLaterality"		StringValue="R"
+	Element="MeasurementLaterality"		StringValue="B"
+ConditionEnd
+
+Condition="PrivateDataElementValueRepresentationIsSequence"
+	Element="PrivateDataElementValueRepresentation"		StringValue="SQ"
+ConditionEnd
+
+Condition="BlockIdentifyingInformationStatusIsMIXED"
+	Element="BlockIdentifyingInformationStatus"		StringValue="MIXED"
+ConditionEnd
+
+Condition="NeedAnatomicRegionSequenceInGeneralImageModule"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="DigitalXRayImageStorageForProcessingSOPClassUID"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="DigitalMammographyXRayImageStorageForProcessingSOPClassUID"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="DigitalIntraoralXRayImageStorageForProcessingSOPClassUID"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="DigitalXRayImageStorageForPresentationSOPClassUID"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="DigitalMammographyXRayImageStorageForPresentationSOPClassUID"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="DigitalIntraoralXRayImageStorageForPresentationSOPClassUID"
+ConditionEnd
+
+Condition="SelectorSequencePointerIsPresent"
+	Element="SelectorSequencePointer"		ElementPresent=""
+ConditionEnd
+
+Condition="ReferencedFrameNumberOrReferencedFrameNumbersPresentButNMImageInstance"
+	Element="SOPClassUID"					StringConstantFromRootAttribute="NuclearMedicineImageStorageSOPClassUID"
+	(
+		Element="ReferencedFrameNumber"						ElementPresent=""
+		Element="ReferencedFrameNumbers"	Operator="Or"	ElementPresent=""
+	) Operator="And"
+ConditionEnd
+
+Condition="IsMultienergyCTAcquisition"
+	Element="MultienergyCTAcquisition"		StringValueFromRootAttribute="YES"
+ConditionEnd
+
+Condition="ImageTypeValue4MissingOrEmptyForMultienergy"
+	Element="MultienergyCTAcquisition"		StringValueFromRootAttribute="YES"
+	(
+		Element="ImageType"					Modifier="Not" ValueSelector="3" ValuePresent=""
+		Element="ImageType"					Operator="Or" ValueSelector="3" StringValue=""
+	) Operator="And"
+ConditionEnd
+
+Condition="ImageTypeValue4IsVMI"
+	Element="ImageType"						ValueSelector="3" StringValueFromRootAttribute="VMI"
+ConditionEnd
+
+Condition="MultienergySourceTechniqueIsSWITCHING_SOURCE"
+	Element="MultienergySourceTechnique"	StringValue="SWITCHING_SOURCE"
+ConditionEnd
+
+Condition="MultienergyDetectorTypeIsPHOTON_COUNTING"
+	Element="MultienergyDetectorType"		StringValue="PHOTON_COUNTING"
+ConditionEnd
+
+Condition="CTAcquisitionDetailsSequenceNotOneItemAndNotMultienergyAcquisition"
+	Element="CTAcquisitionDetailsSequence"	Modifier="Not" SequenceHasOneItem=""
+	Element="MultienergyCTAcquisition"		Operator="And" Modifier="Not" StringValueFromRootAttribute="YES"
+ConditionEnd
+
+Condition="CTGeometrySequenceNotOneItemAndNotMultienergyAcquisition"
+	Element="CTGeometrySequence"	Modifier="Not" SequenceHasOneItem=""
+	Element="MultienergyCTAcquisition"		Operator="And" Modifier="Not" StringValueFromRootAttribute="YES"
+ConditionEnd
+
+Condition="CTExposureSequenceNotOneItemAndNotMultienergyAcquisition"
+	Element="CTExposureSequence"	Modifier="Not" SequenceHasOneItem=""
+	Element="MultienergyCTAcquisition"		Operator="And" Modifier="Not" StringValueFromRootAttribute="YES"
+ConditionEnd
+
+Condition="CTXRayDetailsSequenceNotOneItemAndNotMultienergyAcquisition"
+	Element="CTXRayDetailsSequence"	Modifier="Not" SequenceHasOneItem=""
+	Element="MultienergyCTAcquisition"		Operator="And" Modifier="Not" StringValueFromRootAttribute="YES"
+ConditionEnd
+
+Condition="PatientAlternativeCalendarNeeded"
+	Element="PatientBirthDateInAlternativeCalendar"		ElementPresent=""
+	Element="PatientDeathDateInAlternativeCalendar"		ElementPresent=""
+ConditionEnd
+
+Condition="TypeOfInstancesIsDICOM"
+	Element="TypeOfInstances"		StringValue="DICOM"
+ConditionEnd
+
+Condition="TypeOfInstancesInParentIsCDA"
+	Element="TypeOfInstances"		StringValueAbove="DICOM"
+ConditionEnd
+
+Condition="NeedDICOMRetrievalSequence"
+	Element="DICOMMediaRetrievalSequence"				   Modifier="Not" ElementPresent=""
+	Element="WADORetrievalSequence"			Operator="And" Modifier="Not" ElementPresent=""
+	Element="XDSRetrievalSequence"			Operator="And" Modifier="Not" ElementPresent=""
+	Element="WADORSRetrievalSequence"		Operator="And" Modifier="Not" ElementPresent=""
+ConditionEnd
+
+Condition="NeedDICOMMediaRetrievalSequence"
+	Element="DICOMRetrievalSequence"					   Modifier="Not" ElementPresent=""
+	Element="WADORetrievalSequence"			Operator="And" Modifier="Not" ElementPresent=""
+	Element="XDSRetrievalSequence"			Operator="And" Modifier="Not" ElementPresent=""
+	Element="WADORSRetrievalSequence"		Operator="And" Modifier="Not" ElementPresent=""
+ConditionEnd
+
+Condition="NeedWADORetrievalSequence"
+	Element="DICOMRetrievalSequence"					   Modifier="Not" ElementPresent=""
+	Element="DICOMMediaRetrievalSequence"	Operator="And" Modifier="Not" ElementPresent=""
+	Element="XDSRetrievalSequence"			Operator="And" Modifier="Not" ElementPresent=""
+	Element="WADORSRetrievalSequence"		Operator="And" Modifier="Not" ElementPresent=""
+ConditionEnd
+
+Condition="NeedXDSRetrievalSequence"
+	Element="DICOMRetrievalSequence"					   Modifier="Not" ElementPresent=""
+	Element="DICOMMediaRetrievalSequence"	Operator="And" Modifier="Not" ElementPresent=""
+	Element="WADORetrievalSequence"			Operator="And" Modifier="Not" ElementPresent=""
+	Element="WADORSRetrievalSequence"		Operator="And" Modifier="Not" ElementPresent=""
+ConditionEnd
+
+Condition="NeedWADORSRetrievalSequence"
+	Element="DICOMRetrievalSequence"					   Modifier="Not" ElementPresent=""
+	Element="DICOMMediaRetrievalSequence"	Operator="And" Modifier="Not" ElementPresent=""
+	Element="WADORetrievalSequence"			Operator="And" Modifier="Not" ElementPresent=""
+	Element="XDSRetrievalSequence"			Operator="And" Modifier="Not" ElementPresent=""
+ConditionEnd
+
+Condition="PixelIntensityRelationshipPresent"
+	Element="PixelIntensityRelationship"	ElementPresent=""
+ConditionEnd
+
+Condition="ContentSequencePresent"
+	Element="ContentSequence"				ElementPresent=""
+ConditionEnd
+

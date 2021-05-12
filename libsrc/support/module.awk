@@ -1,4 +1,4 @@
-#  module.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
+#  module.awk Copyright (c) 1993-2020, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 # create C++ headers from modules template 
 
 # can set these values on the command line:
@@ -195,6 +195,7 @@ NR==1	{
 				# do not reset it if already set (else calls during verify or write undo the work done during build)
 				print "\tif (" sequence ") {"
 				print "\t\tif (" sequence "->getInformationEntity() == UnknownIE) " sequence "->setInformationEntity(ie);"
+				print "\t\telse if (getDepthOfInformationEntity(" sequence "->getInformationEntity()) < getDepthOfInformationEntity(ie)) " sequence "->setInformationEntity(ie);"
 				print "\t}"
 				print ""
 			}
@@ -288,6 +289,10 @@ NR==1	{
 			indentcode(sequencenestingdepth)
 			print "\t\t\tint i; for (i=0; i<n; ++i) {"
 			if (role == "verify") {
+				indentcode(sequencenestingdepth)
+				print "\t\t\t\tif (verbose)"
+				indentcode(sequencenestingdepth)
+				print "\t\t\t\t\tlog << \"" sequence "\" << \" item [\" << (i+1) << \"]\" << endl;";
 				indentcode(sequencenestingdepth)
 				print "\t\t\t\tAttributeList *parentlist=list;"
 			}
@@ -477,6 +482,7 @@ NR==1	{
 				# do not reset it if already set (else calls during verify or write undo the work done during build)
 				print "\tif (" name ") {"
 				print "\t\tif (" name "->getInformationEntity() == UnknownIE) " name "->setInformationEntity(ie);"
+				print "\t\telse if (getDepthOfInformationEntity(" name "->getInformationEntity()) < getDepthOfInformationEntity(ie)) " name "->setInformationEntity(ie);"
 				print "\t}"
 				print ""
 			}

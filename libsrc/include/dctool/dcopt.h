@@ -1,3 +1,4 @@
+/* dcopt.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_dcopt__
 #define __Header_dcopt__
 

@@ -1,9 +1,10 @@
-.TH DCDICT 1 "05 April 1998" "DICOM PS3" "DICOM PS3 - Extract dictionary elements"
+.TH DCDICT 1 "06 March 2014" "DICOM PS3" "DICOM PS3 - Extract dictionary elements"
 .SH NAME
 dcdict \- ACR/NEMA DICOM PS3 ... Extract dictionary elements
 .SH SYNOPSIS
 .HP 10
 .B dcdict
+.so man1/gen.so
 [
 .B \-key|k " attributename ]"
 [
@@ -54,5 +55,5 @@ are assumed to be decimal unless preceded by 0x (hexadecimal) or 0 (octal).
 .LP
 \ 
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

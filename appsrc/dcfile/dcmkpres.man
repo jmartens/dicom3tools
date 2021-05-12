@@ -1,9 +1,10 @@
-.TH DCMKPRES 1 "2 December 2004" "DICOM PS3" "DICOM PS3 - Create DICOM presentation state"
+.TH DCMKPRES 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Create DICOM presentation state"
 .SH NAME
 dcmkpres \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Create DICOM presentation state
 .SH SYNOPSIS
 .HP 10
 .B dcmkpres
+.so man1/gen.so
 [
 .B \-addlinearmodalitylut " nentries 1stvaluemapped inbits outbits 1stlutentry lutentryincr"
 ]
@@ -95,6 +96,6 @@ Display byte offset from file start and message start, in hexadecimal, and dump 
 .SH SEE ALSO
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 It would be nice to generate other than linear ramps.

@@ -1,3 +1,4 @@
+/* attrtypo.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_attrtypo__
 #define __Header_attrtypo__
 
@@ -242,16 +243,72 @@ public:
 	void	setValue(const Uint16 *values,Uint32 lengthinwords);
 };
 
-/* ********************* OF VR Attributes ********************* */
+/* ********************* OL VR Attributes ********************* */
 
-#ifdef CRAP
-class OtherFloatSmallAttributeBase : public OtherNonPixelAttribute {
+class OtherLongLargeAttributeBase : public OtherNonPixelAttribute {
 private:
-	unsigned char *data;
+	BinaryInputStream *srcstream;
+	OurStreamPos srcpos;
+	Endian srcendian;
+
 	BinaryOutputStream& writeValues(BinaryOutputStream& stream);
 public:
-	OtherFloatSmallAttributeBase(Tag t);
-	virtual ~OtherFloatSmallAttributeBase();
+	OtherLongLargeAttributeBase(Tag t,BinaryInputStream &stream,OurStreamPos pos);
+	virtual ~OtherLongLargeAttributeBase();
+
+	const char *	getVR() const	{ return "OL"; }
+	Uint16	getValueSize(void) const	{ return 4; }
+
+	bool	isOtherLongNonPixel(void) const	{ return true; }
+
+	BinaryOutputStream& writeData(BinaryOutputStream& stream)
+		{
+			return OtherNonPixelAttribute::writeData(stream);
+		}
+	TextOutputStream& writeData(TextOutputStream& stream);
+	TextOutputStream& write(TextOutputStream& stream,ElementDictionary *dict=0,bool verbose=false,bool showUsedAndIE=false);
+	BinaryOutputStream& write(BinaryOutputStream& stream) { return OtherNonPixelAttribute::write(stream); }
+	DicomOutputStream& write(DicomOutputStream& stream) { return OtherNonPixelAttribute::write(stream); }
+
+	BinaryInputStream& read(BinaryInputStream& stream,Uint32 length);
+
+	bool	getValue(unsigned index,Uint16& vp) const	{ return Attribute::getValue(index,vp); }
+	bool	getValue(unsigned index,Uint32& vp) const	{ return Attribute::getValue(index,vp); }
+	bool	getValue(unsigned index,Int16& vp) const	{ return Attribute::getValue(index,vp); }
+	bool	getValue(unsigned index,Int32& vp) const	{ return Attribute::getValue(index,vp); }
+	bool	getValue(unsigned index,Float32& vp) const	{ return Attribute::getValue(index,vp); }
+	bool	getValue(unsigned index,Float64& vp) const	{ return Attribute::getValue(index,vp); }
+	bool	getValue(unsigned index,Tag& vp) const		{ return Attribute::getValue(index,vp); }
+	bool	getValue(unsigned index,char * & rvalue) const	{ return Attribute::getValue(index,rvalue); }
+	bool	getValue(const unsigned char * & rvalue,Uint32 &rlength) const
+								{ return Attribute::getValue(rvalue,rlength); }
+	bool	getValue(const Uint16 * & rvalue,Uint32 &rlengthinwords) const;
+
+	void	setValue(unsigned index,Uint16 value)		{ Attribute::setValue(index,value); }
+	void	setValue(unsigned index,Uint32 value)		{ Attribute::setValue(index,value); }
+	void	setValue(unsigned index,Int16 value)		{ Attribute::setValue(index,value); }
+	void	setValue(unsigned index,Int32 value)		{ Attribute::setValue(index,value); }
+	void	setValue(unsigned index,Float32 value)	 	{ Attribute::setValue(index,value); }
+	void	setValue(unsigned index,Float64 value)		{ Attribute::setValue(index,value); }
+	void	setValue(unsigned index,Tag value)		{ Attribute::setValue(index,value); }
+	void	setValue(unsigned index,const char *str)	{ Attribute::setValue(index,str); }
+	void	setValue(const unsigned char *values,Uint32 length)
+								{ Attribute::setValue(values,length); }
+	void	setValue(const Uint16 *values,Uint32 lengthinwords);
+};
+
+/* ********************* OF VR Attributes ********************* */
+
+class OtherFloatLargeAttributeBase : public OtherNonPixelAttribute {
+private:
+	BinaryInputStream *srcstream;
+	OurStreamPos srcpos;
+	Endian srcendian;
+
+	BinaryOutputStream& writeValues(BinaryOutputStream& stream);
+public:
+	OtherFloatLargeAttributeBase(Tag t,BinaryInputStream &stream,OurStreamPos pos);
+	virtual ~OtherFloatLargeAttributeBase();
 
 	const char *	getVR() const	{ return "OF"; }
 	Uint16	getValueSize(void) const	{ return 4; }
@@ -291,9 +348,11 @@ public:
 	void	setValue(const Uint16 *values,Uint32 lengthinwords)
 								{ Attribute::setValue(values,lengthinwords); }
 };
-#endif
 
-class OtherFloatLargeAttributeBase : public OtherNonPixelAttribute {
+
+/* ********************* OD VR Attributes ********************* */
+
+class OtherDoubleLargeAttributeBase : public OtherNonPixelAttribute {
 private:
 	BinaryInputStream *srcstream;
 	OurStreamPos srcpos;
@@ -301,11 +360,11 @@ private:
 
 	BinaryOutputStream& writeValues(BinaryOutputStream& stream);
 public:
-	OtherFloatLargeAttributeBase(Tag t,BinaryInputStream &stream,OurStreamPos pos);
-	virtual ~OtherFloatLargeAttributeBase();
+	OtherDoubleLargeAttributeBase(Tag t,BinaryInputStream &stream,OurStreamPos pos);
+	virtual ~OtherDoubleLargeAttributeBase();
 
-	const char *	getVR() const	{ return "OF"; }
-	Uint16	getValueSize(void) const	{ return 4; }
+	const char *	getVR() const	{ return "OD"; }
+	Uint16	getValueSize(void) const	{ return 8; }
 
 	BinaryOutputStream& writeData(BinaryOutputStream& stream)
 		{

@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)sompdmp.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "sompdmp.h"
 
 #include "bnstream.h"

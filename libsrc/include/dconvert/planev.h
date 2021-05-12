@@ -1,11 +1,21 @@
+/* planev.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 //#define DEBUGPLANE
 
 #ifndef __Header_planev__
 #define __Header_planev__
 
 #ifdef DEBUGPLANE
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#include <iomanip>
+#else
 #include <iostream.h>
 #include <iomanip.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 #endif
 
 #include <math.h>

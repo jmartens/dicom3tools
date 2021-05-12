@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrmxls.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrtype.h"
 #include "attrlsln.h"
 #include "attrmxls.h"
@@ -163,12 +164,12 @@ validateUsed(AttributeList& list,TextOutputStream &log)
 			}
 		}
 		if (!used) {
-			if (!t.isPrivateGroup() && !t.isLengthElementOrLengthToEnd() && t != TagFromName(DataSetTrailingPadding)) {
+			if (t.isStandardGroup() && !t.isLengthElementOrLengthToEnd() && t != TagFromName(DataSetTrailingPadding)) {	// NOT isPrivate()
 				ElementDictionary *dictionary = list.getDictionary();
 				if (dictionary) {
 					const char *vrd = dictionary->getValueRepresentation(t);
 					if (!vrd) {
-						log << EMsgDC(AttributeIsNotALegalStandardAttribute) << " - ";
+						log << EMsgDC(AttributeIsNotARecognizedStandardAttribute) << " - ";
 						t.write(log,dictionary);
 						log << endl;
 						succeeded=false;
@@ -190,6 +191,38 @@ ManagedAttributeList::validateUsed(TextOutputStream &log)
 {
 //cerr << "ManagedAttributeList::validateUsed" << endl;
 	return ::validateUsed(*this,log);
+}
+
+static bool
+validatePrivate(AttributeList& list,TextOutputStream &log)
+{
+	bool succeeded=true;
+	AttributeListIterator listi(list);
+	while (!listi) {
+		Attribute *a=listi();
+		Assert(a);
+		Tag t = a->getTag();
+		if (!::loopOverListsInSequencesWithLog(a,log,&::validatePrivate))
+			succeeded=false;
+		if ((t.getGroup() % 2) == 1 && !t.isValidPrivateGroup()) {
+			ElementDictionary *dictionary = list.getDictionary();
+			if (dictionary) {
+				log << EMsgDC(AttributeIsNotInALegalPrivateGroup) << " - ";
+				t.write(log,dictionary);
+				log << endl;
+				succeeded=false;
+			}
+		}
+		++listi;
+	}
+	return succeeded;
+}
+
+bool
+ManagedAttributeList::validatePrivate(TextOutputStream &log)
+{
+//cerr << "ManagedAttributeList::validatePrivate" << endl;
+	return ::validatePrivate(*this,log);
 }
 
 static bool
@@ -1051,14 +1084,17 @@ ManagedAttributeList::read(DicomInputStream& stream,
 		bool ignoretagsoutoforder,
 		bool useUSVRForLUTDataIfNotExplicit,
 		bool useStopAtTag,
-		Tag stopAtTag)
+		Tag stopAtTag,
+		bool fixBitsDuringRead)
 {
 	return ReadableAttributeList::read(
 		stream,getDictionary(),
 		log,verbose,length,
 		metaheadercheck,uselengthtoend,ignoretagsoutoforder,useUSVRForLUTDataIfNotExplicit,
 		false/*forceImplicit*/,
-		useStopAtTag,stopAtTag);
+		useStopAtTag,stopAtTag,
+		false/*nestedWithinSequence*/,NULL/*sequenceOwner*/,
+		fixBitsDuringRead);
 }
 
 bool
@@ -1097,7 +1133,7 @@ ManagedAttributeList::prepare(DicomOutputStream& stream,
 	(!(flags&adddicom) || addDicom(flags&disambiguateseriesbydescription ? true : false))
 	 && (!(flags&adddisclaimer) || addDisclaimer())
 	 && setOutputEncoding(stream.getTransferSyntaxToWriteDataSet())
-	 && setValueRepresentation()
+	 && setValueRepresentationForThisListAndNestedSequences()
 	 && (!(flags&metaheader) || addMetaHeader(stream.getTransferSyntaxToWriteDataSet(),stamp));
 }
 

@@ -125,11 +125,38 @@ StringValues="EnhancedXAXRFImageType2" {
 }
 
 StringValues="EnhancedXAXRFImageType3" {
+	ANGIO,
+	CARDIAC,
+	CARDIAC_GATED,
+	CARDRESP_GATED,
+	DYNAMIC,
+	FLUOROSCOPY,
+	LOCALIZER,
+	MOTION,
+	PERFUSION,
+	PRE_CONTRAST,
+	POST_CONTRAST,
+	RESP_GATED,
+	REST,
+	STATIC,
+	STRESS,
+	VOLUME,
+	NON_PARALLEL,
+	PARALLEL,
+	WHOLE_BODY
+}
+
+
+StringValues="EnhancedXAXRFImageType4" {
+	NONE
+}
+
+StringValues="PlanesInAcquisition" {
 	SINGLE PLANE,
-	BIPLANE A,
-	BIPLANE B,
+	BIPLANE,
 	UNDEFINED
 }
+
 
 StringValues="PlaneIdentification" {
 	MONOPLANE,
@@ -224,4 +251,32 @@ StringValues="XRay3DReconstructionAlgorithmType" {
 	FILTER_BACK_PROJ,
 	ITERATIVE
 }
+
+StringValues="PositionerMotionStatic" {
+	STATIC
+}
+
+StringValues="XRay3DImageVolumeBasedCalculationTechniqueImageLevel" {
+	MAX_IP,
+	MIN_IP,
+	VOLUME_RENDER,
+	SURFACE_RENDER,
+	MPR,
+	CURVED_MPR,
+	NONE,
+	MIXED,
+	TOMOSYNTHESIS
+}
+
+StringValues="XRay3DImageVolumeBasedCalculationTechniqueFrameLevel" {
+	MAX_IP,
+	MIN_IP,
+	VOLUME_RENDER,
+	SURFACE_RENDER,
+	MPR,
+	CURVED_MPR,
+	NONE,
+	TOMOSYNTHESIS
+}
+
 

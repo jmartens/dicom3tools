@@ -1,5 +1,16 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcmulti.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <fstream>
+#include <cctype>
+#else
 #include <fstream.h>
 #include <ctype.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
+
 
 #include "attrmxls.h"
 #include "attrtype.h"
@@ -1279,7 +1290,14 @@ static bool makeCTMRImageDescriptionMacroAttributesAndAppendToList(bool isMR,Att
 			encountered_ImageType && nValues_ImageType > 3
 			? (perFrame_ImageType && perFrame_ImageType[frame] ? perFrame_ImageType[frame][3] : (shared_ImageType ? shared_ImageType [3] : 0)) : 0);
 
-		if (!value4 && isMR) value4=extractNewMRImageTypeValue4FromOldValueType3(value3);
+ 		if (!value4) {
+ 			if (isMR) {
+ 				value4=extractNewMRImageTypeValue4FromOldValueType3(value3);
+ 			}
+ 			else {
+ 				value4="";	// must not be left as null, else addValue() below fails (000414), and we always want a fourth value for enhanced objects (? :()
+ 			}
+ 		}
 		
 		if (isMR) value3 = reMapOldMRToNewMRImageTypeValue3(value3);
 
@@ -1317,7 +1335,14 @@ static bool makeCTMRImageDescriptionMacroAttributesAndAppendToList(bool isMR,Att
 				: (shared_ImageType ? shared_ImageType [3] : 0))
 			: 0
 			);
-		if (!value4 && isMR) value4=extractNewMRImageTypeValue4FromOldValueType3(value3);
+ 		if (!value4) {
+ 			if (isMR) {
+ 				value4=extractNewMRImageTypeValue4FromOldValueType3(value3);
+ 			}
+ 			else {
+ 				value4="";	// must not be left as null, else addValue() below fails (000414), and we always want a fourth value for enhanced objects (? :()
+ 			}
+ 		}
 		
 		if (isMR) value3 = reMapOldMRToNewMRImageTypeValue3(value3);
 
@@ -3835,11 +3860,39 @@ static int findDoubleInTableOfDoublesOrInsert(double value,double *table,int &ta
 	return found;
 }
 
+static void sortUniqueDimensionValues(int nFrames,int nDimensions,double **dimensionValues,int **dimensionIndices) {
+cerr << "sortUniqueDimensionValues: nDimensions " << nDimensions << " nFrames " << nFrames << endl;
+	for (int d=0; d<nDimensions; ++d) {
+cerr << "sortUniqueDimensionValues: dimension " << d << endl;
+		double *differentDimensionValues = new double[nFrames];	// upper bound
+		Assert(differentDimensionValues);
+		int nDifferentDimensionValues=0;
+		int i;
+		for (i=0; i<nFrames; i++) {
+			double v=dimensionValues[d][i];
+			findDoubleInTableOfDoublesOrInsert(v,differentDimensionValues,nDifferentDimensionValues);
+		}
+		if (nDifferentDimensionValues) {
+cerr << "sortUniqueDimensionValues: dimension " << d << " has nDifferentDimensionValues " << nDifferentDimensionValues << endl;
+			qsort((char *)(differentDimensionValues),nDifferentDimensionValues,sizeof(double),doublecompareascending);
+		}
+		// now copy the frame indices into the dimensionIndices ...
+		for (i=0; i<nFrames; i++) {
+			double v=dimensionValues[d][i];
+			int l = findDoubleInTableOfDoublesOrInsert(v,differentDimensionValues,nDifferentDimensionValues);
+			dimensionIndices[d][i]=l;
+cerr << "sortUniqueDimensionValues: dimension " << d << " frame " << i << " value " << v << " index " << l << endl;
+		}
+		if (differentDimensionValues) delete[] differentDimensionValues;
+	}
+}
+
+
 static void partitionFramesByValuesForDimensions(int nFrames,int d,int nDimensions,double **dimensionValues,int **dimensionIndices,int partitionedSetSize,int *partitionedSet) {
 	double *differentDimensionValues = new double[nFrames];	// upper bound
 	Assert(differentDimensionValues);
 	int nDifferentDimensionValues=0;
-//cerr << "partitionFramesByValuesForDimensions: dimension " << d << " partitionedSetSize " << partitionedSetSize << endl;
+cerr << "partitionFramesByValuesForDimensions: dimension " << d << " partitionedSetSize " << partitionedSetSize << endl;
 	int i;
 	for (i=0; i<partitionedSetSize; i++) {
 		int j=partitionedSet[i];
@@ -3847,7 +3900,7 @@ static void partitionFramesByValuesForDimensions(int nFrames,int d,int nDimensio
 		findDoubleInTableOfDoublesOrInsert(v,differentDimensionValues,nDifferentDimensionValues);
 	}
 	if (nDifferentDimensionValues) {
-//cerr << "partitionFramesByValuesForDimensions: nDifferentDimensionValues " << nDifferentDimensionValues << endl;
+cerr << "partitionFramesByValuesForDimensions: nDifferentDimensionValues " << nDifferentDimensionValues << endl;
 		qsort((char *)(differentDimensionValues),nDifferentDimensionValues,sizeof(double),doublecompareascending);
 		// build new partitions, one for each different value ...
 		int nextd = d+1;
@@ -3860,7 +3913,7 @@ static void partitionFramesByValuesForDimensions(int nFrames,int d,int nDimensio
 				if (l == findDoubleInTableOfDoublesOrInsert(v,differentDimensionValues,nDifferentDimensionValues))
 					++newPartitionedSetSize;
 			}
-//cerr << "partitionFramesByValuesForDimensions:  index " << l << " newPartitionedSetSize " << newPartitionedSetSize << endl;
+cerr << "partitionFramesByValuesForDimensions:  index " << l << " newPartitionedSetSize " << newPartitionedSetSize << endl;
 			int *newPartitionedSet=new int[newPartitionedSetSize];
 			Assert(newPartitionedSet);
 			// now copy the frame indices into the new set ...
@@ -3870,7 +3923,7 @@ static void partitionFramesByValuesForDimensions(int nFrames,int d,int nDimensio
 				if (l == findDoubleInTableOfDoublesOrInsert(v,differentDimensionValues,nDifferentDimensionValues)) {
 					newPartitionedSet[next++]=partitionedSet[i];
 					dimensionIndices[d][partitionedSet[i]]=l;
-//cerr << "partitionFramesByValuesForDimensions: dimension " << d << " value " << v << " index " << l << endl;
+cerr << "partitionFramesByValuesForDimensions: dimension " << d << " value " << v << " index " << l << endl;
 				}
 			}
 			Assert(next == newPartitionedSetSize);
@@ -5349,8 +5402,8 @@ cerr << "perFrame_ContentDate = " << perFrame_ContentDate << endl;
 			if (i == 0) {
 				Attribute *aStudyID = dicom_output_options.replacebeforelist ? (*dicom_output_options.replacebeforelist)[TagFromName(StudyID)] : NULL;
 				const char *vStudyIDForUIDGeneration = aStudyID ? AttributeValue(aStudyID,"0") : requiredStudyID /*what is already in the dataset*/;
-//cerr << "(*dicom_output_options.replacebeforelist)[TagFromName(StudyID)] = " << ((*dicom_output_options.replacebeforelist)[TagFromName(StudyID)]) << endl;
 //cerr << "vStudyIDForUIDGeneration = " << vStudyIDForUIDGeneration << endl;
+//if (dicom_output_options.replacebeforelist) { cerr << "(*dicom_output_options.replacebeforelist)[TagFromName(StudyID)] = " << ((*dicom_output_options.replacebeforelist)[TagFromName(StudyID)]) << endl; }
 //cerr << "vStudyIDForUIDGeneration strtol = " << strtol(vStudyIDForUIDGeneration,NULL,0) << endl;
 //cerr << "vStudyIDForUIDGeneration atoi = " << atoi(vStudyIDForUIDGeneration) << endl;
 				studyIDForUIDGeneration = vStudyIDForUIDGeneration ? atoi(vStudyIDForUIDGeneration) : 0;
@@ -7726,7 +7779,7 @@ cerr << "perFrame_ContentDate = " << perFrame_ContentDate << endl;
 										v=getNumericValueFromNonNumericAttributeForDimensionSorting(a);
 									}
 									dimensionValues[ido][d][j]=v;
-//cerr << "frame " << dec << j << " organization " << ido <<  " dimension " << d << " value " << v << endl;
+cerr << "frame " << dec << j << " organization " << ido <<  " dimension " << d << " value " << v << endl;
 								}
 							}
 						}
@@ -7743,11 +7796,16 @@ cerr << "perFrame_ContentDate = " << perFrame_ContentDate << endl;
 								Assert(dimensionIndices[ido][d]);
 							}
 						
-							int *partitionedSet = new int[numberofinputfiles];
-							Assert(partitionedSet);
-							for (int i=0; i<numberofinputfiles; ++i) partitionedSet[i]=i;
-							partitionFramesByValuesForDimensions(numberofinputfiles,0,
-								nDimensions[ido],dimensionValues[ido],dimensionIndices[ido],numberofinputfiles,partitionedSet);
+							if (false) {
+								int *partitionedSet = new int[numberofinputfiles];
+								Assert(partitionedSet);
+								for (int i=0; i<numberofinputfiles; ++i) partitionedSet[i]=i;
+								partitionFramesByValuesForDimensions(numberofinputfiles,0,
+									nDimensions[ido],dimensionValues[ido],dimensionIndices[ido],numberofinputfiles,partitionedSet);
+							}
+							else {
+								sortUniqueDimensionValues(numberofinputfiles,nDimensions[ido],dimensionValues[ido],dimensionIndices[ido]);
+							}
 						}
 						
 						// Step 3 ... insert the Dimension Index Values to each per-frame functional group sequence
@@ -7776,7 +7834,7 @@ cerr << "perFrame_ContentDate = " << perFrame_ContentDate << endl;
 							for (int ido=0; ido<nDimensionOrganizations; ++ido) {
 								for (int d=0; d<nDimensions[ido]; ++d) {
 									int index = dimensionIndices[ido][d][j];
-//cerr << "frame " << dec << j << " organization " << ido << " dimension " << d << " index " << index << " value " << dimensionValues[ido][d][j] << endl;
+cerr << "frame " << dec << j << " organization " << ido << " dimension " << d << " index " << index << " value " << dimensionValues[ido][d][j] << endl;
 									aDimensionIndexValues->addValue(Uint32(index)+1);	// indices are numbered from 1
 								}
 							}

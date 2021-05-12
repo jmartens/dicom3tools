@@ -1,3 +1,4 @@
+/* srcsink.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_srcsink__
 #define __Header_srcsink__
 
@@ -15,6 +16,7 @@ public:
 	virtual const T *getBuffer(void) = 0;
 	virtual size_t getBufferCount(void) const = 0;
 	virtual int good(void) const = 0;
+	virtual ~SourceBase(void) {}
 };
 
 template<class T>

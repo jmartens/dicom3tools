@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrmxrd.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrtype.h"
 #include "attrnew.h"
 #include "attrmxls.h"
@@ -17,12 +18,14 @@
 // there is no detection of failure to skip a truncated attribute at the end
 // of the dataset
 
-static long
-skipBytes(istream *stream,long nSkip) {
+// Need to use Unit32 (NOT long) argument and return value, since may be larger than 2GB (e.g., for large uncompressed pixel data), and VL may be up to (2^32)-2 (000440)
+
+static Uint32
+skipBytes(istream *stream,Uint32 nSkip) {
 	bool success=true;
 	const int bufferSize=32768;
 	char buffer[bufferSize];
-	long totalSkipped=0;
+	Uint32 totalSkipped=0;
 	while (nSkip > 0) {
 		int nToRead = nSkip > bufferSize ? bufferSize : (int)nSkip;
 		stream->read(buffer,nToRead);
@@ -75,7 +78,24 @@ ReadableAttributeList::getValueRepresentation(Tag tag,char *vrbuf,bool& readAsIm
 //cerr << "ReadableAttributeList::getValueRepresentation(): stream is explicit VR - reading VR" << endl;
 		stream->read(vrbuf,2);
 		if (stream->fail()) return 0;
-		if (vrbuf[0] < 'A' || vrbuf[1] < 'A') {		// DicomWorks bug ... occasional implicit VR attribute even though explicit transfer syntax
+		if (vrbuf[0] == '-' && vrbuf[1] == '-') {	// illegal proprietary equivalent of UN VR used by Australian Central Data Networks (CDN) PACS
+			TextOutputStream terr(errorstream.rdbuf());
+			tag.write(terr,dictionary);
+			errorstream << EMsgDC(IllegalCDNHyphenVR) << endl;
+			byteoffset+=2;
+			vrbuf[0]=vrbuf[1]=vrbuf[2]=0;		// ignore whatever was read (vrbuf contents are tested by caller)
+			vre=0;								// will trigger return value based on dictionary lookup
+		}
+		else if (vrbuf[0] == 0 && vrbuf[1] == 0) {	// illegal two bytes of zero VR encountered in Sante de-identifier output (followed by two byte length)
+			TextOutputStream terr(errorstream.rdbuf());
+			tag.write(terr,dictionary);
+			errorstream << EMsgDC(IllegalZeroBytesWhenExplicitVRExpected) << endl;
+			byteoffset+=2;
+			vrbuf[0]=vrbuf[1]=vrbuf[2]=0;		// ignore whatever was read (vrbuf contents are tested by caller)
+			vre=0;								// will trigger return value based on dictionary lookup
+			// subsequent call to getValueLength() will guess that short form length is in use because no padding zero bytes
+		}
+		else if (vrbuf[0] < 'A' || vrbuf[1] < 'A') {		// DicomWorks bug ... occasional implicit VR attribute even though explicit transfer syntax
 			TextOutputStream terr(errorstream.rdbuf());
 			tag.write(terr,dictionary);
 			errorstream << EMsgDC(TagReadFailed) << " - " << MMsgDC(ImplicitVREncodingWhenExplicitRequired) << endl;
@@ -184,79 +204,15 @@ ReadableAttributeList::getValueRepresentation(Tag tag,char *vrbuf,bool& readAsIm
 	return vru;
 }
 
-bool
-ReadableAttributeList::isOtherFloatVR(const char *vr)
-{
-	return vr && vr[0]=='O' && vr[1]=='F';
-}
 
-bool
-ReadableAttributeList::isOtherByteVR(const char *vr)
-{
-	return vr && vr[0]=='O' && vr[1]=='B';
-}
 
-bool
-ReadableAttributeList::isOtherByteOrWordVR(const char *vr)
-{
-	return vr && vr[0]=='O' && (vr[1]=='B' || vr[1]=='W' || vr[1]=='X');
-}
-
-bool
-ReadableAttributeList::isSequenceVR(const char *vr)
-{
-	return vr && vr[0]=='S' &&  vr[1]=='Q';
-}
-
-bool
-ReadableAttributeList::isUnknownVR(const char *vr)
-{
-	return vr && vr[0]=='U' &&  vr[1]=='N';
-}
-
-bool
-ReadableAttributeList::isUnlimitedTextVR(const char *vr)
-{
-	return vr && vr[0]=='U' &&  vr[1]=='T';
-}
-
-static bool
-isKnownExplicitValueRepresentation(const char *vr) {
-	return vr && (
-		   strcmp(vr,"AE") == 0
-		|| strcmp(vr,"AS") == 0
-		|| strcmp(vr,"AT") == 0
-		|| strcmp(vr,"CS") == 0
-		|| strcmp(vr,"DA") == 0
-		|| strcmp(vr,"DS") == 0
-		|| strcmp(vr,"DT") == 0
-		|| strcmp(vr,"FL") == 0
-		|| strcmp(vr,"FD") == 0
-		|| strcmp(vr,"IS") == 0
-		|| strcmp(vr,"LO") == 0
-		|| strcmp(vr,"LT") == 0
-		|| strcmp(vr,"OB") == 0
-		|| strcmp(vr,"OF") == 0
-		|| strcmp(vr,"OW") == 0
-		|| strcmp(vr,"PN") == 0
-		|| strcmp(vr,"SH") == 0
-		|| strcmp(vr,"SL") == 0
-		|| strcmp(vr,"SQ") == 0
-		|| strcmp(vr,"SS") == 0
-		|| strcmp(vr,"ST") == 0
-		|| strcmp(vr,"TM") == 0
-		|| strcmp(vr,"UI") == 0
-		|| strcmp(vr,"UL") == 0
-		|| strcmp(vr,"UN") == 0
-		|| strcmp(vr,"US") == 0
-		|| strcmp(vr,"UT") == 0
-		);
-}
 
 Uint32
 ReadableAttributeList::getValueLength(const char *vr,bool readAsImplicitRegardless)
 {
 //cerr << "ReadableAttributeList::getValueLength(): vr=" << vr << endl;
+//cerr << "ReadableAttributeList::getValueLength(): readAsImplicitRegardless=" << readAsImplicitRegardless << endl;
+
 	Uint32 vl;
 	if (stream->getTransferSyntaxInUse()->isImplicitVR() || readAsImplicitRegardless) {
 //cerr << "ReadableAttributeList::getValueLength(): is implicit VR" << endl;
@@ -265,12 +221,7 @@ ReadableAttributeList::getValueLength(const char *vr,bool readAsImplicitRegardle
 	}
 	else {
 //cerr << "ReadableAttributeList::getValueLength(): is explicit VR" << endl;
-		if (isOtherByteOrWordVR(vr) || isSequenceVR(vr) || isOtherFloatVR(vr)) {
-			(void)stream->read16();	// "Reserved"
-			(*stream) >> vl;
-			byteoffset+=6;
-		}
-		else if (isUnlimitedTextVR(vr) || isUnknownVR(vr)) {
+		if (isUniversalResourceVR(vr) || isUnlimitedCharactersVR (vr) || isUnlimitedTextVR(vr) || isUnknownVR(vr)) {
 			// should be long form, but check for bad implementations that use short form ...
 			vl=stream->read16();
 			byteoffset+=2;
@@ -279,9 +230,14 @@ ReadableAttributeList::getValueLength(const char *vr,bool readAsImplicitRegardle
 				byteoffset+=4;
 			}
 			else {
-				errorstream << EMsgDC(IncorrectShortVLForUTOrUN) << endl;
+				errorstream << EMsgDC(IncorrectShortVLForUROrUCOrUTOrUN) << endl;
 				//good_flag=false;
 			}
+		}
+		else if (isLongValueLengthInExplicitValueRepresentation(vr)) {		// some of these already handled above
+			(void)stream->read16();	// "Reserved"
+			(*stream) >> vl;
+			byteoffset+=6;
 		}
 		else {
 			vl=stream->read16();
@@ -374,10 +330,11 @@ ReadableAttributeList::skipEncapsulatedData(void)
 }
 
 SequenceAttribute *
-ReadableAttributeList::readNewSequenceAttribute(Tag stag,Uint32 length,bool ignoreoutofordertags,bool useUSVRForLUTDataIfNotExplicit,bool undefinedLengthUNTreatedAsSequence)
+ReadableAttributeList::readNewSequenceAttribute(Tag stag,Uint32 length,bool ignoreoutofordertags,bool useUSVRForLUTDataIfNotExplicit,bool undefinedLengthUNTreatedAsSequence,const char *sequenceOwner,bool fixBitsDuringRead,bool havePixelRepresentation,Uint16 vPixelRepresentation)
 {
 //cerr << "readNewSequenceAttribute(): start: undefinedLengthUNTreatedAsSequence = " << (undefinedLengthUNTreatedAsSequence ? "T" : "F") << endl;
 //cerr << "readNewSequenceAttribute(): start: length = " << dec << length << endl;
+//cerr << "readNewSequenceAttribute(): start: sequenceOwner = \"" << (sequenceOwner ? sequenceOwner : "--NULL--") << "\"" << endl;
 	bool showoffset=verbose;
 	SequenceAttribute *a=new SequenceAttribute(stag);
 //cerr << "readNewSequenceAttribute(): created empty tag - isEmpty()=" << a->isEmpty() << endl;
@@ -436,7 +393,7 @@ ReadableAttributeList::readNewSequenceAttribute(Tag stag,Uint32 length,bool igno
 			Assert(item);
 			ElementDictionary *newdict=new ElementDictionary();
 			Assert(newdict);
-			bool result=item->read(*stream,newdict,log,verbose,vl,false/*metaheadercheck*/,false/*uselengthtoend*/,ignoreoutofordertags,useUSVRForLUTDataIfNotExplicit,undefinedLengthUNTreatedAsSequence/*forceImplicit*/,false/*useStopAtTag*/,Tag(0,0)/*stopAtTag*/,true/*nestedWithinSequence*/);
+			bool result=item->read(*stream,newdict,log,verbose,vl,false/*metaheadercheck*/,false/*uselengthtoend*/,ignoreoutofordertags,useUSVRForLUTDataIfNotExplicit,undefinedLengthUNTreatedAsSequence/*forceImplicit*/,false/*useStopAtTag*/,Tag(0,0)/*stopAtTag*/,true/*nestedWithinSequence*/,sequenceOwner,fixBitsDuringRead,havePixelRepresentation,vPixelRepresentation);
 			const char *e=item->errors();
 			if (e) errorstream << e;	// may be warnings
 			if (!result) {
@@ -521,10 +478,12 @@ cerr << "ReadableAttributeList::~ReadableAttributeList" << endl;
 
 bool
 ReadableAttributeList::read(DicomInputStream& str,ElementDictionary* dict,TextOutputStream* l,bool v,Uint32 length,
-	bool metaheadercheck,bool uselengthtoend,bool ignoreoutofordertags,bool useUSVRForLUTDataIfNotExplicit,bool forceImplicit,bool useStopAtTag,Tag stopAtTag,bool nestedWithinSequence)
+	bool metaheadercheck,bool uselengthtoend,bool ignoreoutofordertags,bool useUSVRForLUTDataIfNotExplicit,bool forceImplicit,bool useStopAtTag,Tag stopAtTag,bool nestedWithinSequence,const char *sequenceOwner,bool fixBitsDuringRead,bool havePixelRepresentation,Uint16 vPixelRepresentation)
 {
 //cerr << "ReadableAttributeList::read - start: forceImplicit = " << (forceImplicit ? "T" : "F") << endl;
 //cerr << "ReadableAttributeList::read nestedWithinSequence = " << (nestedWithinSequence ? "T" : "F") << endl;
+//cerr << "ReadableAttributeList::read sequenceOwner = \"" << (sequenceOwner ? sequenceOwner : "--NULL--") << "\"" << endl;
+//cerr << "ReadableAttributeList::read - fixBitsDuringRead = " << (fixBitsDuringRead ? "T" : "F") << endl;
 	stream=&str;
 	dictionary=dict;
 	log=l;
@@ -532,8 +491,9 @@ ReadableAttributeList::read(DicomInputStream& str,ElementDictionary* dict,TextOu
 
 	bool showoffset=v;
 
-	bool allUSSeemToBeByteSwapped=false;	// detect a very unusual and peculiar bug in some images
-	Endian forcePixelDataEndian=NoEndian;	// leave it to the transfer syntax, unless peculiar circumstances arise (allUSSeemToBeByteSwapped is true)
+	bool treatPixelDataAsOtherNonPixelAttribute=false;	// to handle an illegal GE form in which inside a private GE Private Image Thumbnail Sequence is compressed PixelData even though uncompressed transfer syntax (000426)
+	bool allUSSeemToBeByteSwapped=false;				// detect a very unusual and peculiar bug in some images
+	Endian forcePixelDataEndian=NoEndian;				// leave it to the transfer syntax, unless peculiar circumstances arise (allUSSeemToBeByteSwapped is true)
 	bool donewithmetaheader=!metaheadercheck;
 	Uint32 startbyteoffset=byteoffset;
 	Uint32 dicomdirposition=0xffffffff;
@@ -542,7 +502,7 @@ ReadableAttributeList::read(DicomInputStream& str,ElementDictionary* dict,TextOu
 	bool grouplengthcheck=false;
 	Uint32 groupbyteoffsetafterlength=0;	// not used unless grouplengthcheck, but shuts up warning
 	Uint32 grouplengthexpected=0;		// not used unless grouplengthcheck, but shuts up warning
-	while (stream->peek() != EOF && (byteoffset < startbyteoffset+length || length == 0xffffffff)) {
+	while (stream->peek() != istream::traits_type::eof() && (byteoffset < startbyteoffset+length || length == 0xffffffff)) {
 //cerr << "ReadableAttributeList::read - looping (donewithmetaheader is " << (donewithmetaheader ? "true" : "false") << ")" << endl;
 
 //{
@@ -572,11 +532,9 @@ ReadableAttributeList::read(DicomInputStream& str,ElementDictionary* dict,TextOu
 
 		if (!donewithmetaheader && !tag.isMetaheaderGroup()) {
 //cerr << "ReadableAttributeList::read(): Changing from metaheader to dataset" << endl;
-			if (stream->getTransferSyntaxToReadDataSet()) {
-//cerr << "ReadableAttributeList::read(): There is a dataset transfer syntax" << endl;
-				stream->readingDataSet();
-				donewithmetaheader=true;
+			{
 				// backup and read again in case endian changed ...
+//cerr << "ReadableAttributeList::read(): There is a dataset transfer syntax" << endl;
 #ifdef CHECKFORSGINATIVECCSEEKBUG
 cerr << endl << "Before endian check backup @";
 writeZeroPaddedHexNumber(cerr,position,8);
@@ -599,6 +557,15 @@ writeZeroPaddedHexNumber(cerr,stream->rdbuf()->PubSeekOff(0,ios::cur));
 cerr << ")"
     << ": " << endl;
 #endif
+				if (!stream->getTransferSyntaxToReadDataSet()) {
+					errorstream << EMsgDC(NoTransferSyntaxInMetaHeader) << endl;
+					good_flag=false;
+					if (verbose && showoffset) (*log) << endl;
+					bool setswapped32big;
+					stream->guessTransferSyntaxToReadDataSet(setswapped32big);		// always guesses something
+				}
+				stream->readingDataSet();
+				donewithmetaheader=true;
 				(*stream) >> tag;
 				if (stream->fail()) {
 					errorstream << WMsgDC(TagReadFailed) << endl;
@@ -607,12 +574,6 @@ cerr << ")"
 					if (verbose && showoffset) (*log) << endl;
 					return true;
 				}
-			}
-			else {
-				errorstream << EMsgDC(NoTransferSyntaxInMetaHeader) << endl;
-				good_flag=false;
-				if (verbose && showoffset) (*log) << endl;
-				return false;
 			}
 		}
 
@@ -693,6 +654,21 @@ cerr << ")"
 			continue;	// let's just ignore it for now
 		}
 
+		// need to have owner in dictionary BEFORE calling getValueRepresentation()
+		if (tag.isPrivateGroup() && !tag.isLengthElement() && !tag.isPrivateOwner() && !dictionary->hasOwner(tag)) {
+//cerr << "ReadableAttributeList::read - tag is private without owner, have sequenceOwner = " << (sequenceOwner ? sequenceOwner : "--NULL--") << "\"" << endl;
+			TextOutputStream terr(errorstream.rdbuf());
+			tag.write(terr,dictionary);
+			errorstream << " - " << WMsgDC(PrivateTagWithoutOwner);
+			
+			if (sequenceOwner != NULL) {
+				errorstream << " - use owner of parent sequence \"" << (sequenceOwner ? sequenceOwner : "--NULL--") << "\"";
+				// need to make a simulated private owner that specifies the block used by the current tag
+				dictionary->addOwner(Tag(tag.getGroup(),(tag.getElement()>>8)&0xff),sequenceOwner);
+			}
+			errorstream << endl;
+		}
+		
 		char vre[3];
 		bool readAsImplicitRegardless = forceImplicit;
 		const char *vr = NULL;
@@ -795,7 +771,18 @@ cerr << ")"
 		if (isSequenceVR(vr) || treatedUnknownVRAsSequence) {
 			if (verbose) { writebase(tag,vr,vl); (*log) << endl; }
 //cerr << "ReadableAttributeList::read - before readNewSequenceAttribute() good_flag = " << good_flag << endl;
-			a=readNewSequenceAttribute(tag,vl,ignoreoutofordertags,useUSVRForLUTDataIfNotExplicit,forceImplicit || treatedUnknownVRAsSequence);		// once inside UN SQ, always implicit, even if nested
+			const char *useSequenceOwner = dictionary->getOwner(tag);
+//cerr << "ReadableAttributeList::read - useSequenceOwner from dictionary->getOwner(tag) = \"" << (useSequenceOwner ? useSequenceOwner : "--NULL--") << "\"" << endl;
+			if (!useSequenceOwner) {
+				useSequenceOwner = sequenceOwner;	// propagate owner of successively nested sequences (really should check group and block, but since this is non-standard anyway ... :( )
+//cerr << "ReadableAttributeList::read - useSequenceOwner from parent = \"" << (useSequenceOwner ? useSequenceOwner : "--NULL--") << "\"" << endl;
+			}
+			a=readNewSequenceAttribute(tag,vl,ignoreoutofordertags,useUSVRForLUTDataIfNotExplicit,
+				forceImplicit || treatedUnknownVRAsSequence,		/* once inside UN SQ, always implicit, even if nested */
+				useSequenceOwner,									/* in case nested lists are missing owner, propagate owner of the sequence tag itself, if private, or its parent, if missing its own owner */
+				fixBitsDuringRead,
+				havePixelRepresentation,vPixelRepresentation
+				);
 //cerr << "ReadableAttributeList::read - back from readNewSequenceAttribute() with a = " << (a == NULL ? "null" : "valid") << endl;
 //cerr << "ReadableAttributeList::read - back from readNewSequenceAttribute() with stream->fail() = " << stream->fail() << endl;
 //cerr << "ReadableAttributeList::read - back from readNewSequenceAttribute() good_flag = " << good_flag << endl;
@@ -807,9 +794,9 @@ cerr << ")"
 			}
 			// byteoffset already updated by readNewSequenceAttribute()
 		}
-		else if (tag.isPixelDataElement()) {
+		else if (tag.isPixelDataElement() && !treatPixelDataAsOtherNonPixelAttribute) {		// treatPixelDataAsOtherNonPixelAttribute is to handle (000426)
 //cerr << "ReadableAttributeList::read PixelData" << endl;
-			if (isOtherByteOrWordVR(vr)) {
+			if (isOtherByteOrWordOrUnspecifiedVR(vr)) {
 //cerr << "ReadableAttributeList::read OX PixelData" << endl;
 				Uint16 vBitsAllocated=AttributeValue(operator[](TagFromName(BitsAllocated)));
 				Uint16 vBitsStored=AttributeValue(operator[](TagFromName(BitsStored)));
@@ -827,26 +814,34 @@ cerr << ")"
 				if (vHighBit > (vBitsAllocated-1u)) {
 					errorstream << EMsgDC(BadAttributeValue)
 						    << " - High Bit = " << vHighBit
-						    << " " << MMsgDC(Exceeds) << " " << (vBitsAllocated-1u)
-						    << " " << MMsgDC(Using) << " " << (vBitsAllocated-1u)
-						    << endl;
-					vHighBit=vBitsAllocated-1u;
-					operator-=(TagFromName(HighBit));
-					UnsignedShortAttribute *aHighBit=new UnsignedShortAttribute(TagFromName(HighBit),vHighBit);
-					Assert(aHighBit);
-					operator+=(aHighBit);
+						    << " " << MMsgDC(Exceeds) << " " << (vBitsAllocated-1u);
+					if (fixBitsDuringRead) {
+						errorstream << " " << MMsgDC(Using) << " " << (vBitsAllocated-1u);
+					}
+					errorstream << endl;
+					if (fixBitsDuringRead) {
+						vHighBit=vBitsAllocated-1u;
+						operator-=(TagFromName(HighBit));
+						UnsignedShortAttribute *aHighBit=new UnsignedShortAttribute(TagFromName(HighBit),vHighBit);
+						Assert(aHighBit);
+						operator+=(aHighBit);
+					}
 				}
 				if (vHighBit < (vBitsStored-1u)) {
-					errorstream << WMsgDC(BadAttributeValue)
+					errorstream << EMsgDC(BadAttributeValue)
 						    << " - Bits Stored = " << vBitsStored
-						    << " " << MMsgDC(Exceeds) << " High Bit " << vHighBit << " + 1"
-						    << " " << MMsgDC(Using) << " " << (vHighBit+1u)
-						    << endl;
-					vBitsStored=vHighBit+1u;
-					operator-=(TagFromName(BitsStored));
-					UnsignedShortAttribute *aBitsStored=new UnsignedShortAttribute(TagFromName(BitsStored),vBitsStored);
-					Assert(aBitsStored);
-					operator+=(aBitsStored);
+						    << " " << MMsgDC(Exceeds) << " High Bit " << vHighBit << " + 1";
+					if (fixBitsDuringRead) {
+						errorstream << " " << MMsgDC(Using) << " " << (vHighBit+1u);
+					}
+					errorstream << endl;
+					if (fixBitsDuringRead) {
+						vBitsStored=vHighBit+1u;
+						operator-=(TagFromName(BitsStored));
+						UnsignedShortAttribute *aBitsStored=new UnsignedShortAttribute(TagFromName(BitsStored),vBitsStored);
+						Assert(aBitsStored);
+						operator+=(aBitsStored);
+					}
 				}
 				if (vl == 0xffffffff) {
 //cerr << "ReadableAttributeList::read Pixel Data has undefined length VL" << endl;
@@ -923,7 +918,9 @@ cerr << ")"
 			}
 			else {
 //cerr << "ReadableAttributeList::read PixelData not OX" << endl;
-				errorstream << EMsgDC(IllegalVRForPixelData) << endl;
+				TextOutputStream terr(errorstream.rdbuf());
+				tag.write(terr,dictionary);
+				terr << EMsgDC(IllegalVRForPixelData) << endl;
 				good_flag=false;
 				if (verbose && showoffset) (*log) << endl;
 				return false;
@@ -961,7 +958,7 @@ cerr << ")"
 				}
 			}
 			
-			if (isOtherByteOrWordVR(vr)) {
+			if (isOtherByteOrWordOrUnspecifiedVR(vr)) {
 				// PixelData already handled specially
 				if (strcmp(vr,"OX") == 0) {
 					if (tag == TagFromName(OverlayData)) {
@@ -994,12 +991,34 @@ cerr << ")"
 					// the skipping and vl setting is done later in read()
 				}
 			}
+			else if (isOtherLongVR(vr)) {
+				//if (vl <= LARGESTOTHERDATATOKEEPINMEMORY) {
+				//	a=new OtherLongSmallAttribute(tag);
+				//}
+				//else {
+					a=new OtherLongLargeAttribute(tag,
+							*stream,
+							stream->tellg());
+					// the skipping and vl setting is done later in read()
+				//}
+			}
 			else if (isOtherFloatVR(vr)) {
 				//if (vl <= LARGESTOTHERDATATOKEEPINMEMORY) {
 				//	a=new OtherFloatSmallAttribute(tag);
 				//}
 				//else {
 					a=new OtherFloatLargeAttribute(tag,
+							*stream,
+							stream->tellg());
+					// the skipping and vl setting is done later in read()
+				//}
+			}
+			else if (isOtherDoubleVR(vr)) {
+				//if (vl <= LARGESTOTHERDATATOKEEPINMEMORY) {
+				//	a=new OtherDoubleSmallAttribute(tag);
+				//}
+				//else {
+					a=new OtherDoubleLargeAttribute(tag,
 							*stream,
 							stream->tellg());
 					// the skipping and vl setting is done later in read()
@@ -1047,6 +1066,11 @@ cerr << ")"
 				}
 				else {
 					a->read(*stream,vl);
+					if (!isLongValueLengthInExplicitValueRepresentation(vr) && a->getValueSize()*a->getVM() >= 65536) {
+						TextOutputStream terr(errorstream.rdbuf());
+						tag.write(terr,dictionary);
+						terr << " - " << WMsgDC(VLExceedsExplicitVRMaximium) << " - value length = " << dec << vl << endl;
+					}
 				}
 				if (stream->fail()) {
 					errorstream << EMsgDC(AttributeReadFailed) << endl;
@@ -1082,11 +1106,29 @@ cerr << ")"
 					if (donewithmetaheader) {
 						errorstream << EMsgDC(UnexpectedTransferSyntaxUIDOutsideMetaInformationHeader) << " - ignoring - " << newTransferSyntaxUID << endl;
 					}
-					else {
+					else if (newTransferSyntaxUID && strlen(newTransferSyntaxUID) > 0) {
 //cerr << "ReadableAttributeList::read() encountered TransferSyntaxUID - before changing getTransferSyntaxInUse()->isEncapsulated() " << (stream->getTransferSyntaxInUse()->isEncapsulated() ? "true" : "false") << endl;
 //cerr << "ReadableAttributeList::read() encountered TransferSyntaxUID - setting transfer syntax to read data set to " << newTransferSyntaxUID << endl;
 						stream->setTransferSyntaxToReadDataSet(new TransferSyntax(newTransferSyntaxUID));
 //cerr << "ReadableAttributeList::read() encountered TransferSyntaxUID - after changing getTransferSyntaxInUse()->isEncapsulated() " << (stream->getTransferSyntaxInUse()->isEncapsulated() ? "true" : "false") << endl;
+					}
+					else {
+						errorstream << EMsgDC(EmptyTransferSyntaxUIDInMetaInformationHeader) << endl;
+						stream->setTransferSyntaxToReadDataSet(NULL);
+					}
+				}
+				else if (tag == TagFromName(PixelRepresentation)) {
+					// needed to determine VR of XS data elements in implicit VR in data set at this or nested levels (000490) (000491)
+					Uint16 value;
+					Uint32 length;
+					if (!a->getValue(0,value)
+					 || a->getVM() != 1) {
+						errorstream << EMsgDC(BadPixelRepresentation) << endl;
+					}
+					else {
+						havePixelRepresentation = true;
+						vPixelRepresentation = value;
+//cerr << "ReadableAttributeList::read() encountered PixelRepresentation - set havePixelRepresentation = " << (havePixelRepresentation ? "true" : "false") << " vPixelRepresentation = " << vPixelRepresentation << endl;
 					}
 				}
 				else if (tag == TagFromName(FileMetaInformationVersion)) {
@@ -1131,11 +1173,23 @@ cerr << ")"
 						}
 						if (s) delete[] s;
 					}
-					else {
-						if (!dictionary->hasOwner(tag)) {
-							TextOutputStream terr(errorstream.rdbuf());
-							tag.write(terr,dictionary);
-							errorstream << " - " << WMsgDC(PrivateTagWithoutOwner) << endl;
+					// PrivateTagWithoutOwner is handled earlier when establishing dictionary VR and need to possibly inherit parent sequence owner if owner missing within item dataset
+					//else {
+					//	if (!dictionary->hasOwner(tag)) {
+					//		TextOutputStream terr(errorstream.rdbuf());
+					//		tag.write(terr,dictionary);
+					//		errorstream << " - " << WMsgDC(PrivateTagWithoutOwner) << endl;
+					//	}
+					//}
+					else if (tag.isPrivateTag()) {
+						const char *useOwner = dictionary->getOwner(tag);
+						// handle an illegal GE form in which inside a private GE Private Image Thumbnail Sequence is compressed PixelData even though uncompressed transfer syntax (000426)
+						if (tag.getGroup() == 0x7fd1 && (tag.getElement() & 0x00ff) == 0x0010 && useOwner != NULL && strcmp(useOwner,"GEIIS ")) {	// (0x7fd1,0x1010) Compression Type; note the space in the owner check
+							// Need to actually check the value, since when this is used, there is one inside the GE Private Image Thumbnail Sequence with a non-zero value
+							// and one in the top level dataset with a zero value, which shoudl not affect how top level Pixel Data is handled ...
+							Uint32 geGompressionType =AttributeValue(a);
+							treatPixelDataAsOtherNonPixelAttribute = geGompressionType != 0;
+//cerr << "ReadableAttributeList::read - tag is private GE Compression Type, value " << geGompressionType << "; will " << (treatPixelDataAsOtherNonPixelAttribute ? "" : "not ") << "treat PixelData as ordinary tag" << endl;
 						}
 					}
 				}
@@ -1172,7 +1226,7 @@ cerr << ")"
 //cerr << "ReadableAttributeList::read - falling out at end startbyteoffset+length = " << hex << (length == 0xffffffff ? 0xffffffff : (startbyteoffset+length)) << dec << endl;
 //cerr << "ReadableAttributeList::read - falling out at end stream->fail() = " << stream->fail() << endl;
 	TransferSyntax *dts=stream->getTransferSyntaxToReadDataSet();
-	return ((dts && dts->isExplicitVR()) || setValueRepresentation())
+	return ((dts && dts->isExplicitVR()) || setValueRepresentationForThisList(havePixelRepresentation,vPixelRepresentation))
 	    /*&& !stream->fail()*/;		// seems to fail inappropriately on AMD 64 Linux with Siemens PDI 2004 demo DICOMDIR :(
 }
 

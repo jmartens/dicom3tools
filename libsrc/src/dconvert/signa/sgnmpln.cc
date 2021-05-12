@@ -1,6 +1,4 @@
-//#include <iostream.h>
-//#include <iomanip.h>
-
+static const char *CopyrightIdentifier(void) { return "@(#)sgnmpln.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "sgndc.h"
 #include "elmconst.h"
 #include "planea.h"

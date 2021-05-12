@@ -106,6 +106,7 @@ elmdict.tpl:	\
 		elmdict/gems.tpl	\
 		elmdict/papyrus.tpl	\
 		elmdict/toshiba.tpl	\
+		elmdict/hitachi.tpl \
 		elmdict/isg.tpl		\
 		elmdict/elscint.tpl	\
 		elmdict/acuson.tpl	\
@@ -124,6 +125,7 @@ elmdict.tpl:	\
 		elmdict/gems.tpl	\
 		elmdict/papyrus.tpl	\
 		elmdict/toshiba.tpl	\
+		elmdict/hitachi.tpl \
 		elmdict/isg.tpl		\
 		elmdict/elscint.tpl	\
 		elmdict/acuson.tpl	\
@@ -157,7 +159,8 @@ module.tpl:	\
 		module/softcopy.tpl	\
 		module/mr.tpl		\
 		module/ct.tpl		\
-		module/xaxrf.tpl
+		module/xaxrf.tpl	\
+		module/us.tpl
 	cat \
 		module/base.tpl		\
 		module/file.tpl		\
@@ -173,6 +176,7 @@ module.tpl:	\
 		module/mr.tpl		\
 		module/ct.tpl		\
 		module/xaxrf.tpl	\
+		module/us.tpl		\
 	>module.tpl
 
 iodcomp.tpl:	\
@@ -187,7 +191,8 @@ iodcomp.tpl:	\
 		iodcomp/sr.tpl		\
 		iodcomp/softcopy.tpl	\
 		iodcomp/mr.tpl		\
-		iodcomp/ct.tpl
+		iodcomp/ct.tpl	\
+		iodcomp/us.tpl
 	cat \
 		iodcomp/base.tpl	\
 		iodcomp/file.tpl	\
@@ -201,6 +206,7 @@ iodcomp.tpl:	\
 		iodcomp/softcopy.tpl	\
 		iodcomp/mr.tpl		\
 		iodcomp/ct.tpl		\
+		iodcomp/us.tpl		\
 	>iodcomp.tpl
 
 strval.tpl:	\

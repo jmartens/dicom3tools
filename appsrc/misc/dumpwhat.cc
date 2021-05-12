@@ -1,8 +1,22 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dumpwhat.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <cstdlib>            // for atoi()
+#include <cctype>
+#else
+#include <iostream.h>
 #include <fstream.h>
 #include <iomanip.h>
 #include <stdlib.h>            // for atoi()
 #include <ctype.h>
-#include <string.h>
+//#include <string.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 #include "ioopt.h"

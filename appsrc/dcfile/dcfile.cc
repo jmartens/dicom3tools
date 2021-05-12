@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcfile.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "basetype.h"
 #include "mesgtext.h"
 #include "dcopt.h"
@@ -8,30 +9,12 @@
 #include "elmconst.h"
 #include "transynd.h"
 
-static bool
-isOtherByteOrWordVR(const char *vr)
-{
-	return vr && vr[0]=='O' && (vr[1]=='B' || vr[1]=='W' || vr[1]=='X');
-}
-
-static bool
-isSequenceVR(const char *vr)
-{
-	return vr && vr[0]=='S' &&  vr[1]=='Q';
-}
-
-static bool
-isUnknownVR(const char *vr)
-{
-	return vr && vr[0]=='U' &&  vr[1]=='N';
-}
-
 static TransferSyntax *
 readMetaHeaderTillTransferSyntax(DicomInputStream &stream)
 {
 	Uint32 n=0;
 	Uint32 length=0xffffffff;
-	while (stream.peek() != EOF && (length == 0xffffffff || n < length)) {
+	while (stream.peek() != istream::traits_type::eof() && (length == 0xffffffff || n < length)) {
 		Tag tag;
 		stream >> tag;
 		if (stream.fail()) {
@@ -59,7 +42,7 @@ readMetaHeaderTillTransferSyntax(DicomInputStream &stream)
 			stream >> vl;
 			n+=4;
 		}
-		else if (isOtherByteOrWordVR(vr) || isSequenceVR(vr) || isUnknownVR(vr)) {
+		else if (isLongValueLengthInExplicitValueRepresentation(vr)) {
 			(void)stream.read16();	// "Reserved"
 			stream >> vl;
 			n+=6;

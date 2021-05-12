@@ -1,3 +1,4 @@
+#  mesgtext.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 # create mesgtext ix/description table in correct language 
 
 NR==1	{

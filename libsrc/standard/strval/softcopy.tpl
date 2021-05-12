@@ -1,6 +1,7 @@
 StringValues="AnnotationUnits"	{
 	PIXEL,
-	DISPLAY
+	DISPLAY,
+	MATRIX
 }
 
 StringValues="GraphicType"	{
@@ -84,7 +85,7 @@ StringValues="RelativeTimeUnits"	{
 	YEARS
 }
 
-StringValues="ImageBoxLayoutType"	{
+StringValues="ImageBoxLayoutTypeForHangingProtocol"	{
 	TILED,
 	STACK,
 	CINE,
@@ -191,7 +192,8 @@ StringValues="PartialDataDisplayHandling"	{
 
 StringValues="VOILUTFunction"	{
 	LINEAR,
-	SIGMOID
+	SIGMOID,
+	LINEAR_EXACT
 }
 
 StringValues="BlendingPosition"	{
@@ -199,5 +201,39 @@ StringValues="BlendingPosition"	{
 	UNDERLYING
 }
 
+StringValues="ImageBoxLayoutTypeForStructuredDisplay" {
+	STACK,
+	CINE,
+	SINGLE
+}
+
+StringValues="InitialCineRunState" {
+	STOPPED,
+	RUNNING
+}
+
+StringValues="TypeOfSynchronizationBetweenImageBoxes" {
+	FRAME,
+	POSITION,
+	TIME,
+	PHASE
+}
+
+StringValues="BoundingBoxTextHorizontalJustification" {
+	LEFT,
+	RIGHT,
+	CENTER
+}
+
+StringValues="PixelOriginInterpretation"	{
+	FRAME,
+	VOLUME
+}
+
+StringValues="ColorSpace"	{
+	SRGB,
+	ADOBERGB,
+	ROMMRGB
+}
 
 

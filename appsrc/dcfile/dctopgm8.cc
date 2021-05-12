@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dctopgm8.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "attrothr.h"
 #include "attrval.h"
@@ -928,59 +929,63 @@ main(int argc, char *argv[])
 	if (!vBitsAllocated && vBitsStored)
 		vBitsAllocated=((vBitsStored-1u)/8u+1u)*8u;
 
-	if (!vBitsAllocated) {
+	if (!vBitsAllocated && aPixelData) {
 		if (strcmp(aPixelData->getVR(),"OW") == 0)
 			vBitsAllocated=16;
 		else
 			vBitsAllocated=8;
 	}
 
-	Assert(vBitsAllocated <= 16);
+	if (vBitsAllocated > 16) {
+		success=false;
+	}
 
 	if (!vBitsStored) vBitsStored=vBitsAllocated;
 	if (!vHighBit) vHighBit=vBitsStored-1;
 
-	Uint32 framelengthinwords=length/vNumberOfFrames*8/vBitsAllocated;
+	Uint32 framelengthinwords = (vNumberOfFrames && vBitsAllocated) ? length/vNumberOfFrames*8/vBitsAllocated : 0;	// no division by zero for us
 
-	if (!vRows) {
-		if (!vColumns) {
-			if (!vSamplesPerPixel) {
-				vRows=Uint16(sqrt(framelengthinwords));
-				vColumns=Uint16(length/vRows);
-				vSamplesPerPixel=1;
+	if (framelengthinwords) {
+		if (!vRows) {
+			if (!vColumns) {
+				if (!vSamplesPerPixel) {
+					vRows=Uint16(sqrt(framelengthinwords));
+					vColumns=Uint16(length/vRows);
+					vSamplesPerPixel=1;
+				}
+				else {
+					Uint32 left=framelengthinwords/vSamplesPerPixel;
+					vRows=Uint16(sqrt(left));
+					vColumns=Uint16(left/vRows);
+				}
 			}
 			else {
-				Uint32 left=framelengthinwords/vSamplesPerPixel;
-				vRows=Uint16(sqrt(left));
-				vColumns=Uint16(left/vRows);
+				if (!vSamplesPerPixel) {
+					Uint32 left=framelengthinwords/vColumns;
+					vRows=Uint16(sqrt(length));
+					vSamplesPerPixel=1;
+				}
+				else {
+					vRows=Uint16(framelengthinwords/(vColumns*vSamplesPerPixel));
+				}
 			}
 		}
 		else {
-			if (!vSamplesPerPixel) {
-				Uint32 left=framelengthinwords/vColumns;
-				vRows=Uint16(sqrt(length));
-				vSamplesPerPixel=1;
+			if (!vColumns) {
+				if (!vSamplesPerPixel) {
+					vColumns=Uint16(framelengthinwords/vRows);
+					vSamplesPerPixel=1;
+				}
+				else {
+					vColumns=Uint16(framelengthinwords/(vRows*vSamplesPerPixel));
+				}
 			}
 			else {
-				vRows=Uint16(framelengthinwords/(vColumns*vSamplesPerPixel));
+				if (!vSamplesPerPixel) {
+					vSamplesPerPixel=Uint16(framelengthinwords/(vRows*vColumns));
+				}
+				// else we know all three
 			}
-		}
-	}
-	else {
-		if (!vColumns) {
-			if (!vSamplesPerPixel) {
-				vColumns=Uint16(framelengthinwords/vRows);
-				vSamplesPerPixel=1;
-			}
-			else {
-				vColumns=Uint16(framelengthinwords/(vRows*vSamplesPerPixel));
-			}
-		}
-		else {
-			if (!vSamplesPerPixel) {
-				vSamplesPerPixel=Uint16(framelengthinwords/(vRows*vColumns));
-			}
-			// else we know all three
 		}
 	}
 
@@ -1025,12 +1030,12 @@ main(int argc, char *argv[])
 		    << dec << endl;
 	}
 
-	Assert((Uint32)vRows*vColumns*vSamplesPerPixel <= framelengthinwords);
-
 	if (!vRows || !vColumns
 	 || !vPhotometricInterpretation || !vSamplesPerPixel
 	 || !vBitsAllocated
-	 || (vSamplesPerPixel > 1 && vPlanarConfiguration == 0xffff)) {
+	 || (vSamplesPerPixel > 1 && vPlanarConfiguration == 0xffff)
+	 || framelengthinwords == 0
+	 || ((Uint32)vRows*vColumns*vSamplesPerPixel > framelengthinwords)) {
 		log << EMsgDC(MissingMandatoryAttributes) << endl;
 		success=false;
 	}

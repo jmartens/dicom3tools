@@ -4,11 +4,11 @@ CPLUSPLUS_EXTRA_INCLUDES  = $(PROJECTLIBGENERICEXTRAINCLUDES)
 
 CPLUSPLUS_SRCS = getoptns.cc datetype.cc \
                  bnopti.cc bnopto.cc ioopti.cc ioopto.cc \
-		 txstream.cc
+		 txstream.cc version.cc platform.cc
 
 OBJS =           getoptns.o  datetype.o  \
                  bnopti.o  bnopto.o  ioopti.o  ioopto.o \
-		 txstream.o
+		 txstream.o version.o platform.o
 
 
 LibraryTarget($(PROJECTLIBDIR)/lib$(PROJECTGENERICLIBNAME).a,$(OBJS))

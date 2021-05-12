@@ -13,6 +13,12 @@ StringValues="YesNoFull" {
 	NO
 }
 
+StringValues="YesNoFullUnknown" {
+	YES,
+	NO,
+	UNKNOWN
+}
+
 StringValues="YesLetter" {
 	Y = Yes
 }
@@ -180,8 +186,16 @@ StringValues="CodingSchemeUIDForSNM3" {
 	2.16.840.1.113883.6.51 = SNM3
 }
 
+StringValues="CodingSchemeUIDForSCT" {
+	2.16.840.1.113883.6.96 = SCT
+}
+
 StringValues="CodingSchemeUIDForSRT" {
-	2.16.840.1.113883.6.5 = SRT
+	2.16.840.1.113883.6.96 = SRT
+}
+
+StringValues="CodingSchemeUIDForCTV3" {
+	2.16.840.1.113883.6.6 = CTV3
 }
 
 StringValues="CodingSchemeUIDForUCUM" {
@@ -202,6 +216,7 @@ StringValues="MiscellaneousCodingSchemeUIDs"	{
 	2.16.840.1.113883.6.12 = C4,
 	2.16.840.1.113883.6.82 = C5,
 	2.16.840.1.113883.6.13 = CD2,
+	2.16.840.1.113883.6.6 = CTV3,
 	1.2.840.10008.2.16.4 = DCM,
 	1.2.840.10008.2.6.1 = DCMUID,
 	2.16.840.1.113883.6.14 = HPC,
@@ -212,30 +227,47 @@ StringValues="MiscellaneousCodingSchemeUIDs"	{
 	2.16.1 = ISO3166_1,
 	2.16.840.1.113883.6.99 = ISO639_1,
 	2.16.840.1.113883.6.100 = ISO639_2,
+	1.2.840.10008.2.16.7 = ITIS_TSN,
 	2.16.840.1.113883.6.1 = LN,
+	1.2.840.10008.2.16.5 = MA,
+	1.2.840.10008.2.16.8 = MGI,
+	2.16.840.1.113883.3.26.1.1 = NCIt,
 	2.16.840.1.113883.6.50 = POS,
 	2.16.840.1.113883.6.256 = RADLEX,
 	2.16.840.1.113883.6.121 = RFC3066,
 	2.16.840.1.113883.6.51 = SNM3,
-	2.16.840.1.113883.6.5 = SRT,
+	2.16.840.1.113883.6.96 = SRT/SCT,
+	1.2.840.10008.2.16.6 = UBERON,
 	2.16.840.1.113883.6.8 = UCUM,
 	2.16.840.1.113883.6.86 = UMLS,
-	2.16.840.1.113883.6.55 = UPC
+	2.16.840.1.113883.6.55 = UPC,
+	1.2.276.0.7230010.3.0.0.1 = 99_OFFIS_DCMTK,
+	1.3.6.1.4.1.5962.98.1 = 99PMP,
+	1.3.6.1.4.1.5962.98.2 = 99IPCMR,
+	1.3.6.1.4.1.43046.3.0.0 = 99QIICR
 }
 
 StringValues="MiscellaneousCodingSchemeDesignators"	{
+	99_OFFIS_DCMTK = OFFIS DCMTK,
+	99QIICR = NCI QIICR Project 3DSlicer BWH,
+	99HOLX = Hologic,
 	99IHE = IHE Connectathon,
 	99PDL-rad = PointDX,
 	99GEMS = GE,
 	99_MI = Siemens,
 	99NMG = Siemens NM,
+	99SMS_CTMR = Siemens CT MR,
+	99PMSBLUS = Philips Ultrasound,
 	99RPH = RadPharm,
 	99RPANATLOC = RadPharm anatomical locations,
 	99RPH_USERS = RadPharm users,
 	99PMP = PixelMed Publishing,
 	99PMPMRMF = PixelMed Publishing NEMA MRMF,
+	99IPCMR = Imaging Procedure Code Mapping Resource,
 	99SDM = SNOMED DICOM Microglossary,
 	99NCIAIM = NCI Annotation Imaging Markup,
+	99HOLXDXA = Hologic DXA,
+	99KINETDX = Siemens Acuson Ultrasound,
 	ACR = ACR Index for Radiological Diagnosis,
 	ART = WHO Adverse Reaction terms,
 	AS4 = ASTM,
@@ -252,6 +284,7 @@ StringValues="MiscellaneousCodingSchemeDesignators"	{
 	CDS = CDC Surveillance Codes,
 	CE  = CEN ECG Diagnostic Codes,
 	CST = COSTART coding system for adverse drug reactions,
+	CTV3 = NHS Clinical Terms Version 3 (Read Codes),
 	DCM = DICOM Controlled Terminology,
 	DCMUID = DICOM UID Registry,
 	E   = Euclides AFP codes,
@@ -264,6 +297,7 @@ StringValues="MiscellaneousCodingSchemeDesignators"	{
 	HB  = HIBCC,
 	HHCC = Home Health Care Classification System,
 	HI  = Health Outcomes Institute codes for outcome variables,
+	HPC = Healthcare Financing Administration (HCFA) Common Procedure CodingSystem (HCPCS),
 	JC8 = Japanese Chemistry,
 	ICS = ICCS,
 	I9  = ICD9,
@@ -272,15 +306,18 @@ StringValues="MiscellaneousCodingSchemeDesignators"	{
 	I10P = ICD10 Procedure Coding System,
 	IBT = ISBT,
 	ICS = ICCS,
+	IETF4646 = IETF RFC 4646 language codes,
 	ISO3166_1 = ISO 2 letter country codes,
 	ISO639_1 = ISO 2 letter language codes,
 	ISO639_2 = ISO 3 letter language codes,
 	ISO_OID =  ISO OSI Object Identifier Tree,
+	ITIS_TSN = Integrated Taxonomic Information System Taxonomic Serial Number,
 	IUC = IUPAC/IFCC Recommendations of Quantities and Units in Clinical Chemistry,
 	IUPC = IUPAC component (analyte) codes,
 	IUPP = IUPAC property codes,
 	JC8 = Japanese Chemistry Clinical examination classification code,
 	LN = LOINC,
+	MA = Adult Mouse Anatomy Ontology,
 	MCD = Medicaid billing codes/names,
 	MCR = Medicare billing codes/names,
 	MDDX = Medispan diagnostic codes,
@@ -288,18 +325,24 @@ StringValues="MiscellaneousCodingSchemeDesignators"	{
 	MEDC = Medical Economics Drug Codes,
 	MEDR = Medical Dictionary for Drug Regulatory Affairs (MEDDRA),
 	MEDX = Medical Economics Diagnostic Codes,
+	MGI = Mouse Genome Initiative,
 	MGPI = Medispan GPI hierarchical drug codes,
 	MVX = CDC Vaccine Codes,
 	NCDR = American College of Cardiology National Cardiovascular Data Registry Cath Lab Module,
+	NCIt = NCI Thesaurus,
 	NDC = National Drug Codes FDA,
 	NIC = Nursing Interventions Iowa Intervention Project,
 	NPI = HCFA National Provider Identifier,
+	POS = HCFA Place of Service (POS) Codes for Professional Claims,
 	RADLEX = RadLex,
 	RC  = Read Clinical Classification of Medicine,
 	RFC3066 = IETF RFC 3066 language codes,
+	RFC5646 = IETF RFC 5646 language codes,
 	SCPECG = Standard Communications Protocol for Computer-Assisted Electrocardiography,
 	SNM3 = SNOMED International Version 3,
+	SCT = SNOMED-CT,
 	SRT = SNOMED-RT,
+	UBERON  = Uberon integrated cross-species ontology,
 	UC  = UCDS,
 	UCUM = Unified Code for Units of Measure,
 	UMD = Universal Medical Device Nomenclature System MDNS, 
@@ -311,6 +354,14 @@ StringValues="MiscellaneousCodingSchemeDesignators"	{
 	W2  = WHO Record Number 8 Digit Drug Codes,
 	W4  = WHO Record Number With ASTM Extensions,
 	WC  = WHO ATC
+}
+
+StringValues="CodingSchemeDesignatorUCUM"	{
+	UCUM = Unified Code for Units of Measure
+}
+
+StringValues="CodingSchemeDesignatorLOINC"	{
+	LN = LOINC
 }
 
 StringValues="VisitStatusID" {
@@ -528,6 +579,7 @@ StringValues="BodyPartExaminedAnimal" {
 }
 
 StringValues="Modality"	{
+	AR = Autorefraction,
 	AU = Audio,
 	BI = Biomagnetic Imaging,
 	BDUS = Bone Densitometry (ultrasound),
@@ -545,23 +597,29 @@ StringValues="Modality"	{
 	HC = Hard Copy,
 	HD = Hemodynamic Waveform,
 	IO = Intra-oral Radiography,
+	IOL = Intraocular Lens Data,
+	IVOCT = Intravascular Optical Coherence Tomography,
 	IVUS = Intravascular Ultrasound,
+	KER = Keratometry,
 	KO = Key Object Selection,
+	LEN = Lensometry,
 	LS = Laser Surface Scan,
 	MG = Mammography,
 	MR = Magnetic Resonance,
 	NM = Nuclear Medicine,
+	OAM = Ophthalmic Axial Measurements,
 	OCT	= Optical Coherence Tomography (non-Ophthalmic),
 	OP = Ophthalmic Photography,
 	OPM	= Ophthalmic Mapping,
-	OPR	= Ophthalmic Refraction,
 	OPT	= Ophthalmic Tomography,
 	OPV	= Ophthalmic Visual Field,
 	OT = Other,
+	PLAN = Plan,
 	PR = Presentation State,
 	PT = Positron Emmission Tomography,
 	PX = Panoramic X-Ray,
 	REG	= Registration,
+	RESP = Respiratory Waveform,
 	RF = RadioFluoroscopy,
 	RG = Radiographic Imaging Conventional Film Screen,
 	RTDOSE = RT Dose,
@@ -569,12 +627,16 @@ StringValues="Modality"	{
 	RTPLAN = RT Plan,
 	RTRECORD = RT Treatment Record,
 	RTSTRUCT = RT Structure Set,
+	RWV = Real World Value,
 	SEG	= Segmentation,
 	SM = Slide Microscopy,
 	SMR = Stereometric Relationship,
 	SR = SR Document,
+	SRF = Subjective Refraction,
+	STAIN = Automated Slide Stainer,
 	TG = Thermography,
 	US = Ultrasound,
+	VA = Visual Acuity,
 	XA = X-Ray Angiography,
 	XC = External Camera Photography
 }
@@ -587,7 +649,15 @@ StringValues="PatientPosition" {
 	FFP  = Feet First Prone,
 	FFS  = Feet First Supine,
 	FFDR = Feet First Decubitus Right,
-	FFDL = Feet First Decubitus Right
+	FFDL = Feet First Decubitus Right,
+	LFP = Left First-Prone,
+	LFS = Left First-Supine,
+	RFP = Right First-Prone,
+	RFS = Right First-Supine,
+	AFDR = Anterior First Decubitus Right,
+	AFDL = Anterior First Decubitus Left,
+	PFDR = Posterior First Decubitus Right,
+	PFDL = Posterior First Decubitus Left
 }
 
 StringValues="ViewPositionHuman" {
@@ -833,9 +903,24 @@ StringValues="PhotometricInterpretationMonochrome2OrRGBorYBR_FULL_422orYBR_RCTor
 	RGB
 }
 
+StringValues="PhotometricInterpretationRGBorYBR_RCT" {
+	YBR_RCT,
+	RGB
+}
+
+StringValues="PhotometricInterpretationYBRFullOrRGBorYBR_RCT" {
+	YBR_FULL,
+	YBR_RCT,
+	RGB
+}
+
 StringValues="ImageType1"	{
 	ORIGINAL,
 	DERIVED
+}
+
+StringValues="ImageType1OriginalOnly"	{
+	ORIGINAL
 }
 
 StringValues="ImageType1DerivedOnly"	{
@@ -977,7 +1062,7 @@ StringValues="MACAlgorithm"	{
 }
 
 StringValues="CertificateType"	{
-	X509_1993_SIGSHA1
+	X509_1993_SIG
 }
 
 StringValues="CertifiedTimestampType"	{
@@ -1050,7 +1135,8 @@ StringValues="LossyImageCompressionMethod" {
 	ISO_10918_1 = JPEG Lossy Compression,
 	ISO_14495_1 = JPEG-LS Near-lossless Compression,
 	ISO_15444_1 = JPEG 2000 Irreversible Compression,
-	ISO_13818_2 = MPEG2 Compression
+	ISO_13818_2 = MPEG2 Compression,
+	ISO_14496_10 = MPEG-4 AVC/H.264 Compression
 }
 
 StringValues="ContentItemValueTypes" {
@@ -1095,7 +1181,9 @@ StringValues="ResponsiblePersonRole" {
 	RELATIVE,
 	GUARDIAN,
 	CUSTODIAN,
-	AGENT
+	AGENT,
+	INVESTIGATOR,
+	VETERINARIAN
 }
 
 StringValues="PatientSexNeutered" {
@@ -1326,6 +1414,12 @@ StringValues="SegmentAlgorithmType" {
 	MANUAL
 }
 
+StringValues="RecommendedPresentationType" {
+	SURFACE,
+	WIREFRAME,
+	POINTS
+}
+
 StringValues="DistributionType" {
 	NAMED_PROTOCOL,
 	RESTRICTED_REUSE,
@@ -1354,3 +1448,111 @@ StringValues="LongitudinalTemporalInformationModified" {
 	MODIFIED,
 	REMOVED
 }
+
+StringValues="DimensionOrganizationType" {
+	3D,
+	3D_TEMPORAL
+}
+
+StringValues="DimensionOrganizationType3D" {
+	3D
+}
+
+StringValues="IVOCTModality" {
+	IVOCT
+}
+
+StringValues="IVOCTPixelPresentationImageLevel" {
+	COLOR,
+	COLOR_REF,
+	MONOCHROME
+}
+
+StringValues="IVOCTImageAndFrameTypeValue3"	{
+	AXIAL,
+	LONGITUDINAL
+}
+
+StringValues="IVOCTVolumetricProperties"	{
+	DISTORTED
+}
+
+StringValues="IVOCTInterpolationType"	{
+	REPLICATE,
+	CUBIC,
+	BILINEAR
+}
+
+StringValues="OCTAcquisitionDomain"	{
+	TIME,
+	FREQUENCY,
+	SPECTRAL
+}
+
+StringValues="IVOCTIVUSAcquisition"	{
+	MOTORIZED,
+	MANUAL,
+	SELECTIVE,
+	MEASURED
+}
+
+StringValues="IVOCTPixelIntensityRelationship"	{
+	LIN,
+	LOG
+}
+
+StringValues="CatheterDirectionOfRotation"	{
+	CW,
+	CC
+}
+
+StringValues="WellKnownColorPaletteInstanceUIDs" {
+	1.2.840.10008.1.5.1 = Hot Iron Color Palette SOP Instance,
+	1.2.840.10008.1.5.2 = PET Color Palette SOP Instance,
+	1.2.840.10008.1.5.3 = Hot Metal Blue Color Palette SOP Instance,
+	1.2.840.10008.1.5.4 = PET 20 Step Color Palette SOP Instance
+}
+
+StringValues="Volume"	{
+	VOLUME
+}
+
+StringValues="None"	{
+	NONE
+}
+
+StringValues="EmptyValue"	{
+	***EMPTYVALUE***
+}
+
+StringValues="DigitOne"	{
+	1
+}
+
+StringValues="ParametricMapImageAndFrameType1" {
+	DERIVED
+}
+
+StringValues="MappingResources" {
+	DCMR
+}
+
+StringValues="MappingResourceUIDs" {
+	1.2.840.10008.8.1.1
+}
+
+StringValues="MappingResourceNames" {
+	DICOM Content Mapping Resource
+}
+
+StringValues="QueryRetrieveView" {
+	CLASSIC,
+	ENHANCED
+}
+
+StringValues="ParametricMapImagePixelPresentation" {
+	COLOR_RANGE,
+	MONOCHROME
+}
+
+

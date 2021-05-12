@@ -1,12 +1,24 @@
+static const char *CopyrightIdentifier(void) { return "@(#)ancreate.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#include <iomanip>
+#include <cctype>
+#else
 #include <iostream.h>
 #include <iomanip.h>
-#include <string.h>
+//#include <string.h>
 #include <ctype.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 #include "txstream.h"
 #include "getoptns.h"
 #include "mesgtext.h"
+#include "vr.h"
 
 #define INPUTLINEBUFFERLENGTH 32768
 
@@ -435,7 +447,7 @@ getParsedEntry(istream& in,Uint16& group,Uint16& element,
 
 static void
 writeAttribute(ostream& out,Uint16 group,Uint16 element,
-	char *vr,Uint32 vl,int type,char *string,
+	const char *vr,Uint32 vl,int type,char *string,
 	int explicitvr,int big)
 {
 	write16(out,group,big);
@@ -469,10 +481,7 @@ writeAttribute(ostream& out,Uint16 group,Uint16 element,
 	}
 
 	if (actualvl != vl) {
-		if (strcmp(vr,"OB") == 0
-		 || strcmp(vr,"OF") == 0
-		 || strcmp(vr,"OW") == 0
-		 || strcmp(vr,"SQ") == 0) {
+		if (isOtherByteOrLongOrWordOrFloatOrDoubleVR(vr) || isSequenceVR(vr)) {
 			actualvl=vl;
 		}
 		else {
@@ -489,12 +498,7 @@ writeAttribute(ostream& out,Uint16 group,Uint16 element,
 
 	if (explicitvr) {
 		out.write(vr,2);			// 2 byte explicitvr vr
-		if (strcmp(vr,"OB") == 0
-		 || strcmp(vr,"OF") == 0
-		 || strcmp(vr,"OW") == 0
-		 || strcmp(vr,"UN") == 0
-		 || strcmp(vr,"UT") == 0
-		 || strcmp(vr,"SQ") == 0) {
+		if (isLongValueLengthInExplicitValueRepresentation(vr)) {
 			write16(out,0,big);		// 2 byte reserved
 			write32(out,actualvl,big);	// 4 byte value length
 		}
@@ -506,7 +510,7 @@ writeAttribute(ostream& out,Uint16 group,Uint16 element,
 		write32(out,actualvl,big);
 	}
 
-	char pad = (strcmp(vr,"UI") == 0) ? 0 : ' ';
+	char pad = isUIStringVR(vr) ? 0 : ' ';
 	switch (type) {
 		case '<':	// string
 			out << string;
@@ -637,8 +641,9 @@ main(int argc, char *argv[])
 						vr,vl,type,string,
 						explicitvr,big);
 				}
-				if (strcmp(vr,"OB") == 0) datawordlength=1;
-				if (strcmp(vr,"OW") == 0) datawordlength=2;
+				if (strcmp(vr,"OB") == 0) { datawordlength=1; }
+				else if (strcmp(vr,"OW") == 0) { datawordlength=2; }
+				else if (strcmp(vr,"OL") == 0) { datawordlength=4; }
 				break;
 			case 'i':
 				explicitvr=0;

@@ -1,5 +1,15 @@
+static const char *CopyrightIdentifier(void) { return "@(#)datetype.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <cctype>
+//#include <iostream>	// For debugging only
+#else
 #include <ctype.h>
 //#include <iostream.h>	// For debugging only
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 #include "datetype.h"

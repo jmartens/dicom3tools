@@ -1,4 +1,15 @@
+static const char *CopyrightIdentifier(void) { return "@(#)jpegsplit.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#include <fstream>
+#else
+#include <iostream.h>
 #include <fstream.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 #include "mesgtext.h"

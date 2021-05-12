@@ -1,9 +1,10 @@
-.TH DCBRIGGS 1 "15 February 2000" "DICOM PS3" "Create DICOM Briggs pattern"
+.TH DCBRIGGS 1 "6 March 2014" "DICOM PS3" "Create DICOM Briggs pattern"
 .SH NAME
 dcbriggs \- ACR/NEMA DICOM PS3 ... Create DICOM Briggs pattern
 .SH SYNOPSIS
 .HP 10
 .B dcbriggs
+.so man1/gen.so
 [
 .B \-columns|\-cols|\-x " columns"
 ]
@@ -156,5 +157,5 @@ integer. Defaults to 30%.
 .BR dcsmpte(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

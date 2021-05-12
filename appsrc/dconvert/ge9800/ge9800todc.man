@@ -1,9 +1,10 @@
-.TH GE9800TODC 1 "02 May 2010" "DICOM PS3" "ge9800 to DICOM"
+.TH GE9800TODC 1 "06 March 2014" "DICOM PS3" "ge9800 to DICOM"
 .SH NAME
 ge9800todc \- ACR/NEMA DICOM PS3 ... ge9800 to DICOM
 .SH SYNOPSIS
 .HP 10
 .B ge9800todc
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -48,5 +49,5 @@ Converting ...
 .BR dcintro(1) ,
 .BR ge9800dump(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

@@ -1,7 +1,18 @@
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <ctime>
+#include <iostream>
+#include <cassert>
+#include <cstdlib>
+#else
 #include <time.h>
 #include <iostream.h>
 #include <assert.h>
 #include <stdlib.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 // specify string datetime (UTC) on command line
 

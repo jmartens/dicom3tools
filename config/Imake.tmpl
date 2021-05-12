@@ -426,6 +426,14 @@ XCOMM the platform-specific parameters - edit site.def to change
      C_DEFINES_HASSTDNAMESPACEFORSTREAMPOS = -DHASSTDNAMESPACEFORSTREAMPOS=HasStdNameSpaceForStreamPos
 #endif
 
+#ifdef UseStandardHeadersWithoutExtension
+     C_DEFINES_USESTANDARDHEADERSWITHOUTEXTENSION = -DUSESTANDARDHEADERSWITHOUTEXTENSION=UseStandardHeadersWithoutExtension
+#endif
+
+#ifdef EmitUsingStdNameSpace
+     C_DEFINES_EMITUSINGSTDNAMESPACE = -DEMITUSINGSTDNAMESPACE=EmitUsingStdNameSpace
+#endif
+
 #ifdef HasGetHostID
      C_DEFINES_HASGETHOSTID = -DHASGETHOSTID=HasGetHostID
 #endif
@@ -470,16 +478,18 @@ XCOMM the platform-specific parameters - edit site.def to change
                             $(C_EXTRA_DEFINES) $(C_PROTO_DEFINES) \
                             $(C_DEFINES) \
                             $(C_DEFINES_POWINTEGEREXPONENTTYPE) \
-							$(C_DEFINES_USEGLIBCTIMEZONE) \
+                            $(C_DEFINES_USEGLIBCTIMEZONE) \
                             $(C_DEFINES_USEDUMBINFINITYANDNAN) \
-							$(C_DEFINES_HASSTDNAMESPACEFORSTREAMPOS) \
+                            $(C_DEFINES_HASSTDNAMESPACEFORSTREAMPOS) \
+                            $(C_DEFINES_USESTANDARDHEADERSWITHOUTEXTENSION) \
+                            $(C_DEFINES_EMITUSINGSTDNAMESPACE) \
                             $(C_DEFINES_HASGETHOSTID) \
                             $(C_DEFINES_HASGETHOSTIDPROTOTYPE) \
                             $(C_DEFINES_USEXMITSHMEXTENSION) \
                             $(C_DEFINES_DEFAULTGUESSEDDATEORDER) \
                             $(C_DEFINES_BINARYIOFLAGS)
                    CFLAGS = $(C_DEBUGFLAGS) $(C_OPTIONS) $(C_ALLDEFINES) \
-				    $(C_UNOPTIMIZEDFLAGS)
+                            $(C_UNOPTIMIZEDFLAGS)
                  C_LDLIBS = $(C_SYS_LIBRARIES) $(C_EXTRA_LIBRARIES)
               C_LDOPTIONS = $(C_DEBUGFLAGS) $(C_OPTIONS) $(C_LOCAL_LDFLAGS)
             C_DEPENDFLAGS = AnsiCDependFlags
@@ -490,16 +500,18 @@ XCOMM the platform-specific parameters - edit site.def to change
                             $(CPLUSPLUS_EXTRA_DEFINES) \
                             $(CPLUSPLUS_PROTO_DEFINES) $(CPLUSPLUS_DEFINES) \
                             $(C_DEFINES_POWINTEGEREXPONENTTYPE) \
-							$(C_DEFINES_USEGLIBCTIMEZONE) \
+                            $(C_DEFINES_USEGLIBCTIMEZONE) \
                             $(C_DEFINES_USEDUMBINFINITYANDNAN) \
-							$(C_DEFINES_HASSTDNAMESPACEFORSTREAMPOS) \
+                            $(C_DEFINES_HASSTDNAMESPACEFORSTREAMPOS) \
+                            $(C_DEFINES_USESTANDARDHEADERSWITHOUTEXTENSION) \
+                            $(C_DEFINES_EMITUSINGSTDNAMESPACE) \
                             $(C_DEFINES_HASGETHOSTID) \
                             $(C_DEFINES_HASGETHOSTIDPROTOTYPE) \
                             $(C_DEFINES_USEXMITSHMEXTENSION) \
                             $(C_DEFINES_DEFAULTGUESSEDDATEORDER) \
                             $(C_DEFINES_BINARYIOFLAGS)
           CPLUSPLUS_FLAGS = $(CPLUSPLUS_DEBUGFLAGS) $(CPLUSPLUS_OPTIONS) \
-				    $(CPLUSPLUS_UNOPTIMIZEDFLAGS) \
+                            $(CPLUSPLUS_UNOPTIMIZEDFLAGS) \
                             $(CPLUSPLUS_ALLDEFINES)
          CPLUSPLUS_LDLIBS = $(CPLUSPLUS_SYS_LIBRARIES) \
                             $(CPLUSPLUS_EXTRA_LIBRARIES)

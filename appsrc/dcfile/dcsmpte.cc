@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcsmpte.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrtype.h"
 #include "attrothr.h"
 #include "attrmxls.h"

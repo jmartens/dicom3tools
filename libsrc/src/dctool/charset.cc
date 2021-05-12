@@ -1,6 +1,17 @@
+static const char *CopyrightIdentifier(void) { return "@(#)charset.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include <string.h>
-//#include <iostream.h>	// for cerr
-//#include <iomanip.h>	// for cerr
+
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>	// for debugging
+#include <iomanip>	// for debugging
+#else
+#include <iostream.h>	// for debugging
+#include <iomanip.h>	// for debugging
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;	// for debugging
+#endif
 
 #include "charset.h"
 #include "attr.h"

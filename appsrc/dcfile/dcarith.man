@@ -1,9 +1,10 @@
-.TH DCARITH 1 "18 April 2008" "DICOM PS3" "DICOM PS3 - Arithmetic on DICOM pixels"
+.TH DCARITH 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Arithmetic on DICOM pixels"
 .SH NAME
 dcarith \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Arithmetic on DICOM pixels
 .SH SYNOPSIS
 .HP 10
 .B dcarith
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -27,6 +28,9 @@ dcarith \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Arithmetic on DICOM pixels
 ]
 [
 .B \-makeidentityrescale
+]
+[
+.B \-invertgrayscale
 ]
 .so man1/optin.so
 .so man1/optout.so
@@ -96,6 +100,11 @@ pixel values to make RescaleSlope 1 and RescaleIntercept 0, and apply that
 computation to the stored pixel values, setting PixelRepresentation to 1 (signed) and BitsStored to 16, regardless of their previous
 values. Also applies the same computation to PixelPaddingValue (i.e., implies \-pixelpaddingvalue).
 .RE
+.TP
+.B \-invertgrayscale
+.RS
+Invert the grayscale of the pixel values, using the BitsStored value to establish the range (i.e. a value of 0 is replaced by (2^BitsStored)-1 and vice versa).
+.RE
 .SH ENVIRONMENT
 .LP
 \ 
@@ -108,5 +117,5 @@ values. Also applies the same computation to PixelPaddingValue (i.e., implies \-
 .SH SEE ALSO
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

@@ -1,3 +1,4 @@
+/* attrtyps.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_attrtyps__
 #define __Header_attrtyps__
 
@@ -56,6 +57,7 @@ public:
 	virtual BinaryOutputStream& writeData(BinaryOutputStream& stream)
 		{
 			writePaddedValues(stream,' ');
+			return stream;
 		}
 
 	virtual TextOutputStream& writeData(TextOutputStream& stream)

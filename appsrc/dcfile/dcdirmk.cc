@@ -1,5 +1,16 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcdirmk.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <fstream>
+#include <cctype>
+#else
 #include <fstream.h>
 #include <ctype.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
+
 
 #include "attrmxls.h"
 #include "attrlsln.h"
@@ -1049,9 +1060,9 @@ public:
 				(*list)+=new TimeStringAttribute(TagFromName(ContentTime),contentTime);
 
 				Attribute *conceptNameCodeSequence=getCopyOfCodeSequenceAttributeElseError((*srclist),TagFromName(ConceptNameCodeSequence),"Concept Name Code Sequence",filename,log);
-				Assert(conceptNameCodeSequence);
-				(*list)+=conceptNameCodeSequence;
-
+				if (conceptNameCodeSequence) {
+					(*list)+=conceptNameCodeSequence;
+				}
 				// Should also do Content Sequence with HAS CONCEPT MOD Relationship Type :(
 			}
 			else if (strcmp(directoryRecordType,"KEY OBJECT DOC") == 0) {
@@ -1140,7 +1151,12 @@ public:
 					(*list)+=blendingSequence;
 				}
 			}
-			else if (strcmp(directoryRecordType,"REGISTRATION") == 0 || strcmp(directoryRecordType,"FIDUCIAL") == 0 || strcmp(directoryRecordType,"VALUE MAP") == 0) {
+			else if (strcmp(directoryRecordType,"REGISTRATION") == 0
+			      || strcmp(directoryRecordType,"FIDUCIAL") == 0
+				  || strcmp(directoryRecordType,"VALUE MAP") == 0
+				  || strcmp(directoryRecordType,"MEASUREMENT") == 0
+				  || strcmp(directoryRecordType,"SURFACE") == 0
+				  ) {
 				const char *contentDate=getStringValueElseError((*srclist),TagFromName(ContentDate),"Content Date",filename,log);
 				Assert(contentDate);
 				(*list)+=new DateStringAttribute(TagFromName(ContentDate),contentDate);
@@ -2025,7 +2041,7 @@ main(int argc, char *argv[])
 			bad=true;
 		}
 		else {
-			while (flfstr->peek() != EOF) {
+			while (flfstr->peek() != istream::traits_type::eof()) {
 				const int lineBufferSize=2048;
 				char lineBuffer[lineBufferSize];
 				flfstr->getline(lineBuffer,2048);

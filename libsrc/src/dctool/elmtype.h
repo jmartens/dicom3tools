@@ -1,10 +1,11 @@
+/* elmtype.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_elmtype__
 #define __Header_elmtype__
 
 #include "attrtag.h"
 
-const Uint16 VMUNLIMITED = (Uint16)-1;
-const Uint16 VMNONE = 0;
+const Uint32 VMUNLIMITED = (Uint32)-1;
+const Uint32 VMNONE = 0;
 
 #define DATADICTIONARYINDEXSIZE	791
 

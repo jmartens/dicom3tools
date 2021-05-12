@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)elmdict.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "elmtype.h"
 #include "elmdict.h"
 #include "elmentry.h"
@@ -147,14 +148,14 @@ ElementDictionary::getValueRepresentation(Tag t) const
 	return e ? e->ValueRepresentation : 0;
 }
 
-const Uint16
+const Uint32
 ElementDictionary::getValueMultiplicityMinimum(Tag t) const
 {
 	const ElementDictionaryTableEntry *e = (*this)[t];
 	return e ? e->ValueMultiplicityMinimum : VMNONE;
 }
 
-const Uint16
+const Uint32
 ElementDictionary::getValueMultiplicityMaximum(Tag t) const
 {
 	const ElementDictionaryTableEntry *e = (*this)[t];
@@ -195,6 +196,13 @@ ElementDictionary::isRetired(Tag& t) const
 	return e && e->Retired;
 }
 
+bool
+ElementDictionary::isRenderAsString(Tag& t) const
+{
+	const ElementDictionaryTableEntry *e = (*this)[t];
+	return e && e->RenderAsString;
+}
+
 void
 ElementDictionary::addOwner(Tag t,const char *owner)
 {
@@ -209,5 +217,15 @@ bool
 ElementDictionary::hasOwner(Tag& t) const
 {
 	return t.isPrivateGroup() && CurrentOwners && (*CurrentOwners)[t];
+}
+
+const char *
+ElementDictionary::getOwner(Tag& t) const
+{
+	const char* owner = NULL;
+	if (t.isPrivateGroup() && CurrentOwners) {
+		owner = (*CurrentOwners)[t];
+	}
+	return owner;
 }
 

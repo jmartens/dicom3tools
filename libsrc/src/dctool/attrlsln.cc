@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrlsln.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrlsln.h"
 #include "attrseq.h"
 
@@ -20,9 +21,7 @@ lengthOfFixedPartOfAttribute(
 	else if (ts->isExplicitVR()) {
 		const char *vru=a->getVR();
 		if (vru) {	// Explicit OB,OW,SQ,UN,UT
-			if (vru[0]=='O' && (vru[1]=='B' || vru[1]=='W')
-			 || vru[0]=='U' && (vru[1]=='N' || vru[1]=='T')
-			 || vru[0]=='S' &&  vru[1]=='Q')
+			if (isLongValueLengthInExplicitValueRepresentation(vru))
 				length+=6;
 			else
 				length+=2;

@@ -4,11 +4,42 @@ DefineMacro="HierarchicalSOPInstanceReferenceMacro"
 		InvokeMacro="HierarchicalSeriesReferenceMacro"
 	SequenceEnd
 MacroEnd
-	
+
+DefineMacro="HierarchicalSOPInstanceReferenceIHEXDSIManifestProfileMacro"
+	Name="StudyInstanceUID"									Type="1"
+	Sequence="ReferencedSeriesSequence"						Type="1"	VM="1-n"
+		InvokeMacro="HierarchicalSeriesReferenceIHEXDSIManifestProfileMacro"
+	SequenceEnd
+MacroEnd
+
 DefineMacro="HierarchicalSeriesReferenceMacro"
 	Name="SeriesInstanceUID"							Type="1"
 	Name="RetrieveAETitle"								Type="3"
 	Name="RetrieveLocationUID"							Type="3"
+	Name="StorageMediaFileSetID"						Type="3"
+	Name="StorageMediaFileSetUID"						Type="3"
+	Sequence="ReferencedSOPSequence"					Type="1"	VM="1-n"
+		InvokeMacro="SOPInstanceReferenceMacro"
+		Sequence="PurposeOfReferenceCodeSequence"		Type="3"	VM="1-n"
+			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
+		Sequence="ReferencedDigitalSignatureSequence"	Type="3"	VM="1-n"
+			Name="DigitalSignatureUID"					Type="1"
+			Name="Signature"							Type="1"
+		SequenceEnd
+		Sequence="ReferencedSOPInstanceMACSequence"		Type="3"	VM="1"
+			Name="MACCalculationTransferSyntaxUID"		Type="1"
+			Name="MACAlgorithm"							Type="1"	StringDefinedTerms="MACAlgorithm"
+			Name="DataElementsSigned"					Type="1"
+			Name="MAC"									Type="1"
+		SequenceEnd
+	SequenceEnd
+MacroEnd
+
+DefineMacro="HierarchicalSeriesReferenceIHEXDSIManifestProfileMacro"
+	Name="SeriesInstanceUID"							Type="1"
+	Name="RetrieveAETitle"								Type="1"
+	Name="RetrieveLocationUID"							Type="1"
 	Name="StorageMediaFileSetID"						Type="3"
 	Name="StorageMediaFileSetUID"						Type="3"
 	Sequence="ReferencedSOPSequence"					Type="1"	VM="1-n"
@@ -39,15 +70,20 @@ DefineMacro="IdentifiedPersonOrDeviceMacro"
 	Name="DeviceUID"										Type="1C"	Condition="ObserverTypeIsDevice"
 	Name="Manufacturer"										Type="1C"	Condition="ObserverTypeIsDevice"
 	Name="ManufacturerModelName"							Type="1C"	Condition="ObserverTypeIsDevice"
+	Name="StationAETitle"									Type="3"
 	Name="InstitutionName"									Type="2"
 	Sequence="InstitutionCodeSequence"						Type="2"	VM="0-1"
 		InvokeMacro="CodeSequenceMacro"
 	SequenceEnd
+	Name="InstitutionalDepartmentName"						Type="3"
 MacroEnd
 
 DefineMacro="NumericMeasurementMacro"
 	Sequence="MeasuredValueSequence"						Type="2"	VM="0-1"
 		Name="NumericValue"									Type="1"
+		Name="FloatingPointValue"							Type="1C"	NoCondition=""
+		Name="RationalNumeratorValue"						Type="1C"	NoCondition=""
+		Name="RationalDenominatorValue"						Type="1C"	Condition="RationalNumeratorValueIsPresent" NotZeroError=""
 		Sequence="MeasurementUnitsCodeSequence"				Type="1"	VM="1"
 			InvokeMacro="CodeSequenceMacro"								DefinedContextID="82"
 		SequenceEnd
@@ -72,7 +108,11 @@ MacroEnd
 DefineMacro="ImageReferenceMacro"
 	Sequence="ReferencedSOPSequence"								Type="1"	VM="1"
 		InvokeMacro="SOPInstanceReferenceMacro"
-		Name="ReferencedFrameNumber"								Type="1C"	NotZeroError=""	NoCondition=""	# ValueTypeIsImage, but too difficult to determine multiframe ref
+		Name="ReferencedFrameNumber"								Type="1C"	NoCondition=""	NotZeroError=""	# cannot just check SOP Class and mbpo false, since may be absent for multi-frame if applies to all frames (including multi-frame SOP Class with only 1 frame) :(
+		Verify="ReferencedFrameNumber"											Condition="ReferencedFrameNumberPresentAndReferencedSOPClassUIDIsNotMultiFrame"	ThenErrorMessage="May not be present for Referenced SOP Class that is not multi-frame"
+		Name="ReferencedSegmentNumber"								Type="1C"	NoCondition=""	NotZeroError=""	# cannot just check SOP Class and mbpo false, since may be absent for segmentation if applies to all segments :(
+		Verify="ReferencedSegmentNumber"										Condition="ReferencedSegmentNumberPresentAndReferencedSOPClassUIDIsNotSegmentationOrSurfaceSegmentation"	ThenErrorMessage="May not be present for Referenced SOP Class that is not segmentation"
+		Verify="ReferencedSegmentNumber"										Condition="ReferencedFrameNumberAndReferencedSegmentNumberPresent"	ThenErrorMessage="May not be present when ReferencedFrameNumber is present"
 		Sequence="ReferencedSOPSequence"							Type="3"	VM="1"	# presentation states
 			InvokeMacro="SOPInstanceReferenceMacro"
 		SequenceEnd
@@ -98,7 +138,18 @@ DefineMacro="SpatialCoordinatesMacro"
 	Verify="GraphicData"							VM="4"	Condition="GraphicTypeIsCIRCLE"
 	Verify="GraphicData"							VM="8"	Condition="GraphicTypeIsELLIPSE"
 	Name="GraphicType"					Type="1"	StringEnumValues="SRGraphicType"
+	Name="PixelOriginInterpretation"	Type="1C"	NoCondition=""	StringEnumValues="PixelOriginInterpretation"
 	Name="FiducialUID"					Type="3"
+MacroEnd
+
+DefineMacro="SpatialCoordinates3DMacro"
+	Name="ReferencedFrameOfReferenceUID"	Type="3"
+	Name="GraphicData"						Type="1"
+	Verify="GraphicData"								VM="3"	Condition="GraphicTypeIsPOINT"
+	Verify="GraphicData"								VM="12"	Condition="GraphicTypeIsELLIPSE"
+	Verify="GraphicData"								VM="18"	Condition="GraphicTypeIsELLIPSOID"
+	Name="GraphicType"						Type="1"	StringEnumValues="SRGraphicType3D"
+	Name="FiducialUID"						Type="3"
 MacroEnd
 
 DefineMacro="TemporalCoordinatesMacro"
@@ -112,6 +163,7 @@ DefineMacro="ContainerMacro"
 	Name="ContinuityOfContent"			Type="1"	StringEnumValues="ContinuityOfContent"
 	Sequence="ContentTemplateSequence"	Type="1C"	VM="1"	NoCondition=""
 		Name="MappingResource"			Type="1"	StringDefinedTerms="SRTemplateMappingResource"
+		Name="MappingResourceUID"		Type="3"	StringDefinedTerms="MappingResourceUIDs"
 		Name="TemplateIdentifier"		Type="1"
 	SequenceEnd
 MacroEnd
@@ -119,6 +171,8 @@ MacroEnd
 DefineMacro="DocumentContentMacro"
 	Name="ValueType"								Type="1"	StringEnumValues="SRValueTypes"
 	Verify="ValueType"											Condition="BasicTextSRStorageInstance"	StringEnumValues="BasicTextSRValueTypes"
+	Verify="ValueType"											Condition="EnhancedSRStorageInstance"	StringEnumValues="EnhancedAndComprehensiveSRValueTypes"
+	Verify="ValueType"											Condition="ComprehensiveSRStorageInstance"	StringEnumValues="EnhancedAndComprehensiveSRValueTypes"
 	Verify="ValueType"											Condition="KeyObjectSelectionDocumentStorageInstance"	StringEnumValues="KeyObjectSelectionDocumentValueTypes"
 	Verify="ValueType"											Condition="MammographyCADSRStorageInstance"	StringEnumValues="MammographyCADSRValueTypes"
 	Verify="ValueType"											Condition="ChestCADSRStorageInstance"	StringEnumValues="ChestCADSRValueTypes"
@@ -133,17 +187,19 @@ DefineMacro="DocumentContentMacro"
 	Name="Time"										Type="1C"	Condition="ValueTypeIsTime"
 	Name="PersonName"								Type="1C"	Condition="ValueTypeIsPersonName"
 	Name="UID"										Type="1C"	Condition="ValueTypeIsUID"
-	InvokeMacro="NumericMeasurementMacro"			Type="1C"	Condition="ValueTypeIsNumeric"
+	InvokeMacro="NumericMeasurementMacro"			Type="1C"	Condition="ValueTypeIsNum"
 	InvokeMacro="CodeMacro"							Type="1C"	Condition="ValueTypeIsCode"
 	InvokeMacro="CompositeObjectReferenceMacro"		Type="1C"	Condition="ValueTypeIsComposite"
 	InvokeMacro="ImageReferenceMacro"				Type="1C"	Condition="ValueTypeIsImage"
 	InvokeMacro="WaveformReferenceMacro"			Type="1C"	Condition="ValueTypeIsWaveform"
 	InvokeMacro="SpatialCoordinatesMacro"			Type="1C"	Condition="ValueTypeIsSpatialCoordinates"
+	InvokeMacro="SpatialCoordinates3DMacro"			Type="1C"	Condition="ValueTypeIsSpatialCoordinates3D"
 	InvokeMacro="ContainerMacro"					Type="1C"	Condition="ValueTypeIsContainer"
 MacroEnd
 
 DefineMacro="DocumentRelationshipMacro"
 	Name="ObservationDateTime"								Type="1C"	NoCondition=""	# Real world condition
+	Name="ObservationUID"									Type="3"
 	Sequence="ContentSequence"								Type="1C"	VM="1-n"	NoCondition=""  # whether or not leaf is real world
 		Name="RelationshipType"								Type="1"	StringDefinedTerms="SRRelationshipType"
 		InvokeMacro="DocumentRelationshipMacro"				Type="1C"	Condition="RelationshipByValue"
@@ -158,6 +214,7 @@ Module="SRDocumentSeries"
 	Name="SeriesNumber"									Type="1"
 	Name="SeriesDate"									Type="3"
 	Name="SeriesTime"									Type="3"
+	Name="ProtocolName"									Type="3"
 	Name="SeriesDescription"							Type="3"
 	Sequence="SeriesDescriptionCodeSequence"			Type="3"	VM="1"
 		InvokeMacro="CodeSequenceMacro"
@@ -250,6 +307,7 @@ ModuleEnd
 
 Module="SRDocumentContent"
 	InvokeMacro="DocumentContentMacro"
+	Verify="ConceptNameCodeSequence"								Condition="ConceptNameCodeSequenceNotPresent"	ThenErrorMessage="ConceptNameCodeSequence is required for root content item (in top level dataset)"
 	InvokeMacro="DocumentRelationshipMacro"
 ModuleEnd
 
@@ -259,6 +317,7 @@ Module="KeyObjectDocumentSeries"
 	Name="SeriesNumber"									Type="1"
 	Name="SeriesDate"									Type="3"
 	Name="SeriesTime"									Type="3"
+	Name="ProtocolName"									Type="3"
 	Name="SeriesDescription"							Type="3"
 	Sequence="SeriesDescriptionCodeSequence"			Type="3"	VM="1"
 		InvokeMacro="CodeSequenceMacro"
@@ -304,6 +363,12 @@ Module="KeyObjectDocument"
 	SequenceEnd
 	Sequence="IdenticalDocumentsSequence"							Type="1C"	VM="1-n"	NoCondition=""	# real world
 		InvokeMacro="HierarchicalSOPInstanceReferenceMacro"
+	SequenceEnd
+ModuleEnd
+
+Module="IHEXDSIManifestProfile"
+	Sequence="CurrentRequestedProcedureEvidenceSequence"			Type="1"	VM="1-n"
+		InvokeMacro="HierarchicalSOPInstanceReferenceIHEXDSIManifestProfileMacro"
 	SequenceEnd
 ModuleEnd
 

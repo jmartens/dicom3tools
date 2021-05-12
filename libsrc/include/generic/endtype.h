@@ -1,7 +1,16 @@
+/* endtype.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_endtype__
 #define __Header_endtype__
 
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>	//for debugging only
+#else
 #include <iostream.h>	//for debugging only
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;	//for debugging only
+#endif
 
 typedef enum { NoEndian, LittleEndian, BigEndian, ByteEndian } Endian;
 

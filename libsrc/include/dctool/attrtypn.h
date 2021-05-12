@@ -1,5 +1,10 @@
+/* attrtypn.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_attrtypn__
 #define __Header_attrtypn__
+
+/* need these two for TagFromName() in isSufficientSpaceForOneMoreValue() */
+#include "attrtag.h"
+#include "elmconst.h"
 
 /* ********************* Numeric Binary Attributes ********************* */
 
@@ -19,7 +24,10 @@ private:
 
 	bool isSufficientSpaceForOneMoreValue(void)
 		{
-			return Size*(getVM()+1) < 65536;
+			// logic here is that a short VL VR should never have a VL greater than can be sent in explicit VR (2^16-1 == 65535),
+			// with the except of RT DVH (DS) that sometimes must be sent as implicit VR (Mathews, Bosch 2006 Phys. Med. Biol. 51 L11 doi:10.1088/0031-9155/51/5/L01)
+			// also allow it in Histogram Data (encountered big one in Adani MG For Proc
+			return Size*(getVM()+1) < 65536 || getTag() == TagFromName(DVHData) || getTag() == TagFromName(HistogramData);
 		}
 public:
 	NumericBinaryAttribute(Tag t) : Attribute(t) {}

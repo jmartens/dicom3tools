@@ -1,4 +1,4 @@
-Last modified: Sun Feb  6 14:20:49 EST 2011
+Last modified: Fri Sep  4 13:28:51 EDT 2015
 
 Quick start:
 
@@ -30,9 +30,15 @@ compilers) are in your PATH, and that your system isn't too far off then:
 	   choice of gnu over the native compiler and both are in the
 	   PATH, say "notgcc" as an argument to ./Configure.
 
+	   Configure will warn if it does not find gcc and g++; if this
+	   happens and you were not planning on using other compilers,
+	   you will need to install them. If your proceed despite these
+	   warnings, chances are make World will fail and report an
+	   error like "CC not found".
+
 	   Configure uses whatever is the first compiler found in
-	   the PATH, so be sure to set the path to find CC, cc and/or
-	   acc.
+	   the PATH, so be sure to set the path to find gcc, g++,
+	   (or CC, cc or acc if you are not using gcc/g++).
 
 	   If Configure fails with a syntax error, you may have a wierd
 	   /bin/sh ... try changing the first line of config/Configure
@@ -360,9 +366,41 @@ It has been a long time since it was compiled on a Dec Alpha.
 
 Darwin (Mac OS X) Stuff.
 
+On recent Mac OS versions (Yosemite, Mavericks (?)), the X11 library and
+include files may not be present even if XQuartz is installed, and
+these are necessary for the dcdisp stuff to build. Installing the
+MacPorts package "xorg-libX11" ("port install xorg-libX11") will make
+these available (and the Configure script will use these on Darwin by
+preference if they are available) (a "port contents xorg-libX11" will
+show the files that are installed). You may also need the package
+"xorg-libXext" installed.
+
+With XCode 5, the default cpp behavior has changed such that it is incompatible
+with imake ... you need to use the earlier llvm-cpp-4.2. If you already had
+XCode 4 installed, it will already be there, and Configure will warn you that
+you need to set the IMAKECPP environment variable prior to running imake or
+any make that invokes imake (like Make World), e.g.:
+
+	in csh:
+
+		env IMAKECPP=llvm-cpp-4.2 imake -v -I./config
+		env IMAKECPP=llvm-cpp-4.2 make World
+
+	in Bourne shells:
+	
+		IMAKECPP=llvm-cpp-4.2 imake -v -I./config
+		IMAKECPP=llvm-cpp-4.2 make World
+
+Fortunately with XCode 6 this seems to no longer be necessary.
+
+Recent versions also have a makedepend binary that just pops up a warning
+dialog that makedepend isn't installed :( To get around this the Configure
+script now checks for /opt/X11/bin/makedepend, which is where XQuartz
+puts it.
+
 On Snow Leopard (10.6), X11 (an optional install) no longer contains
 imake; the easiest way to get it is to install MacPorts and then install
-the port of imake.
+the port of imake ("port install imake").
 
 On earlier versions, the XQuartz or the Apple (optional) installation of
 X11 contains imake (in /usr/X11R6/bin).
@@ -381,6 +419,24 @@ to "/usr/bin/cc" and "/usr/bin/c++" respectively.
 This should not be necessary if you have the Dec 2002 Developer package installed,
 either from the Apple developer site or from a more recent Jaguar set of install
 disks (e.g. 10.2.3 or later).
+
+Linux Stuff.
+
+Depending on your distribution, gcc will likely already be installed but g++
+may well not be, nor will imake.
+
+E.g., on Debian or Ubuntu, to get g++ you will probably need to run:
+
+  sudo apt-get install g++
+  
+and imake:
+
+  sudo apt-get install xutils-dev
+
+and the X11 development libraries to allow dcdisp to compile:
+
+  sudo apt-get install libX11-dev
+  sudo apt-get install libXext-dev
 
 Cygwin Stuff.
 

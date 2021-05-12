@@ -1,9 +1,10 @@
-.TH DCSRDUMP 1 "18 July 2009" "DICOM PS3" "DICOM PS3 - Describe DICOM SR content"
+.TH DCSRDUMP 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Describe DICOM SR content"
 .SH NAME
 dcsrdump \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Describe DICOM SR content
 .SH SYNOPSIS
 .HP 10
 .B dcsrdump
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -55,7 +56,7 @@ Preceed each content item with the dot delimited numeric identifier of the conte
 .RE
 % dcsrdump -identifier basictextsr.dcm 
 .RE
-1: : CONTAINER: (18748-4,LN,"Diagnostic Imaging Report")  [SEPARATE]
+1: : CONTAINER: (18748-4,LN,"Diagnostic Imaging Report")  [SEPARATE] (DCMR,2000)
 .RE
 	>1.1: CONTAINS: CONTAINER: (121070,DCM,"Findings")  [SEPARATE]
 .RE
@@ -67,5 +68,5 @@ Preceed each content item with the dot delimited numeric identifier of the conte
 .SH SEE ALSO
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

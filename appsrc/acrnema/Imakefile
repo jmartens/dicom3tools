@@ -63,11 +63,11 @@ testcompareandcwithoriginal:
 	for i in `cat $(TOP)/images/acrnema/testlist` ; \
 	do \
 		echo "acrnema/$$i"; \
-		andiff $(TOP)/images/acrnema/$$i $(TOP)/test/$(CURRENT_DIR)/`echo $$i | sed 's:/:.:g'`.ancp.outfile; \
+		andiff $(TOP)/images/acrnema/$$i $(TOP)/test/$(CURRENT_DIR)/`echo $$i | sed 's:/:.:g'`.ancp.ancp.outfile; \
 	done
 	for i in `cat $(TOP)/images/dicom/testlist`; \
 	do \
 		echo "dicom/$$i"; \
-		andiff $(TOP)/images/dicom/$$i $(TOP)/test/$(CURRENT_DIR)/`echo $$i | sed 's:/:.:g'`.ancp.outfile; \
+		andiff $(TOP)/images/dicom/$$i $(TOP)/test/$(CURRENT_DIR)/`echo $$i | sed 's:/:.:g'`.ancp.ancp.outfile; \
 	done
 

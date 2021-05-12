@@ -1,8 +1,21 @@
+static const char *CopyrightIdentifier(void) { return "@(#)pqsplit.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#include <fstream>
+#include <cassert>
+#include <cstdlib>	// for atoi()
+#else
 #include <iostream.h>
 #include <fstream.h>
 #include <assert.h>
-#include <string.h>
-#include <stdlib.h>	// for atoi()
+#include <stdlib.h>
+#endif
+
+#include <string.h>	// need regardless of USESTANDARDHEADERSWITHOUTEXTENSION
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 int
 main(int argc,char **argv)

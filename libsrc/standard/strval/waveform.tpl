@@ -38,6 +38,10 @@ StringValues="SynchronizationTrigger" {
 	NO TRIGGER
 }
 
+StringValues="SynchronizationTriggerNoTrigger" {
+	NO TRIGGER
+}
+
 StringValues="TimeDistributionProtocol" {
 	NTP  = Network Time Protocol,
 	IRIG = InterRange Instrument Group,

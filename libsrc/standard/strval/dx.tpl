@@ -122,6 +122,7 @@ StringValues="DXImageType3"	{
 	***EMPTYVALUE***
 }
 
+# C.8.11.7.1.4
 StringValues="MammoImageType3"	{
 	***EMPTYVALUE***,
 	STEREO_SCOUT,
@@ -133,7 +134,80 @@ StringValues="MammoImageType3"	{
 	POSTFIRE_PLUS,
 	POSTBIOPSY_MINUS,
 	POSTBIOPSY_PLUS,
-	POSTBIOPSY
+	POSTBIOPSY,
+	POSTMARKER_MINUS,
+	POSTMARKER_PLUS,
+	POSTMARKER,
+	TOMO_PROJ,
+	TOMOSYNTHESIS,
+	TOMO_SCOUT,
+	PREFIRE,
+	POSTFIRE,
+	PRE_CONTRAST,
+	POST_CONTRAST
+}
+
+# C.8.11.7.1.4
+StringValues="MammoImageType4"	{
+	***EMPTYVALUE***,
+	GENERATED_2D,
+	ADDITION,
+	SUBTRACTION
+}
+
+# C.8.21.6.1.1
+StringValues="BreastTomoImageAndFrameType4"	{
+	***EMPTYVALUE***,
+	NONE,
+	GENERATED_2D,
+	MAXIMUM,
+	MEAN,
+	ADDITION,
+	SUBTRACTION
+}
+
+# C.8.11.7.1.4
+StringValues="MammoImageType5"	{
+	***EMPTYVALUE***,
+	LOW_ENERGY,
+	HIGH_ENERGY
+}
+
+# C.8.21.6.1.1
+StringValues="BreastTomoImageAndFrameType5"	{
+	***EMPTYVALUE***,
+	LOW_ENERGY,
+	HIGH_ENERGY
+}
+
+# C.8.21.6.1.1
+StringValues="CommonEnhancedImageAndFrameType3AndBreastTomoImageAndFrameType3"	{
+	ANGIO,
+	CARDIAC,
+	CARDIAC_GATED,
+	CARDRESP_GATED,
+	DYNAMIC,
+	FLUOROSCOPY,
+	LOCALIZER,
+	MOTION,
+	PERFUSION,
+	PRE_CONTRAST,
+	POST_CONTRAST,
+	RESP_GATED,
+	REST,
+	STATIC,
+	STRESS,
+	VOLUME,
+	NON_PARALLEL,
+	PARALLEL,
+	WHOLE_BODY,
+	TOMO_PROJ,
+	TOMOSYNTHESIS,
+	TOMO_SCOUT,
+	PREFIRE,
+	POSTFIRE,
+	POSTBIOPSY,
+	POSTMARKER
 }
 
 StringValues="DXPixelIntensityRelationship" {
@@ -192,6 +266,10 @@ StringValues="MammographyPositionerType" {
 	NONE
 }
 
+StringValues="MammographyPositionerTypeWithoutNone" {
+	MAMMOGRAPHIC
+}
+
 StringValues="IntraoralPositionerType" {
 	CEPHALOSTAT,
 	RIGID,
@@ -220,4 +298,20 @@ StringValues="BreastTomosynthesisFieldOfViewShape" {
 StringValues="BreastTomosynthesisXRayReceptorType" {
 	DIGITAL_DETECTOR
 }
+
+StringValues="PositionerPrimaryAngleDirection" {
+	CW = Clockwise,
+	CC = CounterClockwise
+}
+
+StringValues="MammographyPositionerAndDetectorMotion" {
+	STATIONARY = No motion,
+	ROTATION_STEP = Circular arc motion, stepped, acquire only while stationary,
+	ROTATION_CONT = Circular arc motion, continuous during acquisition,
+	TRANSLATION_STEP = Linear motion, stepped, acquire only while stationary,
+	TRANSLATION_CONT = Linear motion, continuous during acquisition,
+	COMPLEX_STEP = Complex motion, stepped, acquire only while stationary,
+	COMPLEX_CONT = Complex motion, continuous during acquisition
+}
+
 

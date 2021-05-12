@@ -2,6 +2,9 @@ MANSUFFIX = 1
 
 CPLUSPLUS_EXTRA_INCLUDES = $(PROJECTAPPDCFILEEXTRAINCLUDES)
 
+SRCSDCCREATE = dccreate.cc
+OBJSDCCREATE = dccreate.o
+
 SRCSDCLUTMIX = dclutmix.cc
 OBJSDCLUTMIX = dclutmix.o
 
@@ -155,8 +158,13 @@ OBJSDCRMMETA = dcrmmeta.o
 SRCSDCENTVFY = dcentvfy.cc
 OBJSDCENTVFY = dcentvfy.o
 
-CPLUSPLUS_SRCS = $(SRCSDCENTVFY) $(SRCSDCLUTMIX) $(SRCSDCUIDCHG) $(SRCSDCDTCHG) $(SRCSDCLUTBURN) $(SRCSDCTOPDF) $(SRCSPDFTODC) $(SRCSPGXTODC) $(SRCSDCENCAP) $(SRCSDCBURN) $(SRCSRAWFTODC) $(SRCSDCCOMB) $(SRCSDCUNCAT) $(SRCSDCSRMRG) $(SRCSDCOSTOSR) $(SRCSDCRMMETA) $(SRCSDCSRDUMP) $(SRCSDCDECMPR) $(SRCSDCSUB) $(SRCSDCSORT) $(SRCSDCPROJ) $(SRCSDCARITH) $(SRCSDCTOPGM8) $(SRCSDCTOPGX) $(SRCSDCPOST) $(SRCSDCTABLE) $(SRCSDCMKPRES) $(SRCSDCORTHO) $(SRCSANTODC) $(SRCSCP) $(SRCSDICT) $(SRCSDIRDMP) $(SRCSDUMP) $(SRCSFILE) $(SRCSHIST) $(SRCSKEY) $(SRCSMERGE) $(SRCSPOSN) $(SRCSIODVFY) $(SRCSSMPTE) $(SRCSBRIGGS) $(SRCSSQEXTR) $(SRCSSTATS) $(SRCSTORAW) $(SRCSTOPNM) $(SRCSPBMTOOVL) $(SRCSPNMTO) $(SRCSRAWTO) $(SRCSLUTDMP)
-OBJS           = $(OBJSDCENTVFY) $(OBJSDCLUTMIX) $(OBJSDCUIDCHG) $(OBJSDCDTCHG) $(OBJSDCLUTBURN) $(OBJSDCTOPDF) $(OBJSPDFTODC) $(OBJSPGXTODC) $(OBJSDCENCAP) $(OBJSDCBURN) $(OBJSRAWFTODC) $(OBJSDCCOMB) $(OBJSDCUNCAT) $(OBJSDCSRMRG) $(OBJSDCOSTOSR) $(OBJSDCRMMETA) $(OBJSDCSRDUMP) $(OBJSDCDECMPR) $(OBJSDCSUB) $(OBJSDCSORT) $(OBJSDCPROJ) $(OBJSDCARITH) $(OBJSDCTOPGM8) $(OBJSDCTOPGX) $(OBJSDCPOST) $(OBJSDCTABLE) $(OBJSDCMKPRES) $(OBJSDCORTHO) $(OBJSANTODC) $(OBJSCP) $(OBJSDICT) $(OBJSDIRDMP) $(OBJSDUMP) $(OBJSFILE) $(OBJSHIST) $(OBJSKEY) $(OBJSIODVFY) $(OBJSMERGE) $(OBJSPOSN) $(OBJSSMPTE) $(OBJSBRIGGS) $(OBJSSQEXTR) $(OBJSSTATS) $(OBJSTORAW) $(OBJSTOPNM) $(OBJSPBMTOOVL) $(OBJSPNMTO) $(OBJSRAWTO) $(OBJSLUTDMP)
+CPLUSPLUS_SRCS = $(SRCSDCCREATE) $(SRCSDCENTVFY) $(SRCSDCLUTMIX) $(SRCSDCUIDCHG) $(SRCSDCDTCHG) $(SRCSDCLUTBURN) $(SRCSDCTOPDF) $(SRCSPDFTODC) $(SRCSPGXTODC) $(SRCSDCENCAP) $(SRCSDCBURN) $(SRCSRAWFTODC) $(SRCSDCCOMB) $(SRCSDCUNCAT) $(SRCSDCSRMRG) $(SRCSDCOSTOSR) $(SRCSDCRMMETA) $(SRCSDCSRDUMP) $(SRCSDCDECMPR) $(SRCSDCSUB) $(SRCSDCSORT) $(SRCSDCPROJ) $(SRCSDCARITH) $(SRCSDCTOPGM8) $(SRCSDCTOPGX) $(SRCSDCPOST) $(SRCSDCTABLE) $(SRCSDCMKPRES) $(SRCSDCORTHO) $(SRCSANTODC) $(SRCSCP) $(SRCSDICT) $(SRCSDIRDMP) $(SRCSDUMP) $(SRCSFILE) $(SRCSHIST) $(SRCSKEY) $(SRCSMERGE) $(SRCSPOSN) $(SRCSIODVFY) $(SRCSSMPTE) $(SRCSBRIGGS) $(SRCSSQEXTR) $(SRCSSTATS) $(SRCSTORAW) $(SRCSTOPNM) $(SRCSPBMTOOVL) $(SRCSPNMTO) $(SRCSRAWTO) $(SRCSLUTDMP)
+OBJS           = $(OBJSDCCREATE) $(OBJSDCENTVFY) $(OBJSDCLUTMIX) $(OBJSDCUIDCHG) $(OBJSDCDTCHG) $(OBJSDCLUTBURN) $(OBJSDCTOPDF) $(OBJSPDFTODC) $(OBJSPGXTODC) $(OBJSDCENCAP) $(OBJSDCBURN) $(OBJSRAWFTODC) $(OBJSDCCOMB) $(OBJSDCUNCAT) $(OBJSDCSRMRG) $(OBJSDCOSTOSR) $(OBJSDCRMMETA) $(OBJSDCSRDUMP) $(OBJSDCDECMPR) $(OBJSDCSUB) $(OBJSDCSORT) $(OBJSDCPROJ) $(OBJSDCARITH) $(OBJSDCTOPGM8) $(OBJSDCTOPGX) $(OBJSDCPOST) $(OBJSDCTABLE) $(OBJSDCMKPRES) $(OBJSDCORTHO) $(OBJSANTODC) $(OBJSCP) $(OBJSDICT) $(OBJSDIRDMP) $(OBJSDUMP) $(OBJSFILE) $(OBJSHIST) $(OBJSKEY) $(OBJSIODVFY) $(OBJSMERGE) $(OBJSPOSN) $(OBJSSMPTE) $(OBJSBRIGGS) $(OBJSSQEXTR) $(OBJSSTATS) $(OBJSTORAW) $(OBJSTOPNM) $(OBJSPBMTOOVL) $(OBJSPNMTO) $(OBJSRAWTO) $(OBJSLUTDMP)
+
+AllTarget(dccreate)
+NormalCCProgramTarget(dccreate,$(OBJSDCCREATE),$(PROJECTDCFILEDEPLIBS),$(PROJECTDCFILELIBS),-lm)
+InstallProgram(dccreate,$(INSTALLBINDIR))
+InstallManPage(dccreate,$(INSTALLMANDIR)/man1)
 
 AllTarget(dcentvfy)
 NormalCCProgramTarget(dcentvfy,$(OBJSDCENTVFY),$(PROJECTDCFILEDEPLIBS),$(PROJECTDCFILELIBS),-lm)
@@ -501,7 +509,7 @@ InstallManPage(dcckovly,$(INSTALLMANDIR)/man1)
 
 DependCCTarget()
 
-test:: testdchist testy2k testpbmtoovl testdcfile testdccp testantodc testpnmtodc testdcdirdmp testdcdump testdciodvfy testdcposn testpack
+test:: testdchist testy2k testpbmtoovl testdcfile testdccp testantodc testpnmtodc testdcdirdmp testdcdump testdciodvfy testdcposn testpack testdcsrdump testdcunrgb
 
 testpbmtoovl:
 	@$(TOP)/support/testapp testlist ./pbmtoovl "-overlaygroup 0 -r SOPClassUID 0 -r SOPInstanceUID 0" $(TOP)/images/ovltest $(TOP)/test/$(CURRENT_DIR) compare pbmtoovl
@@ -570,6 +578,9 @@ testdcfile:
 	@if [ -f $(TOP)/images/osiriscd/dicom/ctspine.dcm ]; then $(TOP)/support/testapp testlist ./dcfile ""                  $(TOP)/images/osiriscd $(TOP)/test/$(CURRENT_DIR) compare file; fi
 	@if [ -d $(TOP)/images/wuerlim/version3 ];           then $(TOP)/support/testapp testlist ./dcfile ""                  $(TOP)/images/wuerlim  $(TOP)/test/wuerlim/$(CURRENT_DIR) compare file; fi
 
+testdcsrdump:
+	@$(TOP)/support/testapp testsrs ./dcsrdump "-identifier"           $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) compare dcsrdump
+
 testdcdirdmp:
 	@$(TOP)/support/testapp testdirs ./dcdirdmp "-vv"                  $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) compare dcdirdmp
 
@@ -594,11 +605,19 @@ testdccp:
 	@if [ -d $(TOP)/images/wuerlim/version3 ];           then $(TOP)/support/testapp testlist ./dccp "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/wuerlim  $(TOP)/test/wuerlim/$(CURRENT_DIR) compare cp; fi
 
 testantodc:
-	@$(TOP)/support/testapp testlist ./antodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/acrnema $(TOP)/test/$(CURRENT_DIR) compare antodc
-	@$(TOP)/support/testapp testlist ./antodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/dicom   $(TOP)/test/$(CURRENT_DIR) compare antodc
+	@$(TOP)/support/testapp testlist ./antodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/acrnema $(TOP)/test/$(CURRENT_DIR) compare todc
+	@$(TOP)/support/testapp testlist ./antodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/dicom   $(TOP)/test/$(CURRENT_DIR) compare todc
 
 testpnmtodc:
-	@$(TOP)/support/testapp testlist ./pnmtodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/pnm $(TOP)/test/$(CURRENT_DIR) compare pnmtodc
+	@$(TOP)/support/testapp testlist ./pnmtodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/pnm $(TOP)/test/$(CURRENT_DIR) compare todc
+
+testdctopnm:
+	@$(TOP)/support/testapp testlist ./dctopnm "-output-endian little"      $(TOP)/images/acrnema $(TOP)/test/$(CURRENT_DIR) compare cp
+	@$(TOP)/support/testapp testlist ./dctopnm "-output-endian little"      $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) compare cp
+
+testdctopgx:
+	@$(TOP)/support/testapp testlist ./dctopgx ""      $(TOP)/images/acrnema $(TOP)/test/$(CURRENT_DIR) compare cp
+	@$(TOP)/support/testapp testlist ./dctopgx ""      $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) compare cp
 
 testdcposn:
 	@$(TOP)/support/testapp testlist ./dcposn "-row   0 -col   0" $(TOP)/images/dicom   $(TOP)/test/$(CURRENT_DIR) compare posnTLHC
@@ -622,7 +641,13 @@ testdcposn:
 	@if [ -d $(TOP)/images/wuerlim/version3 ];           then $(TOP)/support/testapp testlist ./dcposn "-row 255 -col   0" $(TOP)/images/wuerlim  $(TOP)/test/$(CURRENT_DIR) compare posnBLHC; fi
 	@if [ -d $(TOP)/images/wuerlim/version3 ];           then $(TOP)/support/testapp testlist ./dcposn "-row 255 -col 255" $(TOP)/images/wuerlim  $(TOP)/test/$(CURRENT_DIR) compare posnBRHC; fi
 
-test.create:: testdchist.create testy2k.create testpbmtoovl.create testdcfile.create testdccp.create testantodc.create testpnmtodc.create testdcdirdmp.create testdcdump.create testdciodvfy.create testdcposn.create testpack.create
+$(TOP)/images/dicom/testrgb:	$(TOP)/images/dicom/testlist  
+	xargs <"$<" -L1 -I% $(TOP)/appsrc/dcfile/dctable -k PhotometricInterpretation "$(TOP)/images/dicom/%" 2>&1 | grep '"RGB' | sed -e 's/^"\([^"]*\)".*$$/\1/' -e 's/^.*\/images\/dicom\///' >"$@"
+
+testdcunrgb:	$(TOP)/images/dicom/testrgb
+	@$(TOP)/support/testapp testrgb ./dcunrgb.script ""      $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) compare todc
+
+test.create:: testdchist.create testy2k.create testpbmtoovl.create testdcfile.create testdccp.create testantodc.create testpnmtodc.create testdcdirdmp.create testdcdump.create testdciodvfy.create testdcposn.create testpack.create testdcsrdump.create testdcunrgb.create
 
 testy2k.create:
 	./testy2k.sh $(TOP)/test/$(CURRENT_DIR) create
@@ -691,9 +716,11 @@ testdcfile.create:
 	@if [ -f $(TOP)/images/osiriscd/dicom/ctspine.dcm ]; then $(TOP)/support/testapp testlist ./dcfile ""                  $(TOP)/images/osiriscd $(TOP)/test/$(CURRENT_DIR) create file; fi
 	@if [ -d $(TOP)/images/wuerlim/version3 ];           then $(TOP)/support/testapp testlist ./dcfile ""                  $(TOP)/images/wuerlim  $(TOP)/test/wuerlim/$(CURRENT_DIR) create file; fi
 
+testdcsrdump.create:
+	@$(TOP)/support/testapp testsrs ./dcsrdump "-identifier"           $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) create dcsrdump
+
 testdcdirdmp.create:
 	@$(TOP)/support/testapp testdirs ./dcdirdmp "-vv"                  $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) create dcdirdmp
-
 
 testdchist.create:
 	@$(TOP)/support/testapp testlist ./dchist "-h"                $(TOP)/images/acrnema $(TOP)/test/$(CURRENT_DIR) create hist
@@ -716,11 +743,19 @@ testdccp.create:
 	@if [ -d $(TOP)/images/wuerlim/version3 ];           then $(TOP)/support/testapp testlist ./dccp "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/wuerlim  $(TOP)/test/wuerlim/$(CURRENT_DIR) create cp; fi
 
 testantodc.create:
-	@$(TOP)/support/testapp testlist ./antodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/acrnema $(TOP)/test/$(CURRENT_DIR) create antodc
-	@$(TOP)/support/testapp testlist ./antodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/dicom   $(TOP)/test/$(CURRENT_DIR) create antodc
+	@$(TOP)/support/testapp testlist ./antodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/acrnema $(TOP)/test/$(CURRENT_DIR) create todc
+	@$(TOP)/support/testapp testlist ./antodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/dicom   $(TOP)/test/$(CURRENT_DIR) create todc
 
 testpnmtodc.create:
-	@$(TOP)/support/testapp testlist ./pnmtodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/pnm $(TOP)/test/$(CURRENT_DIR) create pnmtodc
+	@$(TOP)/support/testapp testlist ./pnmtodc "-v -stamp 9999 -instancecreationdate 20030314 -instancecreationtime 145912 -timezoneoffsetfromutc +0100"      $(TOP)/images/pnm $(TOP)/test/$(CURRENT_DIR) create todc
+
+testdctopnm.create:
+	@$(TOP)/support/testapp testlist ./dctopnm "-output-endian little"      $(TOP)/images/acrnema $(TOP)/test/$(CURRENT_DIR) create cp
+	@$(TOP)/support/testapp testlist ./dctopnm "-output-endian little"      $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) create cp
+
+testdctopgx.create:
+	@$(TOP)/support/testapp testlist ./dctopgx ""      $(TOP)/images/acrnema $(TOP)/test/$(CURRENT_DIR) create cp
+	@$(TOP)/support/testapp testlist ./dctopgx ""      $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) create cp
 
 testdcposn.create:
 	@$(TOP)/support/testapp testlist ./dcposn "-row   0 -col   0" $(TOP)/images/dicom   $(TOP)/test/$(CURRENT_DIR) create posnTLHC
@@ -744,5 +779,6 @@ testdcposn.create:
 	@if [ -d $(TOP)/images/wuerlim/version3 ];           then $(TOP)/support/testapp testlist ./dcposn "-row 255 -col   0" $(TOP)/images/wuerlim  $(TOP)/test/$(CURRENT_DIR) create posnBLHC; fi
 	@if [ -d $(TOP)/images/wuerlim/version3 ];           then $(TOP)/support/testapp testlist ./dcposn "-row 255 -col 255" $(TOP)/images/wuerlim  $(TOP)/test/$(CURRENT_DIR) create posnBRHC; fi
 
-
+testdcunrgb.create:	$(TOP)/images/dicom/testrgb
+	@$(TOP)/support/testapp testrgb ./dcunrgb.script ""      $(TOP)/images/dicom $(TOP)/test/$(CURRENT_DIR) create todc
 

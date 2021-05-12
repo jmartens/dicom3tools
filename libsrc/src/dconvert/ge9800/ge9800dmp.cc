@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)ge9800dmp.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "ge9800dmp.h"
 
 #include "bnstream.h"

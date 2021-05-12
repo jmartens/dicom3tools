@@ -1,3 +1,4 @@
+/* attrseq.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_attrseq__
 #define __Header_attrseq__
 
@@ -65,7 +66,7 @@ public:
 
 	void reviseVL(void)	{}
 
-	bool verifyVM(const char *module,const char *element,TextOutputStream& log,ElementDictionary *dict,Uint16 multiplicityMin=0,Uint16 multiplicityMax=0,const char *source=NULL) const;
+	bool verifyVM(const char *module,const char *element,TextOutputStream& log,ElementDictionary *dict,Uint32 multiplicityMin=0,Uint32 multiplicityMax=0,const char *source=NULL) const;
 };
 
 #endif /* __Header_attrseq__ */

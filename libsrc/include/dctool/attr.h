@@ -1,3 +1,4 @@
+/* attr.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 // public interface for Attribute class
 
 #ifndef __Header_attr__
@@ -6,6 +7,7 @@
 #include "ie.h"
 #include "attrtag.h"
 #include "charset.h"
+#include "vr.h"
 
 class AttributeList;
 class OtherUnspecifiedLargeAttributeBase;
@@ -149,7 +151,7 @@ public:
 	virtual bool	verifyNotZero(bool verbose,TextOutputStream& log,ElementDictionary *dict,int which=-1,bool warningNotError=true) const;
 
 	virtual bool	verifyVR(const char *module,const char *element,TextOutputStream& log,ElementDictionary *dict) const;
-	virtual bool	verifyVM(const char *module,const char *element,TextOutputStream& log,ElementDictionary *dict,Uint16 multiplicityMin=0,Uint16 multiplicityMax=0,const char *source=NULL) const;
+	virtual bool	verifyVM(const char *module,const char *element,TextOutputStream& log,ElementDictionary *dict,Uint32 multiplicityMin=0,Uint32 multiplicityMax=0,const char *source=NULL) const;
 };
 
 #endif // __Header_attr__

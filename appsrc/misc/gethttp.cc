@@ -1,4 +1,14 @@
+static const char *CopyrightIdentifier(void) { return "@(#)gethttp.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <cctype>
+#else
 #include <ctype.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
+
 #include "basetype.h"
 #include "ntstream.h"
 #include "getoptns.h"

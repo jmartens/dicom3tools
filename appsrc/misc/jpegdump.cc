@@ -1,4 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)jpegdump.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#else
 #include <iostream.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 #include "txstream.h"
@@ -1135,7 +1144,7 @@ main(int,char **)
 					Uint16 value=read16(cin);
 					if (cin) {
 						offset+=2;
-						cerr << "length fixed 3 value ";
+						cerr << "length fixed 4 value ";
 						writeZeroPaddedHexNumber(cerr,value,2);
 						cerr << " ";
 					}

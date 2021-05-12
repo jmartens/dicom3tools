@@ -1,9 +1,10 @@
-.TH PQTODC 1 "05 April 1998" "DICOM PS3" "pq to DICOM"
+.TH PQTODC 1 "06 March 2014" "DICOM PS3" "pq to DICOM"
 .SH NAME
 pqtodc \- ACR/NEMA DICOM PS3 ... pq to DICOM
 .SH SYNOPSIS
 .HP 10
 .B pqtodc
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -48,5 +49,5 @@ Converting ...
 .BR dcintro(1) ,
 .BR pqdump(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

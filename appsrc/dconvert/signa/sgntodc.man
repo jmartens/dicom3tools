@@ -1,9 +1,10 @@
-.TH SGNTODC 1 "25 November 2007" "DICOM PS3" "Signa to DICOM"
+.TH SGNTODC 1 "06 March 2014" "DICOM PS3" "Signa to DICOM"
 .SH NAME
 sgntodc \- ACR/NEMA DICOM PS3 ... Signa to DICOM
 .SH SYNOPSIS
 .HP 10
 .B sgntodc
+.so man1/gen.so
 .B \-v|verbose
 ]
 .I inputfilename
@@ -26,5 +27,5 @@ The basic switches are described in dcintro(1).
 .BR dcintro(1) ,
 .BR sgndump(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

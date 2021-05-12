@@ -17,6 +17,8 @@
 
 # - all C/C++ programs static CopyrightIdentifier string
 
+# - all man files Copyright string
+
 if [ -f VERSION ]
 then
 	version=`head -1 <VERSION`
@@ -28,12 +30,13 @@ if [ -f COPYRIGHT ]
 then
 	copyright=`head -1 <COPYRIGHT`
 else
-	copyright='Copyright (C) 1995. David A. Clunie. All rights reserved.'
+	copyright='Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.'
 fi
 
 date=`date +%y/%m/%d`
 
-idstring="$version $date $copyright"
+#idstring="$version $date $copyright"
+idstring="$copyright"
 
 dodirectory() {
 	echo Directory `pwd`
@@ -82,12 +85,21 @@ dodirectory() {
 			echo Updating $i
 			rm -f $i.BAK
 			mv $i $i.BAK
-			echo "static char *CopyrightIdentifier(void) {" \
+			echo "static const char *CopyrightIdentifier(void) {" \
 				"return \"@(#)$i $idstring\"; }" >>$i
 			grep -v \
-				'^[ 	]*static char [*]*CopyrightIdentifier' \
+				'^[ 	]*static [a-z ]*char [*]*CopyrightIdentifier' \
 				<$i.BAK >>$i
 			if [ -f $i ] ; then rm -f $i.BAK ; fi
+		fi
+	done
+
+	for i in *.man
+	do
+		if [ -f $i ]
+		then
+			echo Updating $i
+			sed -i "s/^Copyright ([Cc]) [0-9][0-9-]*.*Clunie.*\$/${copyright}/" $i
 		fi
 	done
 }

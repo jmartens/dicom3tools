@@ -115,7 +115,8 @@
 (7005,006b) VERS="TSH"	VR="DS"   VM="3"	Owner="TOSHIBA_MEC_CT3"	Keyword="ImagePositionOf4DVolumeTopEquipment"			Name="Image Position of 4D-Volume Top (Equipment)"
 (7005,006c) VERS="TSH"	VR="UI"   VM="1"	Owner="TOSHIBA_MEC_CT3"	Keyword="SOPInstanceUIDOf4DVolume"						Name="SOP Instance UID of 4D-Volume"
 (7005,006d) VERS="TSH"	VR="UI"   VM="1"	Owner="TOSHIBA_MEC_CT3"	Keyword="SeriesInstanceUIDOf4DVolume"					Name="Series Instance UID of 4D-Volume" 
-(7005,00F1) VERS="TSH"	VR="CS"   VM="1"	Owner="TOSHIBA_MEC_CT3"	Keyword="ProtectMarkForImageCurveOrPrivateRecord"		Name="Protect Mark for Image, Curve or Private Record" 
+(7005,0079) VERS="TSH"	VR="SH"   VM="1"	Owner="TOSHIBA_MEC_CT3"	Keyword="InjectorElapsedTime"							Name="Injector Elapsed Time"
+(7005,00F1) VERS="TSH"	VR="CS"   VM="1"	Owner="TOSHIBA_MEC_CT3"	Keyword="ProtectMarkForImageCurveOrPrivateRecord"		Name="Protect Mark for Image, Curve or Private Record"
 (7005,00F1) VERS="TSH"	VR="CS"   VM="1"	Owner="TOSHIBA_MEC_CT3"	Keyword="ProtectMarkForSeriesRecord"					Name="Protect Mark for Series Record" 
 (7005,00F1) VERS="TSH"	VR="CS"   VM="1"	Owner="TOSHIBA_MEC_CT3"	Keyword="ProtectMarkForStudyRecord"						Name="Protect Mark for Study Record" 
 
@@ -129,6 +130,9 @@
 (700d,0007) VERS="TSH"	VR="OB"   VM="1"	Owner="TOSHIBA_MEC_MR3"	Keyword="ImageInformation"		Name="Image Information"
 (700d,0008) VERS="TSH"	VR="OB"   VM="1"	Owner="TOSHIBA_MEC_MR3"	Keyword="OriginalData"			Name="Original Data"
 (700d,0009) VERS="TSH"	VR="SS"   VM="1"	Owner="TOSHIBA_MEC_MR3"	Keyword="OriginalDataFlag"		Name="Original Data Flag"
+(700d,000C) VERS="TSH"	VR="CS"   VM="1"	Owner="TOSHIBA_MEC_MR3"	Keyword="?"						Name="?"
+(700d,0020) VERS="TSH"	VR="SH"   VM="1"	Owner="TOSHIBA_MEC_MR3"	Keyword="?"						Name="?"
+
 (7015,0000) VERS="TSH"	VR="OB"   VM="1"	Owner="TOSHIBA ENCRYPTED SR DATA"	Keyword="?"			Name="?"
 (7015,0010) VERS="TSH"	VR="OB"   VM="1"	Owner="TOSHIBA_SR"	Keyword="?"			Name="?"
 (7015,0060) VERS="TSH"	VR="OB"   VM="1"	Owner="TOSHIBA_SR"	Keyword="?"							Name="?"
@@ -168,7 +172,7 @@
 (7079,0043) VERS="TSH"	VR="SH"   VM="1"	Owner="TOSHIBA_MEC_XA3"	Keyword="?"		Name="?"
 (7079,0044) VERS="TSH"	VR="US"   VM="1"	Owner="TOSHIBA_MEC_XA3"	Keyword="?"		Name="?"
 (7079,0045) VERS="TSH"	VR="SH"   VM="1"	Owner="TOSHIBA_MEC_XA3"	Keyword="?"		Name="?"
-(7079,0046) VERS="TSH"	VR="SS"   VM="1"	Owner="TOSHIBA_MEC_XA3"	Keyword="?"		Name="?
+(7079,0046) VERS="TSH"	VR="SS"   VM="1"	Owner="TOSHIBA_MEC_XA3"	Keyword="?"		Name="?"
 (7079,0047) VERS="TSH"	VR="SS"   VM="18"	Owner="TOSHIBA_MEC_XA3"	Keyword="?"		Name="?"
 (7079,0048) VERS="TSH"	VR="US"   VM="12"	Owner="TOSHIBA_MEC_XA3"	Keyword="?"		Name="?"
 (7079,0049) VERS="TSH"	VR="US"   VM="3"	Owner="TOSHIBA_MEC_XA3"	Keyword="?"		Name="?"

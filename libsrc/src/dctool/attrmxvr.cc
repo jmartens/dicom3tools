@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrmxvr.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrtype.h"
 #include "attrmxls.h"
 #include "attrval.h"
@@ -59,12 +60,12 @@
 // ? should we not change if OW for XO to avoid VM problems ?
 
 bool
-ReadableAttributeList::replaceWithPixelRepresentation(const Tag &t,const char *name,bool havepixrep,bool usesigned)
+ReadableAttributeList::replaceWithPixelRepresentation(const Tag &t,const char *name,bool havePixelRepresentation,bool usesigned)
 {
 	bool success=true;
 	Attribute *a=operator[](t);
 	if (a) {
-		if (havepixrep) {
+		if (havePixelRepresentation) {
 			Attribute *newa;
 			if (usesigned)
 				newa=new SignedShortAttribute(t);
@@ -94,24 +95,32 @@ ReadableAttributeList::replaceWithPixelRepresentation(const Tag &t,const char *n
 }
 
 #define ReplaceWithPixelRepresentation(n) \
-	replaceWithPixelRepresentation(TagFromName(n),#n,aPixelRepresentation!=0,vPixelRepresentation==1)
+	replaceWithPixelRepresentation(TagFromName(n),#n,havePixelRepresentation,vPixelRepresentation==1)
 
 bool
-ReadableAttributeList::setValueRepresentation(void)
+ReadableAttributeList::setValueRepresentationForThisList(bool havePixelRepresentation,Uint16 vPixelRepresentation)
 {
+//cerr << "ReadableAttributeList::setValueRepresentationForThisList - havePixelRepresentation = " << (havePixelRepresentation ? "true" : "false") << " vPixelRepresentation = " << vPixelRepresentation << endl;
 	bool success=true;
+	
+	// caller is responsible for setting vPixelRepresentation during reading, whether it be
+	// in the current level data set or inherited from a sequence parent, since
+	// attributes like RWV-related nested in sequence items may need pixel representation
+	// from the root data set (000490)(000491)
+	
+	// for this to work with attributes in nested sequences, the sequence needs to occur
+	// after the PixelRepresentation attribute ... all known affected sequences (i.e.,
+	// HistogramSequence, Referenced Image Real World Value Mapping Sequence,
+	// Real World Value Mapping Sequence, Data Frame Assignment Sequence,
+	// Enhanced Palette Color Lookup Table Sequence, Optical Path Sequence
+	// Modality LUT Sequence, VOI LUT Sequence, Presentation State Classification Component Sequence
+	// fit that pattern
 
-	Attribute *aPixelRepresentation = operator[](TagFromName(PixelRepresentation));
-	Uint16 vPixelRepresentation;
-
-	if (aPixelRepresentation) {
-		vPixelRepresentation=AttributeValue(aPixelRepresentation);
-		if (vPixelRepresentation != 0 && vPixelRepresentation != 1) {
-			errorstream << EMsgDC(BadValuePixelRepresentation) << endl;
-			good_flag=0;
-			success=false;
-			vPixelRepresentation=0;
-		}
+	if (havePixelRepresentation && vPixelRepresentation != 0 && vPixelRepresentation != 1) {
+		errorstream << EMsgDC(BadValuePixelRepresentation) << endl;
+		good_flag=0;
+		//success=false;			// do not freak out if we get a valid value for PixelRepresentation; not the end of the world if we assume US (000490)
+		vPixelRepresentation=0;		// assume unsigned if not recognized
 	}
 
 	success=success && ReplaceWithPixelRepresentation(PerimeterValue);
@@ -138,6 +147,54 @@ ReadableAttributeList::setValueRepresentation(void)
 	success=success && ReplaceWithPixelRepresentation(RealWorldValueFirstValueMapped);
 	success=success && ReplaceWithPixelRepresentation(HistogramFirstBinValue);
 	success=success && ReplaceWithPixelRepresentation(HistogramLastBinValue);
+
+	return success;
+}
+
+bool
+ReadableAttributeList::setValueRepresentationForThisListAndNestedSequences(bool havePixelRepresentation,Uint16 vPixelRepresentation)
+{
+//cerr << "ReadableAttributeList::setValueRepresentationForThisListAndNestedSequences(bool,Unint16)" << endl;
+
+	bool success = setValueRepresentationForThisList(havePixelRepresentation,vPixelRepresentation);
+	
+	// the following is based on ::loopOverListsInSequences() ...
+	AttributeListIterator listi(*this);
+	while (!listi) {
+		Attribute *a=listi();
+		Assert(a);
+		if (strcmp(a->getVR(),"SQ") == 0) {
+			AttributeList **al;
+			int n;
+			if ((n=a->getLists(&al)) > 0) {
+				int i;
+				for (i=0; i<n; ++i) {
+					ReadableAttributeList *itemList = (ReadableAttributeList *)(al[i]);		// blech ... dangerous downcast, but should be OK because only ever called from ReadableAttributeList::setValueRepresentationForThisListAndNestedSequences() :(
+					success=success && itemList->setValueRepresentationForThisListAndNestedSequences(havePixelRepresentation,vPixelRepresentation);
+				}
+				delete [] al;
+			}
+		}
+		++listi;
+	}
+
+	return success;
+}
+
+bool
+ReadableAttributeList::setValueRepresentationForThisListAndNestedSequences()
+{
+//cerr << "ReadableAttributeList::setValueRepresentationForThisListAndNestedSequences()" << endl;
+	bool havePixelRepresentation = false;
+	
+	Attribute *aPixelRepresentation = operator[](TagFromName(PixelRepresentation));
+	Uint16 vPixelRepresentation = 0;	// should not matter what we set this to if havePixelRepresentation equals false, but make it unsigned just in case
+	if (aPixelRepresentation) {
+		vPixelRepresentation=AttributeValue(aPixelRepresentation);
+		havePixelRepresentation = true;
+	}
+	
+	bool success = setValueRepresentationForThisListAndNestedSequences(havePixelRepresentation,vPixelRepresentation);
 
 	return success;
 }

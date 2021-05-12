@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)condn.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attr.h"
 #include "attrseq.h"
 #include "attrlist.h"
@@ -61,13 +62,51 @@ static bool ElementPresentWithin(AttributeList *list,Tag tag,Tag sequencetag)
 	return present;
 }
 
-// For now we only support descending from root into items of a top level sequence
-// and this doesn't work when called within a macro, which doesn't really have access
+static bool ElementPresentInPath(AttributeList *list,Tag tag)
+{
+//cerr << "ElementPresentInPath:" << endl;
+//cerr << "ElementPresentInPath: tag " << hex << tag.getGroup() << "," << tag.getElement() << dec << endl;
+	if ((*list)[tag]) {
+//cerr << "ElementPresentInPath: tag present" << endl;
+		return true;
+	}
+	else {
+		AttributeListIterator listi(*list);
+		while (!listi) {
+			Attribute *a=listi();
+			if (a->isSequence()) {
+				SequenceAttribute *aseq=(SequenceAttribute *)a;
+				Assert(aseq);
+				AttributeList **array;
+				int n;
+				if ((n=aseq->getLists(&array)) > 0) {
+//cerr << "ElementPresentInPath: found " << n << " items" << endl;
+					int i;
+					for (i=0; i<n; ++i) {
+//cerr << "ElementPresentInPath: item " << dec << i << endl;
+						AttributeList *list=array[i];
+						if (ElementPresentInPath(list,tag)) {	// recurses if necessary
+//cerr << "ElementPresentInPath: back from ElementPresentInPath having found tag" << endl;
+							delete [] array;
+							return true;	
+						}
+					}
+				}
+				delete [] array;
+			}
+			++listi;
+		}
+	}
+//cerr << "ElementPresentInPath: did not find tag" << endl;
+	return false;
+}
+
+// Recursively descends from root into items of a top level sequence ... can be very slow :(
+// This doesn't work when called within a macro, which doesn't really have access
 // to the rootlist at all :(
 static bool ElementPresentInPathFromRoot(AttributeList *list,Tag tag,Tag sequencetag)
 {
 //cerr << "ElementPresentInPathFromRoot:" << endl;
-	bool present=false;
 //cerr << "ElementPresentInPathFromRoot: sequencetag " << hex << sequencetag.getGroup() << "," << sequencetag.getElement() << dec << endl;
 //cerr << "ElementPresentInPathFromRoot: tag " << hex << tag.getGroup() << "," << tag.getElement() << dec << endl;
 //if (sequencetag.getElement() == 0x9222) {
@@ -90,20 +129,21 @@ static bool ElementPresentInPathFromRoot(AttributeList *list,Tag tag,Tag sequenc
 		AttributeList **array;
 		int n;
 		if ((n=aseq->getLists(&array)) > 0) {
-//cerr << "ElementPresentInPathFromRoot: found items" << endl;
+//cerr << "ElementPresentInPathFromRoot: found " << n << " items" << endl;
 			int i; for (i=0; i<n; ++i) {
 //cerr << "ElementPresentInPathFromRoot: item " << dec << i << endl;
 				AttributeList *list=array[i];
-				if ((*list)[tag]) {
-//cerr << "ElementPresentInPathFromRoot: tag present" << endl;
-					present=true;
-					break;
+				if (ElementPresentInPath(list,tag)) {	// recurses if necessary
+//cerr << "ElementPresentInPathFromRoot: back from ElementPresentInPath having found tag" << endl;
+					delete [] array;
+					return true;	
 				}
 			}
 		}
+		delete [] array;
 	}
-//cerr << "ElementPresentInPathFromRoot: returns " << present << endl;
-	return present;
+//cerr << "ElementPresentInPathFromRoot: did not find tag" << endl;
+	return false;
 }
 
 static bool GroupPresent(AttributeList *list,Tag tag)
@@ -223,7 +263,7 @@ static bool TagValueMatch(AttributeList *list,Tag tag,int valueselector,Tag tagt
 		}
 		while (start<end && !match) {
 			Tag value;
-			if (a->getValue(start,value) && value== tagtomatch) {
+			if (a->getValue(start,value) && value == tagtomatch) {
 //cerr << "TagValueMatch: matched at value# " << dec << start << endl;
 				match=true;
 			}
@@ -233,20 +273,52 @@ static bool TagValueMatch(AttributeList *list,Tag tag,int valueselector,Tag tagt
 	return match;
 }
 
-static bool BinaryValueGet(AttributeList *list,Tag tag,int valueselector,Int32& rvalue)
+enum BinaryValueMatchOperator {
+	Equals,
+	NotEquals,
+	LessThan,
+	LessThanOrEquals,
+	GreaterThan,
+	GreaterThanOrEquals
+};
+
+static bool BinaryValueMatch(AttributeList *list,Tag tag,int valueselector,BinaryValueMatchOperator matchoperator,Int32 valuetomatch)
 {
-//cerr << "BinaryValueGet: want valueselector=" << dec << valueselector << endl;
-	Assert(valueselector != -1);
+//cerr << "BinaryValueMatch: want valueselector=" << dec << valueselector << endl;
 	int match=false;
 	Assert(list);
 	Attribute *a=(*list)[tag];
-	if (a && a->isNumeric() && int(a->getVM()) > valueselector) {
-		Int32 value;
-		if (a->getValue(valueselector,value)) {
-			rvalue=value;
-//cerr << "BinaryValueGet: got value of " << dec << rvalue << endl;
-			match=true;
-//cerr << "BinaryValueGet: matched at value# " << dec << (valueselector-1u) << endl;
+	if (a && a->isNumeric()) {
+		unsigned start;
+		unsigned end;
+		if (valueselector >= 0) {	// 0 is 1st value
+			if(int(a->getVM()) >= valueselector) {
+				start=valueselector;
+				end=valueselector+1;
+			}
+			else
+				start=end=0;
+		}
+		else {				// -1 is wildcard
+			start=0;
+			end=a->getVM();
+		}
+		while (start<end && !match) {
+			Int32 value;
+			if (a->getValue(start,value)) {
+//cerr << "BinaryValueMatch: checking value# " << dec << start << endl;
+				if ((matchoperator == Equals && value == valuetomatch)
+				 || (matchoperator == NotEquals && value != valuetomatch)
+				 || (matchoperator == LessThan && value < valuetomatch)
+				 || (matchoperator == LessThanOrEquals && value <= valuetomatch)
+				 || (matchoperator == GreaterThan && value > valuetomatch)
+				 || (matchoperator == GreaterThanOrEquals && value >= valuetomatch)
+				) {
+//cerr << "BinaryValueMatch: matched at value# " << dec << start << endl;
+					match=true;
+				}
+			}
+			++start;
 		}
 	}
 	return match;

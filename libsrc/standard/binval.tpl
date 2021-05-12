@@ -10,6 +10,10 @@ BinaryValues="Three" {
 	0x0003
 }
 
+BinaryValues="FFFF" {
+	0xffff = Inconsistencies may be present
+}
+
 BinaryValues="PregnancyStatus" {
 	0x0001 = Not Pregnant,
 	0x0002 = Possibly Pregnant,
@@ -140,6 +144,14 @@ BinaryValues="PlanarConfigurationIsColorByPixel" {
 BinaryValues="PlanarConfigurationIsColorByPlaneOrPixel" {
 	0x0000,
 	0x0001
+}
+
+BinaryValues="BitsAre32" {
+	32
+}
+
+BinaryValues="BitsAre64" {
+	64
 }
 
 BinaryValues="BitsAre16" {
@@ -317,6 +329,22 @@ BinaryValues="BitsAre10To16" {
 	0x0010
 }
 
+BinaryValues="BitsAre12To16" {
+	0x000C,
+	0x000D,
+	0x000E,
+	0x000F,
+	0x0010
+}
+
+BinaryValues="BitsAre11To15" {
+	0x000B,
+	0x000C,
+	0x000D,
+	0x000E,
+	0x000F
+}
+
 BinaryValues="BitsAre1Or8" {
 	0x0001,
 	0x0008
@@ -368,6 +396,12 @@ BinaryValues="PreferredPlaybackSequencing" {
 }
 
 BinaryValues="PreferredPlaybackSequencingForHangingProtocol" {
+	0x0000 = Looping,
+	0x0001 = Sweeping
+	0x0002 = Stop
+}
+
+BinaryValues="PreferredPlaybackSequencingForStructuredDisplay" {
 	0x0000 = Looping,
 	0x0001 = Sweeping
 	0x0002 = Stop

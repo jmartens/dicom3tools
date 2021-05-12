@@ -8,6 +8,8 @@ Module="FileMetaInformation"
 	Name="ImplementationClassUID"		Type="1"
 	Name="ImplementationVersionName"	Type="3"
 	Name="SourceApplicationEntityTitle"	Type="3"
+	Name="SendingApplicationEntityTitle"	Type="3"
+	Name="ReceivingApplicationEntityTitle"	Type="3"
 	Name="PrivateInformationCreatorUID"	Type="3"
 	Name="PrivateInformation"		Type="1C"	Condition="PrivateInformationCreatorUIDPresent"
 
@@ -58,6 +60,7 @@ Module="DirectoryInformation"
 		InvokeMacro="HL7StructuredDocumentDirectoryRecord"		Condition="DirectoryRecordTypeIsHL7StructuredDocument"
 		InvokeMacro="RealWorldValueMappingDirectoryRecord"		Condition="DirectoryRecordTypeIsRealWorldValueMapping"
 		InvokeMacro="StereometricRelationshipDirectoryRecord"	Condition="DirectoryRecordTypeIsStereometricRelationship"
+		InvokeMacro="SurfaceDirectoryRecord"					Condition="DirectoryRecordTypeIsSurface"
 	SequenceEnd
 ModuleEnd
 
@@ -288,6 +291,13 @@ MacroEnd
 
 DefineMacro="StereometricRelationshipDirectoryRecord"
 		Name="SpecificCharacterSet"					Type="1C"	NoCondition=""	StringDefinedTerms="SpecificCharacterSet"
+		InvokeMacro="ContentIdentificationMacro"
+MacroEnd
+
+DefineMacro="SurfaceDirectoryRecord"
+		Name="SpecificCharacterSet"					Type="1C"	NoCondition=""	StringDefinedTerms="SpecificCharacterSet"
+		Name="ContentDate"							Type="1"
+		Name="ContentTime"							Type="1"
 		InvokeMacro="ContentIdentificationMacro"
 MacroEnd
 

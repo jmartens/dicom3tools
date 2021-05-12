@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcsrdump.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "mesgtext.h"
 #include "dcopt.h"
@@ -75,6 +76,25 @@ processMeasuredValueSequence(Attribute *aMeasuredValueSequence,const char *label
 			if (i > 0) log << ", ";
 
 			logStringValueOfAttribute((*ptr)[TagFromName(NumericValue)],log);
+			
+			Attribute *aFloatingPointValue = (*ptr)[TagFromName(FloatingPointValue)];
+			if (aFloatingPointValue) {
+				log << " {";
+				double v;
+				if (aFloatingPointValue->getValue(0,v)) log << setprecision(16) << v;	// this is setprecision(std::numeric_limits<double>::digits10 + 1)
+				log << "}";
+			}
+
+			Attribute *aRationalNumeratorValue = (*ptr)[TagFromName(RationalNumeratorValue)];
+			Attribute *aRationalDenominatorValue = (*ptr)[TagFromName(RationalDenominatorValue)];
+			if (aRationalNumeratorValue || aRationalDenominatorValue) {
+				log << " {";
+				double v;
+				if (aRationalNumeratorValue && aRationalNumeratorValue->getValue(0,v)) log << v;
+				log << "/";
+				if (aRationalDenominatorValue && aRationalDenominatorValue->getValue(0,v)) log << v;
+				log << "}";
+			}
 
 			Attribute *aMeasurementUnitsCodeSequence=(*ptr)[TagFromName(MeasurementUnitsCodeSequence)];
 			if (aMeasurementUnitsCodeSequence) {
@@ -121,7 +141,11 @@ processReferencedSOPSequence(Attribute *aReferencedSOPSequence,const char *label
 			Attribute *aReferencedSegmentNumber=(*ptr)[TagFromName(ReferencedSegmentNumber)];
 			if (aReferencedSegmentNumber) {
 				log << " [Segment ";
-				logStringValueOfAttribute(aReferencedSegmentNumber,log);
+				//logStringValueOfAttribute(aReferencedSegmentNumber,log);
+				Uint16 value;
+				if (aReferencedSegmentNumber->getValue((Uint16)0,value)) {
+					log << value;
+				}
 				log << "]";
 			}
 
@@ -195,6 +219,26 @@ processScoordContentItem(AttributeList *list,TextOutputStream &log) {
 }
 
 static void
+processScoord3DContentItem(AttributeList *list,TextOutputStream &log) {
+	logStringValueOfAttribute((*list)[TagFromName(GraphicType)],log);
+	log << " {";
+	//log.unsetf(ios_base::fixed,ios_base::scientific);	// :) should really explicitly establish the default floating point notation, in which the precision field specifies the maximum number of meaningful digits to display in total counting both those before and those after the decimal point
+	log << setprecision (15);							// this choice of precision is based on the fact that a DS VR is 16 characters, including the decimal point; this is excessive in that the FL VR (32 bit IEEE float) significand has a precision of 24 binary bits (about 7 decimal digits)
+	Attribute *aGraphicData=(*list)[TagFromName(GraphicData)];
+	int nGraphicData = aGraphicData ? aGraphicData->getVM() : 0;
+	int i;
+	for (i=0; i<nGraphicData; ++ i) {
+		if (i > 0) log << ",";
+		float v;
+		if (aGraphicData->getValue(i,v)) log << v;
+	}
+	log << "}";
+	log << " (FoR ";
+	logStringValueOfAttribute((*list)[TagFromName(ReferencedFrameOfReferenceUID)],log);
+	log << ")";
+}
+
+static void
 processValueOfContentItem(AttributeList *list,TextOutputStream &log) {
 	Attribute *aValueType=(*list)[TagFromName(ValueType)];
 	char *vValueType=AttributeValue(aValueType);
@@ -253,6 +297,10 @@ processValueOfContentItem(AttributeList *list,TextOutputStream &log) {
 			log << " = ";
 			processScoordContentItem(list,log);
 		}
+		else if (strcmp(vValueType,"SCOORD3D") == 0) {
+			log << " = ";
+			processScoord3DContentItem(list,log);
+		}
 		else if (strcmp(vValueType,"TCOORD") == 0) {
 		}
 		else if (strcmp(vValueType,"COMPOSITE") == 0) {
@@ -262,6 +310,20 @@ processValueOfContentItem(AttributeList *list,TextOutputStream &log) {
 			log << " [";
 			logStringValueOfAttribute((*list)[TagFromName(ContinuityOfContent)],log);
 			log << "]";
+			Attribute *aContentTemplateSequence = (*list)[TagFromName(ContentTemplateSequence)];
+			if (aContentTemplateSequence) {
+				AttributeList ** vItems = 0;
+				int nItems=aContentTemplateSequence->getLists(&vItems);
+				if (nItems > 0 && vItems) {
+					AttributeList *itemList = vItems[0];
+					Assert(itemList);
+					log << " (";
+					logStringValueOfAttribute((*itemList)[TagFromName(MappingResource)],log);
+					log << ",";
+					logStringValueOfAttribute((*itemList)[TagFromName(TemplateIdentifier)],log);
+					log << ")";
+				}
+			}
 		}
 		else {
 			log << " **** Unrecognized Value Type ****";
@@ -271,35 +333,77 @@ processValueOfContentItem(AttributeList *list,TextOutputStream &log) {
 	}
 }
 
+static void
+logReferencedContentItemIdentifier(Attribute *a,TextOutputStream &log) {
+	if (a) {
+		Uint16 vm = a->getVM();
+		if (vm > 0) {
+			const char *prefix = NULL;
+			for (Uint16 i=0; i<vm; ++i) {
+				if (prefix) {
+					log << prefix;
+				}
+				char *v;
+				a->getValue(i,v);
+				log << v;
+				delete[] v;
+				prefix=".";
+			}
+		}
+	}
+}
 
 static bool
 processContentItem(AttributeList *list,TextOutputStream &log,bool verbose,bool veryverbose,unsigned depth,const char *identifierstring)   {
 
 	bool success=true;
 
-	Attribute *        aRelationshipType=(*list)[TagFromName(RelationshipType)];
-	Attribute *         aContentSequence=(*list)[TagFromName(ContentSequence)];
-	Attribute * aConceptNameCodeSequence=(*list)[TagFromName(ConceptNameCodeSequence)];
-	Attribute *               aValueType=(*list)[TagFromName(ValueType)];
-
+	Attribute *             aObservationDateTime=(*list)[TagFromName(ObservationDateTime)];
+	Attribute *                  aObservationUID=(*list)[TagFromName(ObservationUID)];
+	Attribute *                aRelationshipType=(*list)[TagFromName(RelationshipType)];
+	Attribute *                 aContentSequence=(*list)[TagFromName(ContentSequence)];
+	Attribute *         aConceptNameCodeSequence=(*list)[TagFromName(ConceptNameCodeSequence)];
+	Attribute *                       aValueType=(*list)[TagFromName(ValueType)];
+	Attribute * aReferencedContentItemIdentifier=(*list)[TagFromName(ReferencedContentItemIdentifier)];
+   
 	indent(log,depth,true,true);
 	if (identifierstring) {
 		log << identifierstring << ": ";
 	}
 	
+	if (aReferencedContentItemIdentifier) {
+		log << "R-";
+	}
 	logStringValueOfAttribute(aRelationshipType,log);
 	log << ": ";
 
-	logStringValueOfAttribute(aValueType,log);
-	log << ": ";
-
-	if (aConceptNameCodeSequence) {
-		processCodeSequence(aConceptNameCodeSequence,"",log);
-		log << " ";
+	if (aReferencedContentItemIdentifier) {
+		logReferencedContentItemIdentifier(aReferencedContentItemIdentifier,log);
 	}
+	else {
+		logStringValueOfAttribute(aValueType,log);
+		log << ": ";
 
-	processValueOfContentItem(list,log);
+		if (aConceptNameCodeSequence) {
+			processCodeSequence(aConceptNameCodeSequence,"",log);
+			log << " ";
+		}
 
+		processValueOfContentItem(list,log);
+	}
+	
+	if (aObservationDateTime || aObservationUID) {
+		log << " (";
+		if (aObservationDateTime) {
+			logStringValueOfAttribute(aObservationDateTime,log);
+		}
+		log << ",";
+		if (aObservationUID) {
+			logStringValueOfAttribute(aObservationUID,log);
+		}
+		log << ")";
+	}
+	
 	log << endl;
 
 	if (aContentSequence) {
@@ -401,7 +505,10 @@ main(int argc, char *argv[])
 	//log << list;
 	//list.write(log,veryverbose);
 
-	success=success&&parseStructuredReport(list,log,verbose,veryverbose,showidentifier);
+	{
+		bool parseSuccess = parseStructuredReport(list,log,verbose,veryverbose,showidentifier);		// parse regardless of read success or failure
+		success=success&&parseSuccess;
+	}
 
 	return success ? 0 : 1;
 }

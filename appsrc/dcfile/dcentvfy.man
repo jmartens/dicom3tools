@@ -1,10 +1,11 @@
-.TH DCENTVFY 1 "28 September 2008" "DICOM PS3" "DICOM PS3 - Validate DICOM entities"
+.TH DCENTVFY 1 "7 December 2015" "DICOM PS3" "DICOM PS3 - Validate DICOM entities"
 .SH NAME
 dcentvfy \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Validate DICOM entities
 .SH SYNOPSIS
 .HP 10
 .B dcentvfy
 " inputfile1 [ inputfile2 ... ]"
+.so man1/gen.so
 [
 .B \-v|verbose|vv|veryverbose
 ]
@@ -18,7 +19,9 @@ dcentvfy \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Validate DICOM entities
 reads the named dicom files (and/or the files listed in the specified
 file), extracts patient, study, series and instance entity unique identifiers
 and then validates that the attribute values defined in the standard
-for those entities have consistent values for the same entity.
+for those entities have consistent values for the same entity, and that
+identifiers of subordinate entries are not reused for different parent
+entities.
 .SH OPTIONS
 The description and verbose output go to standard error.
 .LP
@@ -51,5 +54,5 @@ A file containing a list of DICOM input files (one filename per line).
 .BR dciodvfy(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

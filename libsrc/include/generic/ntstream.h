@@ -1,8 +1,16 @@
-/* ntstream.h 1.00 95/09/21 Copyright (C) 1995. David A. Clunie. All rights reserved. */
+/* ntstream.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_nstream__
 #define __Header_nstream__
 
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#else
 #include <iostream.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 class netbuf: public streambuf {
 protected:

@@ -1,7 +1,17 @@
+static const char *CopyrightIdentifier(void) { return "@(#)ancp.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#include <iomanip>
+#include <cctype>
+#else
 #include <iostream.h>
 #include <iomanip.h>
-#include <string.h>
 #include <ctype.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "attrmxls.h"
 #include "attrtag.h"
@@ -11,99 +21,6 @@
 #include "elmconst.h"
 #include "elmdict.h"
 #include "mesgtext.h"
-
-static bool
-isOtherByteOrWordVR(const char *vr)
-{
-	return vr && vr[0]=='O' && (vr[1]=='B' || vr[1]=='W' || vr[1]=='X');
-}
-
-static bool
-isOtherByteOrWordOrFloatVR(const char *vr)
-{
-	return vr && vr[0]=='O' && (vr[1]=='B' || vr[1]=='F'  || vr[1]=='W' || vr[1]=='X');
-}
-
-static bool
-isSequenceVR(const char *vr)
-{
-	return vr && vr[0]=='S' &&  vr[1]=='Q';
-}
-
-static bool
-isUnknownVR(const char *vr)
-{
-	return vr && vr[0]=='U' &&  vr[1]=='N';
-}
-
-static bool
-isUnlimitedTextVR(const char *vr)
-{
-	return vr && vr[0]=='U' &&  vr[1]=='T';
-}
-
-static bool
-isAgeStringVR(const char *vr)
-{
-	return vr && vr[0]=='A' &&  vr[1]=='S';
-}
-
-static bool
-isDateStringVR(const char *vr)
-{
-	return vr && vr[0]=='D' &&  vr[1]=='A';
-}
-
-static bool
-isTimeStringVR(const char *vr)
-{
-	return vr && vr[0]=='T' &&  vr[1]=='M';
-}
-
-static bool
-isDateTimeStringVR(const char *vr)
-{
-	return vr && vr[0]=='D' &&  vr[1]=='T';
-}
-
-static bool
-isUIStringVR(const char *vr)
-{
-	return vr && vr[0]=='U' &&  vr[1]=='I';
-}
-
-static bool
-isNumericOrDateOrTimeOrUIStringVR(const char *vr)
-{
-	return vr &&
-		(  strcmp(vr,"DA") == 0
-		|| strcmp(vr,"DT") == 0
-		|| strcmp(vr,"DS") == 0
-		|| strcmp(vr,"IS") == 0
-		|| strcmp(vr,"TM") == 0
-		|| strcmp(vr,"UI") == 0);
-}
-
-static bool
-isStringVR(const char *vr)
-{
-	return vr &&
-		(  strcmp(vr,"AE") == 0
-		|| strcmp(vr,"AS") == 0
-		|| strcmp(vr,"CS") == 0
-		|| strcmp(vr,"DA") == 0
-		|| strcmp(vr,"DT") == 0
-		|| strcmp(vr,"DS") == 0
-		|| strcmp(vr,"IS") == 0
-		|| strcmp(vr,"LO") == 0
-		|| strcmp(vr,"LT") == 0
-		|| strcmp(vr,"PN") == 0
-		|| strcmp(vr,"SH") == 0
-		|| strcmp(vr,"ST") == 0
-		|| strcmp(vr,"TM") == 0
-		|| strcmp(vr,"UI") == 0
-		|| strcmp(vr,"UT") == 0);
-}
 
 static Uint16
 extract16(const char *buffer,Endian endian)
@@ -181,7 +98,7 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 	
 	bool lastwasencapOXorItem=false;
 	bool donewithmetaheader=false;
-	while (in.peek() != EOF) {
+	while (in.peek() != istream::traits_type::eof()) {
 		Endian endian = in.getEndian();			// update each time through in case changed after metaheader
 		bool swapped32big = in.isSwapped32Big();
 		char buffer[6];
@@ -196,6 +113,7 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 //tag.write(log,&dict);
 //cerr << endl;
 		if (!donewithmetaheader && !tag.isMetaheaderGroup()) {
+//cerr << "Not done with meta header and no longer meta header group" << endl;
 			if (in.getTransferSyntaxToReadDataSet()) {
 				in.readingDataSet();
 				donewithmetaheader=true;
@@ -210,6 +128,7 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 					cerr << EMsgDC(TagReadFailed) << endl;
 					return false;
 				}
+				endian = in.getEndian();			// don't forget to actually update each time through in case changed after metaheader
 				group = extract16(buffer,endian);
 				element = extract16(buffer+2,endian);
 			}
@@ -238,6 +157,7 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 		}
 		else  {
 			if (in.getTransferSyntaxInUse()->isExplicitVR()) {
+//cerr << "Explicit VR" << endl;
 				in.read(vre,2);
 				if (in.fail()) {
 					cerr << EMsgDC(VRReadFailed) << endl;
@@ -245,17 +165,33 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 				}
 				out.write(vre,2);
 				vre[2]=0;
+//cerr << "Explicit VR is " << vre[0] << vre[1] << endl;
 				vr=vre;
-				if (isOtherByteOrWordOrFloatVR(vr) || isSequenceVR(vr)) {
-					in.read(buffer,6);	// "Reserved" + VL
+				if (vr[0] == 0 && vr[1] == 0) {			// illegal two bytes of zero VR encountered in Sante de-identifier output (followed by two byte length) (000471)
+					vr="UN";
+					in.read(buffer,2);
 					if (in.fail()) {
 						cerr << EMsgDC(VLReadFailed) << endl;
 						return false;
 					}
-					out.write(buffer,6);
-					vl = extract32(buffer+2,endian,swapped32big);
+					out.write(buffer,2);
+					vl = extract16(buffer,endian);
 				}
-				else if (isUnknownVR(vr) || isUnlimitedTextVR(vr)) {
+				else if (vr[0] < 'A' || vr[1] < 'A') {		// DicomWorks bug ... occasional implicit VR attribute even though explicit transfer syntax (000470)
+//cerr << "Implicit VR encoding when Explicit required" << endl;
+					vr="UN";
+					buffer[0] = vre[0];		// first two bytes of VL are not VR after all
+					buffer[1] = vre[2];
+					in.read(buffer+2,2);	// read two more bytes to get 4 byte implicit VL
+					if (in.fail()) {
+						cerr << EMsgDC(VLReadFailed) << endl;
+						return false;
+					}
+					out.write(buffer+2,2);
+					vl = extract32(buffer,endian,swapped32big);
+				}
+				else if (isUniversalResourceVR(vr) || isUnlimitedCharactersVR(vr) || isUnlimitedTextVR(vr) || isUnknownVR(vr)) {
+//cerr << "Checking for possible incorrect short rather than long form of VL" << endl;
 					in.read(buffer,2);
 					if (in.fail()) {
 						cerr << EMsgDC(VLReadFailed) << endl;
@@ -264,6 +200,7 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 					out.write(buffer,2);
 					vl = extract16(buffer,endian);
 					if (vl == 0) {		// if reserved bytes not zero, assume used for short form of length (risky) :(
+//cerr << "Reserved bytes are zero" << endl;
 						in.read(buffer,4);	// VL
 						if (in.fail()) {
 							cerr << EMsgDC(VLReadFailed) << endl;
@@ -273,8 +210,19 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 						vl = extract32(buffer,endian,swapped32big);
 					}
 					else {
+//cerr << "Reserved bytes are not zero - using vl of " << dec << vl << endl;
 						cerr << EMsgDC(IncorrectShortVLForUTOrUN) << endl;
 					}
+				}
+				else if (isLongValueLengthInExplicitValueRepresentation(vr)) {		// some of these already handled above
+//cerr << "Not checking for possible incorrect short rather than long form of VL" << endl;
+					in.read(buffer,6);	// "Reserved" + VL
+					if (in.fail()) {
+						cerr << EMsgDC(VLReadFailed) << endl;
+						return false;
+					}
+					out.write(buffer,6);
+					vl = extract32(buffer+2,endian,swapped32big);
 				}
 				else {
 					in.read(buffer,2);
@@ -299,7 +247,7 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 				vl = extract32(buffer,endian,swapped32big);
 			}
 		}
-//cerr << "VR = " << dec << vr << endl;
+//if (vr) cerr << "VR = " << vr[0] << vr[1] << endl; else cerr << "VR missing" << endl;
 //cerr << "VL = " << dec << vl << endl;
 		
 		if (vl == 0xffffffff		// SQ or OX both will contain items
@@ -384,7 +332,7 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 						}
 						else {
 							long lengthToReplace = vl;
-							bool numeric = isNumericOrDateOrTimeOrUIStringVR(vr) || (*buffer && isdigit(*buffer));	// e.g. for a string private attribute
+							bool numeric = isNonOtherNumericOrDateOrTimeOrUIStringVR(vr) || (*buffer && isdigit(*buffer));	// e.g. for a string private attribute
 							char replacementValue = numeric ? '1' : 'X';
 							char subsequentReplacementValue = numeric ? ' ' : 'X';
 							char *ptr=buffer;
@@ -435,7 +383,7 @@ copyAll(DicomInputStream& in,ostream& out,TextOutputStream& log,ElementDictionar
 			}
 		}
 		lastwasencapOXorItem=
-			(isOtherByteOrWordVR(vr)
+			(isOtherByteOrWordOrUnspecifiedVR(vr)
 			 || tag == TagFromName(Item)
 			 || tag == TagFromName(ItemDelimitationItem)
 			) && in.getTransferSyntaxInUse()->isEncapsulated();

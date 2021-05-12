@@ -1,4 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcopto.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "attr.h"
 #include "attrlist.h"

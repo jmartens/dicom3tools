@@ -1,9 +1,10 @@
-.TH SHIMTODC 1 "05 April 1998" "DICOM PS3" "Imatron to DICOM"
+.TH SHIMTODC 1 "06 March 2014" "DICOM PS3" "Imatron to DICOM"
 .SH NAME
 shimtodc \- ACR/NEMA DICOM PS3 ... Imatron to DICOM
 .SH SYNOPSIS
 .HP 10
 .B shimtodc
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -48,5 +49,5 @@ Converting ...
 .BR dcintro(1) ,
 .BR shimdump(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

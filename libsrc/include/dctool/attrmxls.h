@@ -1,3 +1,4 @@
+/* attrmxls.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_attrmxls__
 #define __Header_attrmxls__
 
@@ -18,21 +19,18 @@ private:
 
 	TextOutputStream& 	writebase(const Tag tag,const char *vr,
 					Uint32 vl);
-	bool			isOtherFloatVR(const char *vr);
-	bool			isOtherByteVR(const char *vr);
-	bool			isOtherByteOrWordVR(const char *vr);
-	bool			isSequenceVR(const char *vr);
-	bool			isUnknownVR(const char *vr);
-	bool			isUnlimitedTextVR(const char *vr);
-	const char *		getValueRepresentation(Tag tag,char *vre,bool& readAsImplicitRegardless);
+	
+	const char *	getValueRepresentation(Tag tag,char *vre,bool& readAsImplicitRegardless);
 	Uint32			getValueLength(const char *vr,bool readAsImplicitRegardless);
 	void			skipEncapsulatedData(void);
-	SequenceAttribute *	readNewSequenceAttribute(Tag tag,Uint32 length,bool ignoreoutofordertags,bool useUSVRForLUTDataIfNotExplicit,bool undefinedLengthUNTreatedAsSequence);
+	SequenceAttribute *	readNewSequenceAttribute(Tag tag,Uint32 length,bool ignoreoutofordertags,bool useUSVRForLUTDataIfNotExplicit,bool undefinedLengthUNTreatedAsSequence,const char *sequenceOwner,bool fixBitsDuringRead,bool havePixelRepresentation,Uint16 vPixelRepresentation);
 	bool			replaceWithPixelRepresentation(
 					const Tag &t,const char *name,
-					bool havepixrep,bool usesigned);
+					bool havePixelRepresentation,bool usesigned);
 protected:
-	bool			setValueRepresentation(void);
+	bool			setValueRepresentationForThisList(bool havePixelRepresentation,Uint16 vPixelRepresentation);
+	bool			setValueRepresentationForThisListAndNestedSequences(bool havePixelRepresentation,Uint16 vPixelRepresentation);
+	bool			setValueRepresentationForThisListAndNestedSequences();
 public:
 	ReadableAttributeList(void);
 	virtual ~ReadableAttributeList();
@@ -49,7 +47,12 @@ public:
 		bool forceImplicit=false,
 		bool useStopAtTag=false,
 		Tag stopAtTag=Tag(0,0),
-		bool nestedWithinSequence=false);
+		bool nestedWithinSequence=false,
+		const char *sequenceOwner=NULL,
+		bool fixBitsDuringRead=true,
+		bool havePixelRepresentation=false,
+		Uint16 vPixelRepresentation=0
+		);
 
 	Uint32		   getByteOffset(void) const { return byteoffset; }
 };
@@ -119,7 +122,8 @@ public:
 		bool ignoreoutofordertags=false,
 		bool useUSVRForLUTDataIfNotExplicit=false,
 		bool useStopAtTag=false,
-		Tag stopAtTag=Tag(0,0));
+		Tag stopAtTag=Tag(0,0),
+		bool fixBitsDuringRead=true);
 
 	DicomOutputStream& write(DicomOutputStream& stream);
 	TextOutputStream&  write(TextOutputStream& stream,bool verbose=false,bool showUsedAndIE=false);
@@ -127,6 +131,7 @@ public:
 	bool validateVR(TextOutputStream &log);
 	bool validateRetired(TextOutputStream &log);
 	bool validateUsed(TextOutputStream &log);
+	bool validatePrivate(TextOutputStream &log);
 
 	flag_types set(flag_types f)	{ return flags=flag_types(flags|f); }
 	flag_types reset(flag_types f)	{ return flags=flag_types(flags&~f); }

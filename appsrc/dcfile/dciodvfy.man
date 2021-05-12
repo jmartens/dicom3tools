@@ -1,9 +1,10 @@
-.TH DCIODVFY 1 "28 September 2008" "DICOM PS3" "DICOM PS3 - Validate DICOM objects"
+.TH DCIODVFY 1 "6 December 2016" "DICOM PS3" "DICOM PS3 - Validate DICOM objects"
 .SH NAME
 dciodvfy \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Validate DICOM objects
 .SH SYNOPSIS
 .HP 10
 .B dciodvfy
+.so man1/gen.so
 [
 .B \-profile profilename
 ]
@@ -38,7 +39,19 @@ The basic input switches are described in dcintro(1). Options specific to this p
 .TP
 .B \-profile profilename
 .RS
-Validate not against the standard but the IOD matching the named profile.
+Validate against the IOD matching the named profile. Currently supported profiles that specialize the DICOM standard IODs with additional requirements are
+.TP
+IHEREM (specializes XRayRadiationDoseSR),
+.TP
+IHEMammo (specializes MammographyImageForProcessing and MammographyImageForPresentation),
+.TP
+IHEMammoProfileWithPartialViewOption (specializes MammographyImageForPresentation),
+.TP
+IHEDBT (specializes BreastTomosynthesisImage),
+.TP
+IHEXDSIManifest (specializes KeyObjectSelectionDocument),
+.TP
+Dental (specializes IntraoralImageForPresentation, DXImageForPresentation and BasicDirectory)
 .RE
 .TP
 .B \-describe
@@ -120,5 +133,5 @@ Error - Missing attribute Type 1 Required ...
 .BR dcfile(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2016, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

@@ -5,7 +5,13 @@ Module="AcquisitionContext"
 			InvokeMacro="CodeSequenceMacro"
 		SequenceEnd
 		Name="ReferencedFrameNumbers"				Type="1C"	NoCondition=""	NotZeroError=""
-		Name="NumericValue"							Type="1C"	Condition="AcquisitionContextItemIsNumericValueOrMeasurementUnitsCodeSequenceIsPresent"
+		Name="NumericValue"							Type="1C"	VM="1-n" Condition="AcquisitionContextItemIsNumeric"
+		Name="FloatingPointValue"					Type="1C"	VM="1-n" NoCondition=""																# should check that VM is same as NumericValue :(
+		Verify="FloatingPointValue"								Condition="FloatingPointValuePresentButAcquisitionContextItemIsNotNumeric"			ThenErrorMessage="May not be present when NumericValue is absent"
+		Name="RationalNumeratorValue"				Type="1C"	VM="1-n" NoCondition=""																# should check that VM is same as NumericValue :(
+		Verify="RationalNumeratorValue"							Condition="RationalNumeratorValuePresentButAcquisitionContextItemIsNotNumeric"		ThenErrorMessage="May not be present when NumericValue is absent"
+		Name="RationalDenominatorValue"				Type="1C"	VM="1-n" Condition="RationalNumeratorValueIsPresent" NotZeroError=""				# should check that VM is same as NumericValue :(
+		Verify="RationalDenominatorValue"						Condition="RationalDenominatorValuePresentButAcquisitionContextItemIsNotNumeric"	ThenErrorMessage="May not be present when NumericValue is absent"
 		Sequence="MeasurementUnitsCodeSequence"		Type="1C"	VM="1"	Condition="NeedMeasurementUnitsCodeSequence"
 			InvokeMacro="CodeSequenceMacro"
 		SequenceEnd

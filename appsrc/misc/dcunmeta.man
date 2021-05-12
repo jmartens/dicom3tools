@@ -69,5 +69,5 @@ Data: Encapsulated	No
 .SH SEE ALSO
 .BR dcfile(1), dcrmmeta(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

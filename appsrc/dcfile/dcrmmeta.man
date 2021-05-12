@@ -1,9 +1,10 @@
-.TH DCRMMETA 1 "17 Dec 2000" "DICOM PS3" "DICOM PS3 - Remove meta information header"
+.TH DCRMMETA 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Remove meta information header"
 .SH NAME
 dcrmmeta \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Remove meta information header
 .SH SYNOPSIS
 .HP 10
 .B dcrmmeta
+.so man1/gen.so
 .so man1/optin.so
 .so man1/genout.so
 .SH DESCRIPTION
@@ -38,5 +39,5 @@ The basic input switches are described in dcintro(1). There are no options speci
 .SH SEE ALSO
 .BR dcintro(1), dcunmeta(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

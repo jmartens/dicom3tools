@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dckey.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "attrnew.h"
 #include "attrval.h"
@@ -115,6 +116,10 @@ main(int argc,char **argv)
 			<< " <" << MMsgDC(InputFile)
 			<< endl;
 		return 1;
+	}
+	
+	if (!keylist) {	// (000482) and Debian 715786
+		return 0;
 	}
 
 	DicomInputStream din(*(istream *)input_opener,

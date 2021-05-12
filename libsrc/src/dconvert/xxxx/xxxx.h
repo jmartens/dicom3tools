@@ -1,3 +1,4 @@
+/* xxxx.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_xxxx__
 #define __Header_xxxx__
 

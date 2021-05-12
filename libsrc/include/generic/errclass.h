@@ -1,7 +1,16 @@
+/* errclass.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_errclass__
 #define __Header_errclass__
 
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iomanip>
+#else
 #include <iomanip.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 class ErrorsInClass {
 private:

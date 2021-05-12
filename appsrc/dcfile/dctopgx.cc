@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dctopgx.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "attrothr.h"
 #include "attrval.h"
@@ -201,14 +202,11 @@ main(int argc, char *argv[])
 
 	const char *pgxstring=0;
 
-	if (vSamplesPerPixel == 1
-	 && vPhotometricInterpretation
-	 && (strcmp(vPhotometricInterpretation,"MONOCHROME1") == 0
-	  || strcmp(vPhotometricInterpretation,"MONOCHROME2") == 0) ) {
+	if (vSamplesPerPixel == 1) {
 		pgxstring="PG";
 	}
 	else {
-		log << "Only greyscale images supported" << endl;
+		log << "Only single channel images supported" << endl;
 		success=false;
 	}
 

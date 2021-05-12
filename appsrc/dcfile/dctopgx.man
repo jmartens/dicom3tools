@@ -1,9 +1,10 @@
-.TH DCTOPGX 1 "04 March 1999" "DICOM PS3" "DICOM PS3 - DICOM image to PGX file"
+.TH DCTOPGX 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - DICOM image to PGX file"
 .SH NAME
 dctopgx \- ACR/NEMA DICOM PS3 ... DICOM PS3 - DICOM image to PGX file
 .SH SYNOPSIS
 .HP 10
 .B dctopgx
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -15,7 +16,7 @@ dctopgx \- ACR/NEMA DICOM PS3 ... DICOM PS3 - DICOM image to PGX file
 .SH DESCRIPTION
 .LP
 .B dctopgx
-reads the named dicom or acr-nema input file and copies the raw image
+reads the named dicom or acr-nema single channel (grayscale or palette color; the photometric interpretation is not checked) input file and copies the raw image
 pixel data to a PGX file as used for the JPEG 2000 Verification Model.
 .LP
 A PGX file contains of a single text header line of the form
@@ -69,5 +70,5 @@ Display byte offset from file start and message start, in hexadecimal, and dump 
 .BR dctoraw(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

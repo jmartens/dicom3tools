@@ -1,9 +1,10 @@
-.TH DCTOPNM 1 "04 December 2010" "DICOM PS3" "DICOM PS3 - DICOM image to PNM file"
+.TH DCTOPNM 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - DICOM image to PNM file"
 .SH NAME
 dctopnm \- ACR/NEMA DICOM PS3 ... DICOM PS3 - DICOM image to PNM file
 .SH SYNOPSIS
 .HP 10
 .B dctopnm
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -18,10 +19,19 @@ dctopnm \- ACR/NEMA DICOM PS3 ... DICOM PS3 - DICOM image to PNM file
 reads the named dicom or acr-nema input file and copies the raw image
 pixel data to a PNM file after adding a PGM or PPM header.
 .LP
-The input file must be unencapsulated, and in the case of > 8 bit data,
+The input file must be unencapsulated, single channel (grayscale or palette color; the photometric interpretation is not checked for single channel), or three channel interleaved RGB, and in the case of > 8 bit data,
 in the same byte order as desired in the output, since the raw bytes
 are copied from input to output without any conversion. Use dccp(1)
 first to change the encoding if necessary.
+.LP
+Only the necessary number of bytes
+to encode the pixel data will be written (based on rows, columns, number of
+frames, samples per pixel and bits allocated); this means that for an odd number
+of bytes the extra DICOM padding byte will not be copied to the raw output. This
+prevents netpbm utilities freaking out with an error "reading magic number" if the padding byte is
+present. If
+any of the necessary attributes to calculate
+the correct pixel data length are missing, all encoded bytes will be written.
 .LP
 .SH OPTIONS
 The PNM output goes where it is specified or standard out.
@@ -107,5 +117,6 @@ Writing ...
 .BR dctopgm8(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
+It would be desirable to be able to expand palette color images to produce RGB output, and to handle color-by-plane rather than interleaved RGB, but for now, these are not supported.

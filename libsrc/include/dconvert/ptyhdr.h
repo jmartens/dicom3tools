@@ -1,7 +1,16 @@
+/* ptyhdr.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_ptyhdr__
 #define __Header_ptyhdr__
 
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#else
 #include <iostream.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 #include "convtype.h"

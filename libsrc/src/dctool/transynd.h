@@ -1,3 +1,4 @@
+/* transynd.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_transynd__
 #define __Header_transynd__
 

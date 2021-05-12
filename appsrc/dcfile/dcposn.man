@@ -1,9 +1,10 @@
-.TH DCPOSN 1 "6 March 2007" "DICOM PS3" "DICOM PS3 - DICOM locate position"
+.TH DCPOSN 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - DICOM locate position"
 .SH NAME
 dcposn \- ACR/NEMA DICOM PS3 ... DICOM PS3 - DICOM locate position
 .SH SYNOPSIS
 .HP 10
 .B dcposn
+.so man1/gen.so
 [
 .B \-col|x n
 ]
@@ -66,7 +67,7 @@ Row=0 Col=0   X=45.0 Y=-119.5 Z=119.5
 .SH SEE ALSO
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 This program really only exists for automated testing of the image plane
 module.

@@ -1,4 +1,13 @@
-#include <ctype.h>
+static const char *CopyrightIdentifier(void) { return "@(#)pdftodc.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <cctype>	// for isspace()
+#else
+#include <ctype.h>	// for isspace()
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "attrtype.h"
 #include "attrothr.h"

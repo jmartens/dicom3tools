@@ -1,3 +1,4 @@
+/* ge9800src.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_ge9800src__
 #define __Header_ge9800src__
 

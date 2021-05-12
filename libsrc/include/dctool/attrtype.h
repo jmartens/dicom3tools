@@ -1,3 +1,4 @@
+/* attrtype.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_attrtype__
 #define __Header_attrtype__
 
@@ -256,6 +257,7 @@ public:
 	BinaryOutputStream& writeData(BinaryOutputStream& stream)
 		{
 			writePaddedValues(stream,0);
+			return stream;
 		}
 
 	TextOutputStream& writeData(TextOutputStream& stream)
@@ -281,6 +283,38 @@ public:
 			writePadded(stream,0);
 			return stream;
 		}
+};
+
+class UnlimitedCharactersAttribute : public NonNumericStringAttribute {
+public:
+	UnlimitedCharactersAttribute(Tag t) : NonNumericStringAttribute(t) {}
+
+	UnlimitedCharactersAttribute(Tag t,const char *v)
+		: NonNumericStringAttribute(t,v) {}
+	UnlimitedCharactersAttribute(Tag t,Uint16 v)
+		: NonNumericStringAttribute(t,v) {}
+	UnlimitedCharactersAttribute(Tag t,Uint32 v)
+		: NonNumericStringAttribute(t,v) {}
+	UnlimitedCharactersAttribute(Tag t,Int16 v)
+		: NonNumericStringAttribute(t,v) {}
+	UnlimitedCharactersAttribute(Tag t,Int32 v)
+		: NonNumericStringAttribute(t,v) {}
+	UnlimitedCharactersAttribute(Tag t,Float32 v)
+		: NonNumericStringAttribute(t,v) {}
+	UnlimitedCharactersAttribute(Tag t,Float64 v)
+		: NonNumericStringAttribute(t,v) {}
+
+	const char *	getVR() const	{ return "UC"; }
+	bool validateVR(TextOutputStream& stream,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const;
+};
+
+class UniversalResourceAttribute : public LongTextAttributeBase {
+public:
+	UniversalResourceAttribute(Tag t) : LongTextAttributeBase(t) {}
+	UniversalResourceAttribute(Tag t,const char *v)
+		: LongTextAttributeBase(t,v) {}
+	const char *	getVR() const	{ return "UR"; }
+	bool validateVR(TextOutputStream& stream,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const;
 };
 
 class UnlimitedTextAttribute : public LongTextAttributeBase {
@@ -425,17 +459,25 @@ public:
 	virtual ~OtherWordLargeNonPixelAttribute() {}
 };
 
-//class OtherFloatSmallAttribute : public OtherFloatSmallAttributeBase {
-//public:
-//	OtherFloatSmallAttribute(Tag t) : OtherFloatSmallAttributeBase(t) {}
-//	virtual ~OtherFloatSmallAttribute() {}
-//};
+class OtherLongLargeAttribute : public OtherLongLargeAttributeBase {
+public:
+	OtherLongLargeAttribute(Tag t,BinaryInputStream &stream,OurStreamPos pos)
+		: OtherLongLargeAttributeBase(t,stream,pos) {}
+	virtual ~OtherLongLargeAttribute() {}
+};
 
 class OtherFloatLargeAttribute : public OtherFloatLargeAttributeBase {
 public:
 	OtherFloatLargeAttribute(Tag t,BinaryInputStream &stream,OurStreamPos pos)
 		: OtherFloatLargeAttributeBase(t,stream,pos) {}
 	virtual ~OtherFloatLargeAttribute() {}
+};
+
+class OtherDoubleLargeAttribute : public OtherDoubleLargeAttributeBase {
+public:
+	OtherDoubleLargeAttribute(Tag t,BinaryInputStream &stream,OurStreamPos pos)
+		: OtherDoubleLargeAttributeBase(t,stream,pos) {}
+	virtual ~OtherDoubleLargeAttribute() {}
 };
 
 /* ********************* Unknown VR Attributes ********************* */

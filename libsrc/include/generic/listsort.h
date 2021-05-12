@@ -1,4 +1,4 @@
-/* listsort.h 1.00 95/09/21 Copyright (C) 1995. David A. Clunie. All rights reserved. */
+/* listsort.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_listsort__
 #define __Header_listsort__
 

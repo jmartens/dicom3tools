@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)planea.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrtype.h"
 #include "attrlist.h"
 #include "elmconst.h"

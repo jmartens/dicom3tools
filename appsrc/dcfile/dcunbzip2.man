@@ -1,4 +1,4 @@
-.TH dcunbzip2 1 "23 Feb 2003" "DICOM PS3" "DICOM PS3 - Decompress deflated DICOM file"
+.TH dcunbzip2 1 "17 Oct 2016" "DICOM PS3" "DICOM PS3 - Decompress deflated DICOM file"
 .SH NAME
 dcunbzip2 \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Decompress deflated DICOM file
 .SH SYNOPSIS
@@ -27,5 +27,8 @@ There are no options.
 .SH SEE ALSO
 .BR dcbzip2(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2016, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
+Previously the first two "BZ" bytes were stripped before encoding;
+this is no longer performed and could result in incompatibility
+with old files saved in the bzip2 transfer syntax

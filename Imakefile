@@ -23,6 +23,8 @@ ARCHIVEWINEXENAME = dicom3tools_winexe
 ARCHIVEWINEXEFILES = \
 	appsrc/acrnema/andump.exe \
 	/usr/bin/cygwin1.dll \
+	/usr/bin/cyggcc_s-1.dll \
+	/usr/bin/cygstdc++-6.dll \
 	appsrc/dcfile/dcdump.exe \
 	appsrc/dcfile/dcentvfy.exe \
 	appsrc/dcfile/dcfile.exe \
@@ -33,7 +35,10 @@ ARCHIVEWINEXEFILES = \
 	appsrc/dcfile/dcstats.exe \
 	appsrc/dcfile/dctable.exe \
 	appsrc/dcfile/dcsort.exe \
-	appsrc/dcfile/dcdirdmp.exe
+	appsrc/dcfile/dcdirdmp.exe \
+	appsrc/dcfile/dctoraw.exe \
+	appsrc/dcfile/dccmp.script \
+	appsrc/dcfile/dcdiff.script
 
 ARCHIVEMACEXENAME = dicom3tools_macexe
 ARCHIVEMACEXEFILES = \
@@ -48,7 +53,10 @@ ARCHIVEMACEXEFILES = \
 	appsrc/dcfile/dcstats \
 	appsrc/dcfile/dctable \
 	appsrc/dcfile/dcsort \
-	appsrc/dcfile/dcdirdmp
+	appsrc/dcfile/dcdirdmp \
+	appsrc/dcfile/dctoraw \
+	appsrc/dcfile/dccmp.script \
+	appsrc/dcfile/dcdiff.script
 
 LINKTOIMAGEDIR = ../dctool.support/images
 LINKTOTESTDIR = ../dctool.support/test
@@ -62,12 +70,14 @@ World:
 	$(MAKE) $(MFLAGS) Makefiles
 	$(MAKE) $(MFLAGS) clean
 	$(MAKE) $(MFLAGS) depend
+	$(MAKE) $(MFLAGS) setplatform
 	$(MAKE) $(MFLAGS)
 
 World.unclean:
 	$(MAKE) $(MFLAGS) Makefile
 	$(MAKE) $(MFLAGS) Makefiles
 	$(MAKE) $(MFLAGS) depend
+	$(MAKE) $(MFLAGS) setplatform
 	$(MAKE) $(MFLAGS)
 
 NamedTargetSubdirs(library,libsrc,NullParameter,NullParameter,all)
@@ -77,10 +87,16 @@ InstallWhatis(NullParameter)
 sb:	$(SBSOURCEDIRS)
 	support/linksb $(SBDIR) $(SBSOURCEDIRS)
 
-update.version:
-	support/updvers
+update.copyright:
+	support/updatecopyright
 
-archive:	clean clean.makefiles clean.config clean.docs archive.unclean
+setversion:
+	support/setversion
+
+setplatform:
+	support/setplatform
+
+archive:	setversion clean clean.makefiles clean.config clean.docs archive.unclean
 
 archive.unclean:
 	$(CP) NotAMakefile Makefile; \
@@ -153,7 +169,8 @@ archive.winexe:
 	cp $(ARCHIVEWINEXEFILES) $$link; \
 	archive=$(ARCHIVEWINEXENAME)$$version.zip; \
 	$(RM) $$archive; \
-	(cd $$link; zip ../$$archive *.exe *.dll); \
+	(cd $$link; for i in *.exe; do touch $$i.local; done); \
+	(cd $$link; zip ../$$archive *.script *.exe *.dll *.exe.local); \
 	$(RM) $$link
 
 archive.macexe:

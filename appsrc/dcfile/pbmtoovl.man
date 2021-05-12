@@ -1,9 +1,10 @@
-.TH PBMTOOVL 1 "01 June 1998" "DICOM PS3" "DICOM PS3 - Create DICOM Overlay from PBM file"
+.TH PBMTOOVL 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Create DICOM Overlay from PBM file"
 .SH NAME
 pbmtoovl \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Create DICOM Overlay from PBM file
 .SH SYNOPSIS
 .HP 10
 .B pbmtoovl
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -57,7 +58,7 @@ Display contents after creation, during replacement, and before writing.
 .BR dciodvfy(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 .LP
 Only raw grayscale PBM files are supported.

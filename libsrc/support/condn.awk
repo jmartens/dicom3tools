@@ -1,3 +1,4 @@
+#  condn.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 # create C++ headers from conditions template 
 
 # can set these values on the command line:
@@ -198,23 +199,57 @@ NR==1	{
 			RLENGTH-length("StringValue=\"")-1);
 	}
 	
+	stringvalueabove=""
+	stringvalueaboveused=0
+	if (match($0,"StringValueAbove=\"[^\"]*\"")) {
+		stringvalueaboveused=1
+		stringvalueabove=substr($0,RSTART+length("StringValueAbove=\""),
+			RLENGTH-length("StringValueAbove=\"")-1);
+	}
+	
 	stringvaluefromrootattribute=""
 	stringvaluefromrootattributeused=0
 	if (match($0,"StringValueFromRootAttribute=\"[^\"]*\"")) {
 		stringvaluefromrootattributeused=1
-		stringvaluefromrootattribute =substr($0,RSTART+length("StringValueFromRootAttribute=\""),
+		stringvaluefromrootattribute=substr($0,RSTART+length("StringValueFromRootAttribute=\""),
 			RLENGTH-length("StringValueFromRootAttribute=\"")-1);
 	}
-	
+
 	binaryvalue=""
-	if (match($0,"BinaryValue=\"[^\"]*\""))
-		binaryvalue=substr($0,RSTART+length("BinaryValue=\""),
+	binaryvaluematchoperator=""
+	if (match($0,"BinaryValue=\"[^\"]*\"")) {
+		binaryvaluewithoperator=substr($0,RSTART+length("BinaryValue=\""),
 			RLENGTH-length("BinaryValue=\"")-1);
+		# e.g., "== 1" ; "< 367"
+		spacestart=index(binaryvaluewithoperator," "); # 3 ; 2
+		binaryvalue=substr(binaryvaluewithoperator,spacestart+1,length(binaryvaluewithoperator)-spacestart);	# 4, 4-3=1 ; 3, 5-2=3
+		matchoperatorstring=substr(binaryvaluewithoperator,1,spacestart-1);	# 1,2 ; 1,1
+		if (matchoperatorstring == "==") binaryvaluematchoperator = "Equals"
+		else if (matchoperatorstring == "!=") binaryvaluematchoperator = "NotEquals"
+		else if (matchoperatorstring == "<") binaryvaluematchoperator = "LessThan"
+		else if (matchoperatorstring == "<=") binaryvaluematchoperator = "LessThanOrEquals"
+		else if (matchoperatorstring == ">") binaryvaluematchoperator = "GreaterThan"
+		else if (matchoperatorstring == ">=") binaryvaluematchoperator = "GreaterThanOrEquals"
+		else print "Error - Binary Match Operator \"" matchoperatorstring "\" invalid at line" FNR >"/dev/tty"
+	}
 
 	binaryvaluefromrootattribute=""
-	if (match($0,"BinaryValueFromRootAttribute=\"[^\"]*\""))
-		binaryvaluefromrootattribute=substr($0,RSTART+length("BinaryValueFromRootAttribute=\""),
+	binaryvaluematchoperatorfromrootattribute=""
+	if (match($0,"BinaryValueFromRootAttribute=\"[^\"]*\"")) {
+		binaryvaluewithoperator=substr($0,RSTART+length("BinaryValueFromRootAttribute=\""),
 			RLENGTH-length("BinaryValueFromRootAttribute=\"")-1);
+		# e.g., "== 1" ; "< 367"
+		spacestart=index(binaryvaluewithoperator," "); # 3 ; 2
+		binaryvaluefromrootattribute=substr(binaryvaluewithoperator,spacestart+1,length(binaryvaluewithoperator)-spacestart);	# 4, 4-3=1 ; 3, 5-2=3
+		matchoperatorstring=substr(binaryvaluewithoperator,1,spacestart-1);	# 1,2 ; 1,1
+		if (matchoperatorstring == "==") binaryvaluematchoperatorfromrootattribute = "Equals"
+		else if (matchoperatorstring == "!=") binaryvaluematchoperatorfromrootattribute = "NotEquals"
+		else if (matchoperatorstring == "<") binaryvaluematchoperatorfromrootattribute = "LessThan"
+		else if (matchoperatorstring == "<=") binaryvaluematchoperatorfromrootattribute = "LessThanOrEquals"
+		else if (matchoperatorstring == ">") binaryvaluematchoperatorfromrootattribute = "GreaterThan"
+		else if (matchoperatorstring == ">=") binaryvaluematchoperatorfromrootattribute = "GreaterThanOrEquals"
+		else print "Error - Binary Match Operator \"" matchoperatorstring "\" invalid at line" FNR >"/dev/tty"
+	}
 
 	tagvalue=""
 	if (match($0,"TagValue=\"[^\"]*\""))
@@ -303,30 +338,17 @@ NR==1	{
 		if (stringvalueused) {
 			print "\tcondition" nestinglevel " " operator "=" modifier "(StringValueMatch(list,TagFromName(" element ")," selector ",\"" stringvalue "\")?1:0);"
 		}
+		if (stringvalueaboveused) {
+			print "\tcondition" nestinglevel " " operator "=" modifier "(StringValueMatch(parentlist,TagFromName(" element ")," selector ",\"" stringvalueabove "\")?1:0);"
+		}
 		if (stringvaluefromrootattributeused) {
 			print "\tcondition" nestinglevel " " operator "=" modifier "(StringValueMatch(rootlist,TagFromName(" element ")," selector ",\"" stringvaluefromrootattribute "\")?1:0);"
 		}
 		if (length(binaryvalue) > 0) {
-			if (selector == "-1") {
-				print "Error - Wildcard value selector not allowed for binary value, assuming 1st value, at line " FNR >"/dev/tty"
-				selector="0"
-			}
-			print "\t{"
-			print "\t\tInt32 value;"
-			print "\t\tif (BinaryValueGet(list,TagFromName(" element ")," selector ",value))"
-			print "\t\t\tcondition" nestinglevel " " operator "=" modifier "((value " binaryvalue ")?1:0);"
-			print "\t}"
+			print "\tcondition" nestinglevel " " operator "=" modifier "(BinaryValueMatch(list,TagFromName(" element ")," selector "," binaryvaluematchoperator "," binaryvalue ")?1:0);"
 		}
 		if (length(binaryvaluefromrootattribute) > 0) {
-			if (selector == "-1") {
-				print "Error - Wildcard value selector not allowed for binary value, assuming 1st value, at line " FNR >"/dev/tty"
-				selector="0"
-			}
-			print "\t{"
-			print "\t\tInt32 value;"
-			print "\t\tif (BinaryValueGet(rootlist,TagFromName(" element ")," selector ",value))"
-			print "\t\t\tcondition" nestinglevel " " operator "=" modifier "((value " binaryvaluefromrootattribute ")?1:0);"
-			print "\t}"
+			print "\tcondition" nestinglevel " " operator "=" modifier "(BinaryValueMatch(rootlist,TagFromName(" element ")," selector "," binaryvaluematchoperatorfromrootattribute "," binaryvaluefromrootattribute ")?1:0);"
 		}
 		if (length(tagvalue) > 0) {
 			print "\tcondition" nestinglevel " " operator "=" modifier "(TagValueMatch(list,TagFromName(" element ")," selector ",Tag(" tagvalue "))?1:0);"

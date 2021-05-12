@@ -1,9 +1,10 @@
-.TH PDFTODC 1 "08 October 2005" "DICOM PS3" "DICOM PS3 - Encapsulate PDF in DICOM"
+.TH PDFTODC 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Encapsulate PDF in DICOM"
 .SH NAME
 pdftodc \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Encapsulate PDF in DICOM
 .SH SYNOPSIS
 .HP 10
 .B pdftodc
+.so man1/gen.so
 [
 .B \-conceptname scheme code meaning version
 ]
@@ -55,6 +56,6 @@ Fill in the ConceptNameCodeSequence attribute with the supplied values.
 .BR dctopdf(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 

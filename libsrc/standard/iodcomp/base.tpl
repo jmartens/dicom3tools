@@ -21,6 +21,7 @@ CompositeIOD="CRImage"			Condition="CRImageInstance"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"				Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"					Usage="M"
 		Module="ContrastBolus"				Usage="C"	Condition="NeedModuleContrastBolus"
 		Module="DisplayShutter"				Usage="U"	Condition="NeedModuleDisplayShutter"
@@ -31,6 +32,7 @@ CompositeIOD="CRImage"			Condition="CRImageInstance"
 		Module="ModalityLUT"				Usage="U"	Condition="NeedModuleModalityLUT"
 		Module="VOILUT"						Usage="U"	Condition="NeedModuleVOILUT"
 		Module="SOPCommon"					Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="CheckSingleFramePseudo"		Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
@@ -60,6 +62,7 @@ CompositeIOD="CTImage"			Condition="CTImageInstance"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"				Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePlane"					Usage="M"
 		Module="ImagePixel"					Usage="M"
 		Module="ContrastBolus"				Usage="C"	Condition="NeedModuleContrastBolus"
@@ -69,6 +72,7 @@ CompositeIOD="CTImage"			Condition="CTImageInstance"
 		Module="OverlayPlane"				Usage="U"	Condition="NeedModuleOverlayPlane"
 		Module="VOILUT"						Usage="U"	Condition="NeedModuleVOILUT"
 		Module="SOPCommon"					Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="CheckSingleFramePseudo"		Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
@@ -98,6 +102,7 @@ CompositeIOD="MRImage"			Condition="MRImageInstance"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"				Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePlane"					Usage="M"
 		Module="ImagePixel"					Usage="M"
 		Module="ContrastBolus"				Usage="C"	Condition="NeedModuleContrastBolus"
@@ -107,6 +112,7 @@ CompositeIOD="MRImage"			Condition="MRImageInstance"
 		Module="OverlayPlane"				Usage="U"	Condition="NeedModuleOverlayPlane"
 		Module="VOILUT"						Usage="U"	Condition="NeedModuleVOILUT"
 		Module="SOPCommon"					Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="CheckSingleFramePseudo"		Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
@@ -137,6 +143,7 @@ CompositeIOD="NMImage"			Condition="NMImageInstance"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"				Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"					Usage="M"
 		Module="AcquisitionContext"			Usage="U"	Condition="NeedModuleAcquisitionContext"
 		Module="Device"						Usage="U"	Condition="NeedModuleDevice"
@@ -154,7 +161,9 @@ CompositeIOD="NMImage"			Condition="NMImageInstance"
 		Module="OverlayPlane"				Usage="U"	Condition="NeedModuleOverlayPlane"
 		Module="MultiFrameOverlay"			Usage="U"	Condition="NeedModuleMultiFrameOverlay"
 		Module="VOILUT"						Usage="U"	Condition="NeedModuleVOILUT"
+		Module="ICCProfile"					Usage="U"	Condition="NeedModuleICCProfile"
 		Module="SOPCommon"					Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="FrameExtraction"			Usage="C"	Condition="NeedModuleFrameExtraction"
 	InformationEntityEnd
 CompositeIODEnd
@@ -185,6 +194,7 @@ CompositeIOD="USImage"			Condition="USImageInstance"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"				Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"					Usage="M"
 		Module="ContrastBolus"				Usage="C"	Condition="NeedModuleContrastBolus"
 		Module="PaletteColorLookupTable"	Usage="C"	Condition="PhotometricInterpretationIsPaletteColor"
@@ -194,7 +204,9 @@ CompositeIOD="USImage"			Condition="USImageInstance"
 		Module="USImage"					Usage="M"
 		Module="OverlayPlane"				Usage="U"	Condition="NeedModuleOverlayPlane"
 		Module="VOILUT"						Usage="U"	Condition="NeedModuleVOILUT"
+		Module="ICCProfile"					Usage="U"	Condition="NeedModuleICCProfile"
 		Module="SOPCommon"					Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="CheckSingleFramePseudo"		Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
@@ -225,6 +237,7 @@ CompositeIOD="USMultiFrameImage"	Condition="USMultiFrameImageInstance"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"				Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"					Usage="M"
 		Module="ContrastBolus"				Usage="C"	Condition="NeedModuleContrastBolus"
 		Module="Cine"						Usage="M"
@@ -236,7 +249,9 @@ CompositeIOD="USMultiFrameImage"	Condition="USMultiFrameImageInstance"
 		Module="USRegionCalibration"		Usage="U"	Condition="NeedModuleUSRegionCalibration"
 		Module="USImage"					Usage="M"
 		Module="VOILUT"						Usage="U"	Condition="NeedModuleVOILUT"
+		Module="ICCProfile"					Usage="U"	Condition="NeedModuleICCProfile"
 		Module="SOPCommon"					Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="FrameExtraction"			Usage="C"	Condition="NeedModuleFrameExtraction"
 	InformationEntityEnd
 CompositeIODEnd
@@ -264,6 +279,7 @@ CompositeIOD="SCImage"			Condition="SCImageInstance"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"				Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"					Usage="M"
 		Module="Device"						Usage="U"	Condition="NeedModuleDevice"
 		Module="Specimen"					Usage="U"	Condition="NeedModuleSpecimen"
@@ -271,7 +287,9 @@ CompositeIOD="SCImage"			Condition="SCImageInstance"
 		Module="OverlayPlane"				Usage="U"	Condition="NeedModuleOverlayPlane"
 		Module="ModalityLUT"				Usage="U"	Condition="NeedModuleModalityLUT"
 		Module="VOILUT"						Usage="U"	Condition="NeedModuleVOILUT"
+		Module="ICCProfile"					Usage="U"	Condition="NeedModuleICCProfile"
 		Module="SOPCommon"					Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="CheckSingleFramePseudo"		Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
@@ -299,6 +317,7 @@ CompositeIOD="MultiframeSingleBitSCImage"			Condition="MultiframeSingleBitSCImag
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"						Usage="M"
+		Module="GeneralReference"					Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"							Usage="M"
 		Module="Cine"								Usage="C"	Condition="NeedModuleCineForSC"
 		Module="MultiFrame"							Usage="M"
@@ -309,6 +328,7 @@ CompositeIOD="MultiframeSingleBitSCImage"			Condition="MultiframeSingleBitSCImag
 		Module="SCMultiFrameImage"					Usage="M"
 		Module="SCMultiFrameVector"					Usage="C"	Condition="NumberOfFramesGreaterThanOne"
 		Module="SOPCommon"							Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="FrameExtraction"						Usage="C"	Condition="NeedModuleFrameExtraction"
 		Module="MultiframeSingleBitSCImagePseudo"	Usage="M"
 		# how to forbid presence of VOI LUT Module and Overlay Module :( ?
@@ -332,23 +352,32 @@ CompositeIOD="MultiframeGrayscaleByteSCImage"			Condition="MultiframeGrayscaleBy
 		Module="GeneralSeries"							Usage="M"
 		Module="ClinicalTrialSeries"					Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="FrameOfReference"						Usage="C"	Condition="PixelMeasuresOrPlanePositionOrPlaneOrientationSequenceIsPresent"
+		Module="Synchronization"						Usage="U"	Condition="NeedToCheckModuleSynchronization"
+	InformationEntityEnd
 	InformationEntity="Equipment"
 		Module="GeneralEquipment"						Usage="U"	Condition="NeedModuleGeneralEquipment"
 		Module="SCEquipment"							Usage="M"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"							Usage="M"
+		Module="GeneralReference"						Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"								Usage="M"
 		Module="Cine"									Usage="C"	Condition="NeedModuleCineForSC"
 		Module="MultiFrame"								Usage="M"
 		Module="FramePointers"							Usage="U"	Condition="NeedModuleFramePointers"
 		Module="Device"									Usage="U"	Condition="NeedModuleDevice"
+		Module="MultiFrameFunctionalGroupsCommon"		Usage="U"	Condition="MultiFrameFunctionalGroupsModuleIsPresent"
+		Module="MultiFrameFunctionalGroupsForMFSC"		Usage="U"	Condition="MultiFrameFunctionalGroupsModuleIsPresent"
+		Module="MultiFrameDimension"					Usage="U"	Condition="NeedModuleMultiFrameDimension"
 		Module="Specimen"								Usage="U"	Condition="NeedModuleSpecimen"
 		Module="SCImage"								Usage="U"
 		Module="SCMultiFrameImage"						Usage="M"
 		Module="SCMultiFrameVector"						Usage="C"	Condition="NumberOfFramesGreaterThanOne"
 		Module="VOILUT"									Usage="C"	Condition="NeedModuleVOILUT"
 		Module="SOPCommon"								Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="FrameExtraction"						Usage="C"	Condition="NeedModuleFrameExtraction"
 		Module="MultiframeGrayscaleByteSCImagePseudo"	Usage="M"
 		# how to forbid presence of Overlay Module :( ?
@@ -372,23 +401,32 @@ CompositeIOD="MultiframeGrayscaleWordSCImage"			Condition="MultiframeGrayscaleWo
 		Module="GeneralSeries"							Usage="M"
 		Module="ClinicalTrialSeries"					Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="FrameOfReference"						Usage="C"	Condition="PixelMeasuresOrPlanePositionOrPlaneOrientationSequenceIsPresent"
+		Module="Synchronization"						Usage="U"	Condition="NeedToCheckModuleSynchronization"
+	InformationEntityEnd
 	InformationEntity="Equipment"
 		Module="GeneralEquipment"						Usage="U"	Condition="NeedModuleGeneralEquipment"
 		Module="SCEquipment"							Usage="M"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"							Usage="M"
+		Module="GeneralReference"						Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"								Usage="M"
 		Module="Cine"									Usage="C"	Condition="NeedModuleCineForSC"
 		Module="MultiFrame"								Usage="M"
 		Module="FramePointers"							Usage="U"
 		Module="Device"									Usage="U"	Condition="NeedModuleDevice"
+		Module="MultiFrameFunctionalGroupsCommon"		Usage="U"	Condition="MultiFrameFunctionalGroupsModuleIsPresent"
+		Module="MultiFrameFunctionalGroupsForMFSC"		Usage="U"	Condition="MultiFrameFunctionalGroupsModuleIsPresent"
+		Module="MultiFrameDimension"					Usage="U"	Condition="NeedModuleMultiFrameDimension"
 		Module="Specimen"								Usage="U"	Condition="NeedModuleSpecimen"
 		Module="SCImage"								Usage="U"
 		Module="SCMultiFrameImage"						Usage="M"
 		Module="SCMultiFrameVector"						Usage="C"	Condition="NumberOfFramesGreaterThanOne"
 		Module="VOILUT"									Usage="C"	Condition="NeedModuleVOILUT"
 		Module="SOPCommon"								Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="FrameExtraction"						Usage="C"	Condition="NeedModuleFrameExtraction"
 		Module="MultiframeGrayscaleWordSCImagePseudo"	Usage="M"
 		# how to forbid presence of Overlay Module :( ?
@@ -412,22 +450,32 @@ CompositeIOD="MultiframeTrueColorSCImage"				Condition="MultiframeTrueColorSCIma
 		Module="GeneralSeries"							Usage="M"
 		Module="ClinicalTrialSeries"					Usage="U"	Condition="NeedModuleClinicalTrialSeries"
 	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="FrameOfReference"						Usage="C"	Condition="PixelMeasuresOrPlanePositionOrPlaneOrientationSequenceIsPresent"
+		Module="Synchronization"						Usage="U"	Condition="NeedToCheckModuleSynchronization"
+	InformationEntityEnd
 	InformationEntity="Equipment"
 		Module="GeneralEquipment"						Usage="U"	Condition="NeedModuleGeneralEquipment"
 		Module="SCEquipment"							Usage="M"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"							Usage="M"
+		Module="GeneralReference"						Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"								Usage="M"
 		Module="Cine"									Usage="C"	Condition="NeedModuleCineForSC"
 		Module="MultiFrame"								Usage="M"
 		Module="FramePointers"							Usage="U"
 		Module="Device"									Usage="U"	Condition="NeedModuleDevice"
+		Module="MultiFrameFunctionalGroupsCommon"		Usage="U"	Condition="MultiFrameFunctionalGroupsModuleIsPresent"
+		Module="MultiFrameFunctionalGroupsForMFSC"		Usage="U"	Condition="MultiFrameFunctionalGroupsModuleIsPresent"
+		Module="MultiFrameDimension"					Usage="U"	Condition="NeedModuleMultiFrameDimension"
 		Module="Specimen"								Usage="U"	Condition="NeedModuleSpecimen"
 		Module="SCImage"								Usage="U"
 		Module="SCMultiFrameImage"						Usage="M"
 		Module="SCMultiFrameVector"						Usage="C"	Condition="NumberOfFramesGreaterThanOne"
+		Module="ICCProfile"								Usage="U"	Condition="NeedModuleICCProfile"
 		Module="SOPCommon"								Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 		Module="FrameExtraction"						Usage="C"	Condition="NeedModuleFrameExtraction"
 		Module="MultiframeTrueColorSCImagePseudo"		Usage="M"
 		# how to forbid presence of VOI LUT Module and Overlay Module :( ?
@@ -570,6 +618,7 @@ CompositeIOD="Segmentation"				Condition="SegmentationInstance"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"									Usage="M"
+		Module="GeneralReference"								Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"										Usage="M"
 		Module="SegmentationImage"								Usage="M"
 		Module="CommonInstanceReference"						Usage="C"	Condition="DerivationImageFunctionalGroupPresent"
@@ -580,6 +629,40 @@ CompositeIOD="Segmentation"				Condition="SegmentationInstance"
 		Module="SOPCommon"										Usage="M"
 		Module="FrameExtraction"								Usage="C"	Condition="NeedModuleFrameExtraction"
 		# how to forbid presence of VOI LUT Module and Overlay Module :( ?
+	InformationEntityEnd
+CompositeIODEnd
+
+CompositeIOD="SurfaceSegmentation"				Condition="SurfaceSegmentationInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"					Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"								Usage="M"
+		Module="ClinicalTrialSubject"					Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd
+	InformationEntity="Study"
+		Module="GeneralStudy"							Usage="M"
+		Module="PatientStudy"							Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"						Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="GeneralSeries"							Usage="M"
+		Module="ClinicalTrialSeries"					Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+		Module="SegmentationSeries"						Usage="M"
+	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="FrameOfReference"						Usage="M"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"						Usage="M"
+		Module="EnhancedGeneralEquipment"				Usage="M"
+	InformationEntityEnd
+	InformationEntity="Surface"
+		Module="SurfaceSegmentation"					Usage="M"
+		Module="SurfaceMesh"							Usage="M"
+		Module="CommonInstanceReference"				Usage="C"	Condition="NeedModuleCommonInstanceReference"
+		Module="GeneralReference"						Usage="U"	Condition="NeedModuleGeneralReference"
+		Module="SOPCommon"								Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
 
@@ -610,6 +693,7 @@ CompositeIOD="SpatialRegistration"			Condition="SpatialRegistrationInstance"
 	InformationEntity="SpatialRegistration"
 		Module="SpatialRegistration"		Usage="M"
 		Module="CommonInstanceReference"	Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="SOPCommon"					Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
@@ -642,6 +726,7 @@ CompositeIOD="DeformableSpatialRegistration"			Condition="DeformableSpatialRegis
 	InformationEntity="SpatialRegistration"
 		Module="DeformableSpatialRegistration"	Usage="M"
 		Module="CommonInstanceReference"		Usage="M"
+		Module="GeneralReference"				Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="SOPCommon"						Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
@@ -670,6 +755,7 @@ CompositeIOD="SpatialFiducials"				Condition="SpatialFiducialsInstance"
 	InformationEntity="SpatialFiducials"
 		Module="SpatialFiducials"			Usage="M"
 		Module="CommonInstanceReference"	Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="SOPCommon"					Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
@@ -758,3 +844,96 @@ CompositeIOD="RealWorldValueMapping"				Condition="RealWorldValueMappingInstance
 	InformationEntityEnd
 CompositeIODEnd
 
+CompositeIOD="IVOCTImage"			Condition="IVOCTImageInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"									Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"												Usage="M"
+		Module="ClinicalTrialSubject"									Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd
+	InformationEntity="Study"
+		Module="GeneralStudy"											Usage="M"
+		Module="PatientStudy"											Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"										Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="GeneralSeries"											Usage="M"
+		Module="ClinicalTrialSeries"									Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+		Module="IntravascularOCTSeries"									Usage="M"	
+	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="FrameOfReference"										Usage="M"
+		Module="Synchronization"										Usage="M"	Condition="NeedToCheckModuleSynchronization"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"										Usage="M"
+		Module="EnhancedGeneralEquipment"								Usage="M"
+	InformationEntityEnd
+	InformationEntity="Image"
+		Module="ImagePixel"												Usage="M"
+		Module="SupplementalPaletteColorLUT"							Usage="C"	Condition="NeedModuleSupplementalPaletteColorLUT"
+		Module="EnhancedContrastBolus"									Usage="M"
+		Module="MultiFrameFunctionalGroupsCommon"						Usage="M"
+		Module="MultiFrameFunctionalGroupsForIVOCTImageForPresentation"	Usage="C"	Condition="PresentationIntentTypeIsForPresentation"
+		Module="MultiFrameFunctionalGroupsForIVOCTImageForProcessing"	Usage="C"	Condition="PresentationIntentTypeIsForProcessing"
+		Module="MultiFrameDimension"									Usage="M"
+		Module="AcquisitionContext"										Usage="M"
+		Module="CardiacSynchronization"									Usage="C"	Condition="NeedModuleCardiacSynchronization"
+		Module="IntravascularOCTImage"									Usage="M"
+		Module="IntravascularOCTAcquisitionParameters"					Usage="M"
+		Module="IntravascularOCTProcessingParameters"					Usage="C"	Condition="PresentationIntentTypeIsForProcessing"
+		Module="IntravascularImageAcquisitionParameters"				Usage="M"
+		Module="Device"													Usage="U"	Condition="NeedModuleDevice"
+		Module="SOPCommon"												Usage="M"
+		Module="CommonInstanceReference"								Usage="M"
+		Module="FrameExtraction"										Usage="C"	Condition="NeedModuleFrameExtraction"
+	InformationEntityEnd
+CompositeIODEnd
+
+CompositeIOD="ParametricMap" Condition="ParametricMapInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"									Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"												Usage="M"
+		Module="ClinicalTrialSubject"									Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd
+	InformationEntity="Study"
+		Module="GeneralStudy"											Usage="M"
+		Module="PatientStudy"											Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"										Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="GeneralSeries"											Usage="M"
+		Module="ParametricMapSeries"									Usage="M"
+		Module="ClinicalTrialSeries"									Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="FrameOfReference"										Usage="M"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"										Usage="M"
+		Module="EnhancedGeneralEquipment"								Usage="M"
+	InformationEntityEnd
+	InformationEntity="Image"
+		Module="GeneralImage"											Usage="M"
+		Module="GeneralReference"										Usage="U"	Condition="NeedModuleGeneralReference"
+		Module="ImagePixel"												Usage="C"	Condition="PixelDataPresent"
+		Module="FloatingPointImagePixel"								Usage="C"	Condition="FloatPixelDataPresent"
+		Module="DoubleFloatingPointImagePixel"							Usage="C"	Condition="DoubleFloatPixelDataPresent"
+		Module="ParametricMapImage"										Usage="M"
+		Module="MultiFrameFunctionalGroupsCommon"						Usage="M"
+		Module="MultiFrameFunctionalGroupsForParametricMap"				Usage="M"
+		Module="MultiFrameDimension"									Usage="M"
+		Module="CardiacSynchronization"									Usage="U"	Condition="NeedModuleCardiacSynchronization"
+		Module="RespiratorySynchronization"								Usage="U"	Condition="NeedModuleRespiratorySynchronization"
+		Module="BulkMotionSynchronization"								Usage="U"	Condition="NeedModuleBulkMotion"
+		Module="AcquisitionContext"										Usage="M"
+		Module="Device"													Usage="U"	Condition="NeedModuleDevice"
+		Module="Specimen"												Usage="U"	Condition="NeedModuleSpecimen"
+		Module="CommonInstanceReference"								Usage="C"	Condition="NeedModuleCommonInstanceReference"	# really should check if contained references are present :(
+		Module="SOPCommon"												Usage="M"
+		Module="FrameExtraction"										Usage="C"	Condition="NeedModuleFrameExtraction"
+	InformationEntityEnd
+CompositeIODEnd

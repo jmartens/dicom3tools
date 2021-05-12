@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrvrfy.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attr.h"
 #include "mesgtext.h"
 #include "elmdict.h"
@@ -49,7 +50,7 @@ Attribute::verifyDefinedTerms(char *(*method)(char *value),
 		}
 	}
 	else {
-		log << EMsgDC(TriedToVerifyDefinedTermsForNonStringAttribute)
+		log << EMsgDC(TriedToVerifyDefinedTermsForNonStringAttribute) << " "
 		    << MMsgDC(ForAttribute) << " <"
 		    << (dict ? dict->getDescription(getTag()) : "")
 		    << ">" << endl;
@@ -111,7 +112,7 @@ Attribute::verifyEnumValues(char *(*method)(char *value),
 		}
 	}
 	else {
-		log << EMsgDC(TriedToVerifyEnumeratedValueForNonStringAttribute)
+		log << EMsgDC(TriedToVerifyEnumeratedValueForNonStringAttribute) << " "
 		    << MMsgDC(ForAttribute) << " <"
 		    << (dict ? dict->getDescription(getTag()) : "")
 		    << ">" << endl;
@@ -172,7 +173,7 @@ Attribute::verifyEnumValues(char *(*method)(Uint16 value),
 		}
 	}
 	else {
-		log << EMsgDC(TriedToVerifyEnumeratedValueForNonNumericAttribute)
+		log << EMsgDC(TriedToVerifyEnumeratedValueForNonNumericAttribute) << " "
 		    << MMsgDC(ForAttribute) << " <"
 		    << (dict ? dict->getDescription(getTag()) : "")
 		    << ">" << endl;
@@ -227,7 +228,7 @@ Attribute::verifyBitMap(char *(*method)(Uint16 value),
 		}
 	}
 	else {
-		log << EMsgDC(TriedToVerifyBitMapForNonNumericAttribute)
+		log << EMsgDC(TriedToVerifyBitMapForNonNumericAttribute) << " "
 		    << MMsgDC(ForAttribute) << " <"
 		    << (dict ? dict->getDescription(getTag()) : "")
 		    << ">" << endl;
@@ -291,7 +292,7 @@ Attribute::verifyEnumValues(char *(*method)(Uint16 group,Uint16 element),
 		}
 	}
 	else {
-		log << EMsgDC(TriedToVerifyEnumeratedValueForNonTagAttribute)
+		log << EMsgDC(TriedToVerifyEnumeratedValueForNonTagAttribute) << " "
 		    << MMsgDC(ForAttribute) << " <"
 		    << (dict ? dict->getDescription(getTag()) : "")
 		    << ">" << endl;
@@ -340,7 +341,7 @@ Attribute::verifyNotZero(
 		}
 	}
 	else {
-		log << EMsgDC(TriedToVerifyNotZeroForNonNumericAttribute)
+		log << EMsgDC(TriedToVerifyNotZeroForNonNumericAttribute) << " "
 		    << MMsgDC(ForAttribute) << " <"
 		    << (dict ? dict->getDescription(getTag()) : "")
 		    << ">" << endl;
@@ -357,11 +358,17 @@ Attribute::verifyVR(const char *module,const char *element,
 {
 	Assert(dict);
 	Tag tag=getTag();
+	
+	if (tag.isPrivateTag()) {
+		// Since we do not have the owner context at this point, we cannot look it up in the p[rivate dictionary
+		// so just skip the test ... will only impact IODs that use private attributes, e.g., private IODs
+		return true;
+	}
 	const char *vrd=dict->getValueRepresentation(tag);
 	const char *vre=getVR();
 
 	if (!vrd) {
-		log << EMsgDC(NoSuchElementInDictionary);
+		log << EMsgDC(NoSuchElementInDictionary) << " ";
 		if (element) log << MMsgDC(Element) << "=<" << element << ">";
 		if (module)  log << MMsgDC(Module)  << "=<" << module  << ">";
 		log << endl;
@@ -405,15 +412,15 @@ bool
 Attribute::verifyVM(const char *module,const char *element,
 	TextOutputStream& log,
 	ElementDictionary *dict,
-	Uint16 multiplicityMin,Uint16 multiplicityMax,const char *specifiedSource) const
+	Uint32 multiplicityMin,Uint32 multiplicityMax,const char *specifiedSource) const
 {
 	Assert(dict);
 	Tag tag=getTag();
 	Uint16 vm=getVM();
 //log << "Attribute::verifyVM(): getVM() = " << vm << endl;
-	Uint16 dictmin=dict->getValueMultiplicityMinimum(tag);
-	Uint16 dictmax=dict->getValueMultiplicityMaximum(tag);
-	Uint16 errmin,errmax;
+	Uint32 dictmin=dict->getValueMultiplicityMinimum(tag);
+	Uint32 dictmax=dict->getValueMultiplicityMaximum(tag);
+	Uint32 errmin,errmax;
 	int err=0;
 	const char *source;
 	Assert(VMNONE == 0);

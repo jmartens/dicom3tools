@@ -1,3 +1,4 @@
+#  elmtojava_DicomDictionary_CreateTagList.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 # create Java from element dictionary template 
 
 NR==1	{

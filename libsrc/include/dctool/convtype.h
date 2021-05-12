@@ -1,3 +1,4 @@
+/* convtype.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_convtype__
 #define __Header_convtype__
 

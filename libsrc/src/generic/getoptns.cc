@@ -1,10 +1,25 @@
+static const char *CopyrightIdentifier(void) { return "@(#)getoptns.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>	// for cerr for version message
+#include <iomanip>
+#include <cctype>
+//#include <string>
+#else
+#include <iostream.h>	// for cerr for version message
 #include <iomanip.h>
 #include <ctype.h>
-#include <string.h>
+//#include <string.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 #include "getoptns.h"
 #include "mesgtext.h"
+#include "version.h"
+#include "platform.h"
 
 // many of the get and extract methods should be a template
 // but can't figure out how to have template functions declared within
@@ -203,6 +218,20 @@ GetNamedOptions::GetNamedOptions(int argc,const char *const *argv)
 	else {
 		int i;
 		for (i=0; i<argc_start; ++i) argv_used[i]=false;
+	}
+	
+	if (get("version")) {
+		cerr << "dicom3tools " << MMsgDC(Version) << ": " << dicom3tools_version_string << endl;
+		cerr << "dicom3tools " << MMsgDC(Platform) << ": " << dicom3tools_platform_string << endl;
+#ifdef __GNUC__
+		cerr << "dicom3tools " << MMsgDC(Preprocessor) << ": gcc cpp " << __GNUC__ << "." <<  __GNUC_MINOR__ << "." << __GNUC_PATCHLEVEL__ << endl;
+		cerr << "dicom3tools " << MMsgDC(Compiler) << ": gcc g++ " << __VERSION__ << endl;
+#endif
+		cerr << "dicom3tools " << MMsgDC(UIDRoot) << ": " << DEFAULTUIDROOT << endl;
+		// if there are other arguments, keep going (i.e., allow the invoker to do something), otherwise exit (i.e., so as to allow getting version and do nothing else)
+		if (argc_start <= 1) {
+			exit(0);
+		}
 	}
 }
 

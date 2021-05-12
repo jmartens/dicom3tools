@@ -1,9 +1,10 @@
-.TH DCINTRO 1 "10 Mar 2010" "DICOM PS3" "DICOM PS3 - Introduction and Options"
+.TH DCINTRO 1 "6 Mar 2014" "DICOM PS3" "DICOM PS3 - Introduction and Options"
 .SH NAME
 dcintro \- ACR/NEMA DICOM PS3 ... Introduction and options
 .SH SYNOPSIS
 .HP 10
 .B dcxxxx
+.so man1/gen.so
 .so man1/optin.so
 .so man1/optout.so
 .SH DESCRIPTION
@@ -265,6 +266,11 @@ changed at this point will have no effect on actual image pixel data
 transformations, and hence may be specified here to correct such
 attributes.
 .RE
+.TP
+.BI \-version
+.RS
+Print a version string to stderr, and exit if there are no other arguments.
+.RE
 .SH ENVIRONMENT
 .LP
 \ 
@@ -279,7 +285,7 @@ attributes.
 \ 
 .SH AUTHOR
 .LP
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 .LP
 Though redirection from a file on standard input should work, certain libraries give incorrect results, rather than actually failing with a seek error ... this has been observed with libg++ 2.7.0 and is a bit worrying. The use of standard input redirection has not been removed however, for use in those environments in which it does work.

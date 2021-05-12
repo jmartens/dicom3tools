@@ -146,9 +146,13 @@ StringValues="NMPhaseDescription" {
 	EXCRETION
 }
 
-StringValues="NMSliceProgressionDirection" {
+StringValues="CardiacSliceProgressionDirection" {
 	APEX_TO_BASE,
-	BASE_TO_APEX
+	BASE_TO_APEX,
+	ANT_TO_INF,
+	INF_TO_ANT,
+	SEPTUM_TO_WALL,
+	WALL_TO_SEPTUM
 }
 
 

@@ -1,9 +1,10 @@
-.TH DCCP 1 "22 January 2006" "DICOM PS3" "DICOM PS3 - Copy DICOM file"
+.TH DCCP 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Copy DICOM file"
 .SH NAME
 dccp \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Copy DICOM file
 .SH SYNOPSIS
 .HP 10
 .B dccp
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -12,6 +13,9 @@ dccp \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Copy DICOM file
 ]
 [
 .B \-removecommandgroup
+]
+[
+.B \-fixbaddecimalseparator
 ]
 [
 .B \-selectvoilutitem 0..n\-1
@@ -41,7 +45,7 @@ replaced, class and instance unique identifiers generated or removed,
 group lengths added, or private attributes removed, as specified by
 the replacement options described in dcintro(1). This allows pre-DICOM
 ACR-NEMA or SPI files to be converted to DICOM files containing
-conforming instances of SOP classes in a semi-automated manner. If the
+conforming instances of SOP classes in a semi-automated manner. If patient and study information is present (indicating a composite IOD), and the
 SOP Class can be automatically determined, such as for CT or MR images,
 specific SOP Class instances will be created, otherwise SC will be used.
 Unique study, series and instance identifiers will be generated from a
@@ -72,6 +76,12 @@ command group (0x0000) elements at the head of the dataset (e.g. if the both the
 and dataset network PDUs were saved to a file), since the command group elements will get
 inserted in fromt of the meta information header. Use this option to remove command group
 elements (whether or not a meta information header is added).
+.RE
+.TP
+.B \-fixbaddecimalseparator
+.RS
+Sometimes illegal DS VR values are encountered that use a Locale-specific decimal separator of "," (such as might be displayed in France, Italy, Brazil, etc.) rather
+than the period "." required by the standard; this option can be used to fix these.
 .RE
 .TP
 .B \-selectvoilutitem 0..n\-1
@@ -179,7 +189,7 @@ Keep only the selected VOI LUT Sequence Item, where the items are numbered from 
 .LP
 \ 
 .SH SEE ALSO
-.BR dcintro(1)
+.BR dcintro(1),dccreate(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

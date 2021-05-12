@@ -10,6 +10,7 @@ Module="DisplayedArea"
 		Sequence="ReferencedImageSequence"			Type="1C"	VM="1-n"	NoCondition=""	# realworld
 			InvokeMacro="ImageSOPInstanceReferenceMacro"
 		SequenceEnd
+		Name="PixelOriginInterpretation"			Type="1C"	Condition="VLWholeSlideMicroscopyImageInstance"	mbpo="true"	StringEnumValues="PixelOriginInterpretation"
 		Name="DisplayedAreaTopLeftHandCorner"		Type="1"
 		Name="DisplayedAreaBottomRightHandCorner"	Type="1"
 		Name="PresentationSizeMode"					Type="1"	StringEnumValues="PresentationSizeMode"
@@ -31,7 +32,7 @@ Module="GraphicAnnotation"
 			Name="UnformattedTextValue"						Type="1"
 			Name="BoundingBoxTopLeftHandCorner"				Type="1C"	Condition="BoundingBoxNeeded"
 			Name="BoundingBoxBottomRightHandCorner"			Type="1C"	Condition="BoundingBoxNeeded"
-			Name="BoundingBoxTextHorizontalJustification"	Type="1C"	Condition="BoundingBoxTopLeftHandCornerPresent"
+			Name="BoundingBoxTextHorizontalJustification"	Type="1C"	Condition="BoundingBoxTopLeftHandCornerPresent"	StringEnumValues="BoundingBoxTextHorizontalJustification"
 			Name="AnchorPoint"								Type="1C"	Condition="AnchorPointNeeded" mbpo="true"
 			Name="AnchorPointVisibility"					Type="1C"	Condition="AnchorPointPresent"	StringEnumValues="YesNoLetter"
 		SequenceEnd
@@ -138,13 +139,14 @@ Module="PresentationStateBlending"
 		SequenceEnd
 	SequenceEnd
 	Name="RelativeOpacity"								Type="1"
-	Sequence="ReferencedSpatialRegistrationSequence"	Type="3"	VM="0-n"
+	Sequence="ReferencedSpatialRegistrationSequence"	Type="3"	VM="1-n"
 		InvokeMacro="HierarchicalSOPInstanceReferenceMacro"
 	SequenceEnd
 ModuleEnd
 
 Module="ICCProfile"
 	Name="ICCProfile"											Type="1"
+	Name="ColorSpace"											Type="3"
 ModuleEnd
 
 DefineMacro="HangingProtocolSelectorAttributeContextMacro"
@@ -230,14 +232,18 @@ ModuleEnd
 Module="HangingProtocolEnvironment"
 	Name="NumberOfScreens"										Type="2"
 	Sequence="NominalScreenDefinitionSequence"					Type="2"	VM="0-n"
-		Name="NumberOfVerticalPixels"							Type="1"
-		Name="NumberOfHorizontalPixels"							Type="1"
-		Name="DisplayEnvironmentSpatialPosition"				Type="1"
-		Name="ScreenMinimumGrayscaleBitDepth"					Type="1C"	Condition="ScreenMinimumColorBitDepthNotPresent"
-		Name="ScreenMinimumColorBitDepth"						Type="1C"	Condition="ScreenMinimumGrayscaleBitDepthNotPresent"
-		Name="ApplicationMaximumRepaintTime"					Type="3"
+		InvokeMacro="ScreenSpecificationsMacro"
 	SequenceEnd
 ModuleEnd
+
+DefineMacro="ScreenSpecificationsMacro"
+	Name="NumberOfVerticalPixels"								Type="1"
+	Name="NumberOfHorizontalPixels"								Type="1"
+	Name="DisplayEnvironmentSpatialPosition"					Type="1"
+	Name="ScreenMinimumGrayscaleBitDepth"						Type="1C"	Condition="ScreenMinimumColorBitDepthNotPresent"
+	Name="ScreenMinimumColorBitDepth"							Type="1C"	Condition="ScreenMinimumGrayscaleBitDepthNotPresent"
+	Name="ApplicationMaximumRepaintTime"						Type="3"
+MacroEnd
 
 Module="HangingProtocolDisplay"
 	Sequence="DisplaySetsSequence"								Type="1"	VM="1-n"
@@ -248,7 +254,7 @@ Module="HangingProtocolDisplay"
 		Sequence="ImageBoxesSequence"							Type="1"	VM="1-n"	# is sometimes one, and sometimes more than one, depending on whether tiled :(
 			Name="ImageBoxNumber"								Type="1"
 			Name="DisplayEnvironmentSpatialPosition"			Type="1"
-			Name="ImageBoxLayoutType"							Type="1"	StringDefinedTerms="ImageBoxLayoutType"
+			Name="ImageBoxLayoutType"							Type="1"	StringDefinedTerms="ImageBoxLayoutTypeForHangingProtocol"
 			Name="ImageBoxTileHorizontalDimension"				Type="1C"	Condition="ImageBoxLayoutTypeIsTiled"
 			Name="ImageBoxTileVerticalDimension"				Type="1C"	Condition="ImageBoxLayoutTypeIsTiled"
 			Name="ImageBoxScrollDirection"						Type="1C"	Condition="ImageBoxLayoutTypeIsTiledAndMoreThanOneTile"	StringEnumValues="ImageBoxScrollDirection"
@@ -270,6 +276,7 @@ Module="HangingProtocolDisplay"
 			InvokeMacro="HangingProtocolSelectorAttributeValueMacro"
 			Name="SelectorValueNumber"							Type="1C"	Condition="SelectorAttributeAndFilterByOperatorPresent"
 			Name="FilterByOperator"								Type="1C"	Condition="SelectorAttributePresentAndFilterByAttributePresenceNotPresentOrFilterByCategoryPresent"	StringEnumValues="FilterByOperator"
+			Name="ImageSetSelectorUsageFlag"					Type="3"	StringEnumValues="ImageSetSelectorUsageFlag"
 		SequenceEnd
 		Sequence="SortingOperationsSequence"					Type="2"	VM="0-n"
 			Name="SelectorAttribute"							Type="1C"	Condition="SortByCategoryNotPresent"
@@ -297,7 +304,7 @@ Module="HangingProtocolDisplay"
 		Name="DisplaySetPresentationGroupDescription"			Type="3"
 	SequenceEnd
 	Name="PartialDataDisplayHandling"							Type="3"	StringEnumValues="PartialDataDisplayHandling"
-	Sequence="SynchronizedScrollingSequence"					Type="3"	VM="0-n"
+	Sequence="SynchronizedScrollingSequence"					Type="3"	VM="1-n"
 		Name="DisplaySetScrollingGroup"							Type="1"
 	SequenceEnd
 	Sequence="NavigationIndicatorSequence"						Type="3"	VM="1-n"
@@ -308,6 +315,75 @@ ModuleEnd
 
 Module="ColorPaletteDefinition"
 	InvokeMacro="ContentIdentificationMacro"
+ModuleEnd
+
+Module="StructuredDisplay"
+	InvokeMacro="ContentIdentificationMacro"
+	Name="PresentationCreationDate"								Type="1"
+	Name="PresentationCreationTime"								Type="1"
+	Name="NumberOfScreens"										Type="1"
+	Verify="NumberOfScreens"												BinaryEnumValues="One"	Condition="BasicStructuredDisplayInstance"
+	Sequence="NominalScreenDefinitionSequence"					Type="1"	VM="1-n"	# should check length is == NumberOfScreens, but no mechanism for that :(
+		InvokeMacro="ScreenSpecificationsMacro"
+	SequenceEnd
+	Sequence="IconImageSequence"								Type="3"	VM="1"
+		InvokeMacro="IconImageSequenceMacro"
+	SequenceEnd
+	Name="StructuredDisplayBackgroundCIELabValue"				Type="3"
+	Name="EmptyImageBoxCIELabValue"								Type="3"
+	Name="HangingProtocolName"									Type="3"
+	Name="HangingProtocolCreator"								Type="3"
+ModuleEnd
+
+Module="StructuredDisplayImageBox"
+	Sequence="StructuredDisplayImageBoxSequence"				Type="1"	VM="1-n"
+		Name="DisplayEnvironmentSpatialPosition"				Type="1"
+		Name="ImageBoxNumber"									Type="1"
+		Name="ImageBoxLayoutType"								Type="1"	StringDefinedTerms="ImageBoxLayoutTypeForStructuredDisplay"
+		Name="ImageBoxOverlapPriority"							Type="3"
+		Verify="ImageBoxOverlapPriority"									Condition="ImageBoxOverlapPriorityValueNot1To100"	ThenErrorMessage="Is not a positive integer in the range 1 to 100" ShowValueWithMessage="true"
+		Name="DisplaySetHorizontalJustification"				Type="3"	StringEnumValues="DisplaySetHorizontalJustification"
+		Name="DisplaySetVerticalJustification"					Type="3"	StringEnumValues="DisplaySetVerticalJustification"
+		Name="PreferredPlaybackSequencing"						Type="1C"	Condition="ImageBoxLayoutTypeIsCine"	BinaryEnumValues="PreferredPlaybackSequencingForStructuredDisplay"
+		Name="RecommendedDisplayFrameRate"						Type="1C"	Condition="ImageBoxLayoutTypeIsCineAndCineRelativeToRealTimeNotPresent"
+		Verify="RecommendedDisplayFrameRate"								Condition="RecommendedDisplayFrameRateNotGreaterThanZero"	ThenErrorMessage="Is not greater than 0" ShowValueWithMessage="true"
+		Name="CineRelativeToRealTime"							Type="1C"	Condition="ImageBoxLayoutTypeIsCineAndRecommendedDisplayFrameRateNotPresent"
+		Verify="CineRelativeToRealTime"										Condition="CineRelativeToRealTimeNotGreaterThanZero"	ThenErrorMessage="Is not greater than 0" ShowValueWithMessage="true"
+		Name="InitialCineRunState"								Type="1C"	Condition="ImageBoxLayoutTypeIsCine"	StringDefinedTerms="InitialCineRunState"
+		Name="StartTrim"										Type="2C"	Condition="ImageBoxLayoutTypeIsCine"
+		Name="StopTrim"											Type="2C"	Condition="ImageBoxLayoutTypeIsCine"
+		Sequence="ReferencedFirstFrameSequence"					Type="2C"	VM="0-1"	Condition="ImageBoxLayoutTypeIsStack"
+			InvokeMacro="ImageSOPInstanceReferenceMacro"
+		SequenceEnd
+		Sequence="ReferencedImageSequence"						Type="2C"	VM="0-n"	Condition="NoReferencedPresentationStateOrStereometricInstanceOrInstance"
+			InvokeMacro="ImageSOPInstanceReferenceMacro"
+			Sequence="ReferencedPresentationStateSequence"		Type="1C"	VM="1"		NoCondition=""
+				InvokeMacro="SOPInstanceReferenceMacro"
+			SequenceEnd
+		SequenceEnd
+		Sequence="ReferencedPresentationStateSequence"			Type="1C"	VM="1"		Condition="NoReferencedImageOrStereometricInstanceOrInstance"
+			InvokeMacro="SOPInstanceReferenceMacro"
+		SequenceEnd
+		Sequence="ReferencedInstanceSequence"					Type="1C"	VM="1"		Condition="NoReferencedPresentationStateOrStereometricInstanceOrImage"
+			InvokeMacro="SOPInstanceReferenceMacro"
+		SequenceEnd
+		Sequence="ReferencedStereometricInstanceSequence"		Type="1C"	VM="1"		Condition="NoReferencedPresentationStateOrInstanceOrImage"
+			InvokeMacro="SOPInstanceReferenceMacro"
+		SequenceEnd
+	SequenceEnd
+	Sequence="ImageBoxSynchronizationSequence"					Type="1C"	VM="1-n"	NoCondition=""
+		Name="SynchronizedImageBoxList"							Type="1"	VM="2-n"
+		Name="TypeOfSynchronization"							Type="1"				StringEnumValues="TypeOfSynchronizationBetweenImageBoxes"
+	SequenceEnd
+ModuleEnd
+
+Module="StructuredDisplayAnnotation"
+	Sequence="StructuredDisplayTextBoxSequence"					Type="1"	VM="1-n"
+		Name="UnformattedTextValue"								Type="1"
+		Name="DisplayEnvironmentSpatialPosition"				Type="1"
+		Name="BoundingBoxTextHorizontalJustification"			Type="1"				StringEnumValues="BoundingBoxTextHorizontalJustification"
+		Name="GraphicLayerRecommendedDisplayCIELabValue"		Type="3"
+	SequenceEnd
 ModuleEnd
 
 

@@ -1,9 +1,10 @@
-.TH DCDISP 1 "23 April 1999" "DICOM PS3" "DICOM PS3 - Display file on X window"
+.TH DCDISP 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Display file on X window"
 .SH NAME
 dcdisp \- ACR/NEMA DICOM PS3 ... Display file on X window
 .SH SYNOPSIS
 .HP 10
 .B dcdisp
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -191,7 +192,7 @@ Using ...
 .SH SEE ALSO
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 Only handles 8-16 bit monochrome, palette color, and rgb photometric interpretations (with color-by-pixel planar configuration) only.
 .LP

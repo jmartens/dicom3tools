@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)lutclass.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attr.h"
 #include "errclass.h"
 #include "lutclass.h"

@@ -23,23 +23,40 @@ DefineMacro="IconImageSequenceMacro"
 	Name="GreenPaletteColorLookupTableData"			Type="1C"	Condition="PhotometricInterpretationNeedsPalette"
 	Name="BluePaletteColorLookupTableData"			Type="1C"	Condition="PhotometricInterpretationNeedsPalette"
 	Name="ICCProfile"								Type="3"
+	Name="ColorSpace"								Type="3"
 MacroEnd
 
-DefineMacro="CodeSequenceMacro"
-	Name="CodeValue"						Type="1"
+DefineMacro="BasicCodeSequenceMacro"
+	Name="CodeValue"						Type="1C"	Condition="LongCodeValueAndURNCodeValueAbsent"
 	Verify="CodeValue"									Condition="CodeValueIllegalOrDeprecated"	ThenErrorMessage="Code Value is illegal or deprecated" ShowValueWithMessage="true"
-	Name="CodingSchemeDesignator"			Type="1"	StringDefinedTerms="MiscellaneousCodingSchemeDesignators"
+	Name="CodingSchemeDesignator"			Type="1C"	Condition="CodeValueOrLongCodeValuePresent"	StringDefinedTerms="MiscellaneousCodingSchemeDesignators"	mbpo="true"
 	Verify="CodingSchemeDesignator"						Condition="CodingSchemeDesignatorDeprecated"	ThenWarningMessage="Coding Scheme Designator is deprecated" ShowValueWithMessage="true"
 	Name="CodingSchemeVersion"				Type="1C"	Condition="CodingSchemeVersionRequired" mbpo="true"
 	Name="CodeMeaning"						Type="1"
 	Verify="CodeMeaning"								Condition="CodeMeaningIllegalOrDeprecated"	ThenErrorMessage="Code Meaning is illegal or deprecated" ShowValueWithMessage="true"
+	Name="LongCodeValue"					Type="1C"	Condition="CodeValueAndURNCodeValueAbsent"
+	Name="URNCodeValue"						Type="1C"	Condition="CodeValueAndLongCodeValueAbsent"
+MacroEnd
+
+DefineMacro="EnhancedCodeSequenceMacro"
 	Name="ContextIdentifier"				Type="3"
 	Name="ContextUID"						Type="3"
-	Name="MappingResource"					Type="1C"	Condition="ContextIdentifierIsPresent"
+	Name="MappingResource"					Type="1C"	Condition="ContextIdentifierIsPresent"		StringDefinedTerms="MappingResources"
+	Name="MappingResourceUID"				Type="3"	StringDefinedTerms="MappingResourceUIDs"
+	Name="MappingResourceName"				Type="3"	StringDefinedTerms="MappingResourceNames"
 	Name="ContextGroupVersion"				Type="1C"	Condition="ContextIdentifierIsPresent"
 	Name="ContextGroupExtensionFlag"		Type="3"	StringEnumValues="YesNoLetter"
 	Name="ContextGroupLocalVersion"			Type="1C"	Condition="ExtendedCodingScheme"
 	Name="ContextGroupExtensionCreatorUID"	Type="1C"	Condition="ExtendedCodingScheme"
+MacroEnd
+
+DefineMacro="CodeSequenceMacro"
+	InvokeMacro="BasicCodeSequenceMacro"
+	Sequence="EquivalentCodeSequence"		Type="3"	VM="1-n"
+		InvokeMacro="BasicCodeSequenceMacro"
+		InvokeMacro="EnhancedCodeSequenceMacro"
+	SequenceEnd
+	InvokeMacro="EnhancedCodeSequenceMacro"
 MacroEnd
 
 DefineMacro="CodeSequenceMeaningOptionalMacro"
@@ -103,21 +120,31 @@ DefineMacro="ContentItemMacro"
 		InvokeMacro="CodeSequenceMacro"
 	SequenceEnd
 	Name="NumericValue"						Type="1C"	Condition="ValueTypeIsNumeric"
+	Name="FloatingPointValue"				Type="1C"	NoCondition=""
+	Verify="FloatingPointValue"							Condition="FloatingPointValuePresentButValueTypeIsNotNumeric"	ThenErrorMessage="May only be present for NUMERIC ValueType"
+	Name="RationalNumeratorValue"			Type="1C"	NoCondition=""
+	Verify="RationalNumeratorValue"						Condition="RationalNumeratorValuePresentButValueTypeIsNotNumeric"	ThenErrorMessage="May only be present for NUMERIC ValueType"
+	Name="RationalDenominatorValue"			Type="1C"	Condition="RationalNumeratorValueIsPresent" NotZeroError=""
+	Verify="RationalDenominatorValue"					Condition="RationalDenominatorValueButValueTypeIsNotNumeric"	ThenErrorMessage="May only be present for NUMERIC ValueType"
 	Sequence="MeasurementUnitsCodeSequence"	Type="1C"	VM="1"	Condition="ValueTypeIsNumeric"
 		InvokeMacro="CodeSequenceMacro"
 	SequenceEnd
 	Sequence="ReferencedSOPSequence"		Type="1C"	VM="1"	Condition="ValueTypeIsCompositeOrImage"
 		InvokeMacro="SOPInstanceReferenceMacro"
-		Name="ReferencedFrameNumber"		Type="1C"	NoCondition=""	NotZeroError=""	# required if multi-frame image, does not apply to all, and ReferencedSegmentNumber not present; could check SOP Class :(
-		Name="ReferencedSegmentNumber"		Type="1C"	NoCondition=""	NotZeroError=""	# required if is segmentation, does not apply to all, and ReferencedFrameNumber not present; could check SOP Class :(
+		Name="ReferencedFrameNumber"		Type="1C"	NoCondition=""	NotZeroError=""	# cannot just check SOP Class and mbpo false, since may be absent for multi-frame if applies to all frames (including multi-frame SOP Class with only 1 frame) :(
+		Verify="ReferencedFrameNumber"					Condition="ReferencedFrameNumberPresentAndReferencedSOPClassUIDIsNotMultiFrame"	ThenErrorMessage="May not be present for Referenced SOP Class that is not multi-frame"
+		Name="ReferencedSegmentNumber"		Type="1C"	NoCondition=""	NotZeroError=""	# cannot just check SOP Class and mbpo false, since may be absent for segmentation if applies to all segments :(
+		Verify="ReferencedSegmentNumber"				Condition="ReferencedSegmentNumberPresentAndReferencedSOPClassUIDIsNotSegmentationOrSurfaceSegmentation"	ThenErrorMessage="May not be present for Referenced SOP Class that is not segmentation"
 		Verify="ReferencedSegmentNumber"				Condition="ReferencedFrameNumberAndReferencedSegmentNumberPresent"	ThenErrorMessage="May not be present when ReferencedFrameNumber is present"
-	SequenceEnd
+		SequenceEnd
 MacroEnd
 
 DefineMacro="ImageSOPInstanceReferenceMacro" InformationEntity="Image"
 	InvokeMacro="SOPInstanceReferenceMacro"
-	Name="ReferencedFrameNumber"					Type="1C"	NoCondition=""	NotZeroError=""	# could check SOP Class :(
-	Name="ReferencedSegmentNumber"					Type="1C"	NoCondition=""	NotZeroError=""	# could check SOP Class :(
+	Name="ReferencedFrameNumber"					Type="1C"	NoCondition=""	NotZeroError=""	# cannot just check SOP Class and mbpo false, since may be absent for multi-frame if applies to all frames (including multi-frame SOP Class with only 1 frame) :(
+	Verify="ReferencedFrameNumber"								Condition="ReferencedFrameNumberPresentAndReferencedSOPClassUIDIsNotMultiFrame"	ThenErrorMessage="May not be present for Referenced SOP Class that is not multi-frame"
+	Name="ReferencedSegmentNumber"					Type="1C"	NoCondition=""	NotZeroError=""	# cannot just check SOP Class and mbpo false, since may be absent for segmentation if applies to all segments :(
+	Verify="ReferencedSegmentNumber"							Condition="ReferencedSegmentNumberPresentAndReferencedSOPClassUIDIsNotSegmentationOrSurfaceSegmentation"	ThenErrorMessage="May not be present for Referenced SOP Class that is not segmentation"
 	Verify="ReferencedSegmentNumber"							Condition="ReferencedFrameNumberAndReferencedSegmentNumberPresent"	ThenErrorMessage="May not be present when ReferencedFrameNumber is present"
 MacroEnd
 
@@ -241,10 +268,16 @@ DefineMacro="ContentIdentificationMacro" InformationEntity="Instance"
 	Name="InstanceNumber"										Type="1"
 	Name="ContentLabel"											Type="1"
 	Name="ContentDescription"									Type="2"
+	Sequence="ConceptNameCodeSequence"							Type="3"	VM="1"
+		InvokeMacro="CodeSequenceMacro"
+	SequenceEnd
 	Sequence="AlternateContentDescriptionSequence"				Type="3"	VM="1-n"
 		Name="ContentDescription"								Type="1"
 		Sequence="LanguageCodeSequence"							Type="1"	VM="1"
 			InvokeMacro="CodeSequenceMacro"									DefinedContextID="5000"
+		SequenceEnd
+		Sequence="ConceptNameCodeSequence"						Type="3"	VM="1"
+			InvokeMacro="CodeSequenceMacro"
 		SequenceEnd
 	SequenceEnd
 	Name="ContentCreatorName"									Type="2"
@@ -275,6 +308,19 @@ DefineMacro="IssuerOfPatientIDMacro"
 			InvokeMacro="CodeSequenceMacro"
 		SequenceEnd
 	SequenceEnd
+MacroEnd
+
+DefineMacro="AlgorithmIdentificationMacro"
+	Sequence="AlgorithmFamilyCodeSequence"						Type="1"	VM="1"
+		InvokeMacro="CodeSequenceMacro"
+	SequenceEnd
+	Sequence="AlgorithmNameCodeSequence"						Type="3"	VM="1"
+		InvokeMacro="CodeSequenceMacro"
+	SequenceEnd
+	Name="AlgorithmName"										Type="1"
+	Name="AlgorithmVersion"										Type="1"
+	Name="AlgorithmParameters"									Type="3"
+	Name="AlgorithmSource"										Type="3"
 MacroEnd
 
 # no information entity specified for this macro, else screws up attributes that are otherwise at the Series entity level
@@ -312,7 +358,7 @@ DefineMacro="ContributingImageSourcesMacro" InformationEntity="Instance"
 	Name="Columns"											Type="1"	NotZeroError=""
 	Name="BitsStored"										Type="1"	NotZeroError=""
 	Name="LossyImageCompression"							Type="1"	StringEnumValues="LossyImageCompression"
-	Name="LossyImageCompressionRatio"						Type="1C"	Condition="LossyImageCompressionIs01"
+	Name="LossyImageCompressionRatio"						Type="1C"	Condition="LossyImageCompressionIs01"	NotZeroError=""
 	Name="LossyImageCompressionMethod"						Type="1C"	StringDefinedTerms="LossyImageCompressionMethod"	Condition="LossyImageCompressionIs01"
 MacroEnd
 
@@ -345,12 +391,65 @@ DefineMacro="PerformedProcedureStepSummaryMacro" InformationEntity="Series"
 	Name="CommentsOnThePerformedProcedureStep"				Type="3"
 MacroEnd
 
+DefineMacro="ExposureIndexMacro" InformationEntity="Frame"
+	Name="ExposureIndex"									Type="3"	NotZeroWarning=""
+	Name="TargetExposureIndex"								Type="3"	NotZeroWarning=""
+	Name="DeviationIndex"									Type="3"	NotZeroWarning=""
+MacroEnd
+
+DefineMacro="MandatoryViewAndSliceProgressionDirectionMacro" InformationEntity="Frame"
+	Sequence="ViewCodeSequence"								Type="1"	VM="1"
+		InvokeMacro="CodeSequenceMacro"						BaselineContextID="26"
+		Sequence="ViewModifierCodeSequence"					Type="2C"	VM="0-n"	NoCondition=""	# real-world - if needed to fully specify the view
+			InvokeMacro="ContentItemMacro"					BaselineContextID="23"
+		SequenceEnd
+	SequenceEnd
+	Name="SliceProgressionDirection"						Type="1C"	StringEnumValues="CardiacSliceProgressionDirection"	Condition="ViewIsCardiacShortOrLongAxis"	mbpo="true"
+MacroEnd
+
+DefineMacro="OptionalViewAndSliceProgressionDirectionMacro" InformationEntity="Frame"
+	Sequence="ViewCodeSequence"								Type="3"	VM="1"
+		InvokeMacro="CodeSequenceMacro"						BaselineContextID="26"
+		Sequence="ViewModifierCodeSequence"					Type="3"	VM="1-n"
+			InvokeMacro="ContentItemMacro"					BaselineContextID="23"
+		SequenceEnd
+	SequenceEnd
+	Name="SliceProgressionDirection"						Type="3"	StringEnumValues="CardiacSliceProgressionDirection"
+MacroEnd
+
+DefineMacro="RTEquipmentCorrelationMacro" InformationEntity="Image"
+	Name="PatientSupportAngle"								Type="3"
+	Name="TableTopPitchAngle"								Type="3"
+	Name="TableTopRollAngle"								Type="3"
+	Name="TableTopLongitudinalPosition"						Type="3"
+	Name="TableTopLateralPosition"							Type="3"
+MacroEnd
+
+DefineMacro="PatientGroupMacro" InformationEntity="Patient"
+	Sequence="SourcePatientGroupIdentificationSequence"		Type="3"	VM="1"
+		Name="PatientID"									Type="1"
+		InvokeMacro="IssuerOfPatientIDMacro"
+	SequenceEnd
+	Sequence="GroupOfPatientsIdentificationSequence"		Type="3"	VM="1-n"
+		Name="PatientID"									Type="1"
+		InvokeMacro="IssuerOfPatientIDMacro"
+		Name="SubjectRelativePositionInImage"				Type="3"
+		Name="PatientPosition"								Type="3"
+	SequenceEnd
+MacroEnd
+
+DefineMacro="UDIMacro" InformationEntity="Equipment"
+	Name="UniqueDeviceIdentifier"							Type="1"
+	Name="DeviceDescription"								Type="3"
+MacroEnd
+
 Module="Patient"
 	Name="PatientName"						Type="2"
 	Name="PatientID"						Type="2"
 	InvokeMacro="IssuerOfPatientIDMacro"
 	Name="PatientBirthDate"					Type="2"
 	Name="PatientSex"						Type="2"	StringEnumValues="Sex"
+	Name="QualityControlSubject"			Type="3"	StringEnumValues="YesNoFull"
 	Sequence="ReferencedPatientSequence"	Type="3"	VM="1"
 		InvokeMacro="SOPInstanceReferenceMacro"
 	SequenceEnd
@@ -378,6 +477,19 @@ Module="Patient"
 			InvokeMacro="CodeSequenceMacro"
 		SequenceEnd
 	SequenceEnd
+	Name="StrainDescription"						Type="3"
+	Name="StrainNomenclature"						Type="3"
+	Sequence="StrainCodeSequence"					Type="3"	VM="1-n"
+		InvokeMacro="CodeSequenceMacro"
+	SequenceEnd
+	Name="StrainAdditionalInformation"				Type="3"
+	Sequence="StrainStockSequence"					Type="3"	VM="1"
+		Name="StrainStockNumber"					Type="1"
+		Name="StrainSource"							Type="1"
+		Sequence="StrainSourceRegistryCodeSequence"	Type="1"	VM="1"
+			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
+	SequenceEnd
 	Name="ResponsiblePerson"				Type="2C"	Condition="IsAnimal" mbpo="true"
 	Name="ResponsiblePersonRole"			Type="1C"	Condition="ResponsiblePersonIsPresentWithValue"	StringDefinedTerms="ResponsiblePersonRole"
 	Name="ResponsibleOrganization"			Type="2C"	Condition="IsAnimal" mbpo="true"
@@ -386,6 +498,7 @@ Module="Patient"
 	Sequence="DeidentificationMethodCodeSequence"	Type="1C"	VM="1-n"	Condition="PatientIdentityRemovedAndNotDeidentificationMethod" mbpo="true"
 		InvokeMacro="CodeSequenceMacro"					DefinedContextID="7050"
 	SequenceEnd
+	InvokeMacro="PatientGroupMacro"
 ModuleEnd
 
 Module="ClinicalTrialSubject"
@@ -426,7 +539,7 @@ Module="GeneralStudy"
 	Sequence="RequestingServiceCodeSequence"				Type="3"	VM="1"
 		InvokeMacro="CodeSequenceMacro"						DefinedContextID="7030"
 	SequenceEnd
-	Sequence="ReferencedStudySequence"						Type="3"	VM="0-n"
+	Sequence="ReferencedStudySequence"						Type="3"	VM="1-n"
 		InvokeMacro="SOPInstanceReferenceMacro"
 	SequenceEnd
 	Sequence="ProcedureCodeSequence"						Type="3"	VM="1-n"
@@ -496,10 +609,10 @@ Module="GeneralSeries"
 	Sequence="OperatorIdentificationSequence"				Type="3"	VM="1-n"
 		InvokeMacro="PersonIdentificationMacro"
 	SequenceEnd
-	Sequence="ReferencedPerformedProcedureStepSequence"		Type="3"	VM="0-1"
+	Sequence="ReferencedPerformedProcedureStepSequence"		Type="3"	VM="1"
 		InvokeMacro="SOPInstanceReferenceMacro"
 	SequenceEnd
-	Sequence="RelatedSeriesSequence"						Type="3"	VM="0-n"
+	Sequence="RelatedSeriesSequence"						Type="3"	VM="1-n"
 		Name="StudyInstanceUID"								Type="1"
 		Name="SeriesInstanceUID"							Type="1"
 		Sequence="PurposeOfReferenceCodeSequence"			Type="2"	VM="0-n"
@@ -528,7 +641,7 @@ ModuleEnd
 
 Module="EnhancedSeries"
 	Name="SeriesNumber"										Type="1"
-	Sequence="ReferencedPerformedProcedureStepSequence"		Type="1C"	VM="1"	NoCondition=""
+	Sequence="ReferencedPerformedProcedureStepSequence"		Type="1C"	VM="1"	Condition="SeriesNeedReferencedPerformedProcedureStepSequence"
 		InvokeMacro="SOPInstanceReferenceMacro"
 	SequenceEnd
 ModuleEnd
@@ -548,11 +661,14 @@ Module="GeneralEquipment"
 	Name="DeviceSerialNumber"								Type="3"
 	Name="SoftwareVersions"									Type="3"
 	Name="GantryID"											Type="3"
+	Sequence="UDISequence"									Type="3"	VM="1-n"
+		InvokeMacro="UDIMacro"
+	SequenceEnd
 	Name="SpatialResolution"								Type="3"
 	Name="DateOfLastCalibration"							Type="3"
 	Name="TimeOfLastCalibration"							Type="3"
 	Name="PixelPaddingValue"								Type="1C"	Condition="PixelPaddingRangeLimitIsPresent" mbpo="true"
-	Verify="PixelPaddingValue"											Condition="PixelPaddingValueIsPresentAndInstanceIsNotAnImage"	ThenErrorMessage="May not be present when not an image"
+	Verify="PixelPaddingValue"											Condition="PixelPaddingValueIsPresentAndInstanceIsNotAnImage"	ThenErrorMessage="May not be present when not an integer pixel data image"
 ModuleEnd
 
 Module="EnhancedGeneralEquipment"
@@ -560,6 +676,39 @@ Module="EnhancedGeneralEquipment"
 	Name="ManufacturerModelName"							Type="1"
 	Name="DeviceSerialNumber"								Type="1"
 	Name="SoftwareVersions"									Type="1"
+ModuleEnd
+
+Module="GeneralReference"
+	Sequence="ReferencedImageSequence"						Type="3"	VM="1-n"
+		InvokeMacro="ImageSOPInstanceReferenceMacro"
+		Sequence="PurposeOfReferenceCodeSequence"			Type="3"	VM="1"
+			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
+	SequenceEnd
+	Sequence="ReferencedInstanceSequence"					Type="3"	VM="1-n"
+		InvokeMacro="SOPInstanceReferenceMacro"
+		Sequence="PurposeOfReferenceCodeSequence"			Type="1"	VM="1"
+ 			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
+	SequenceEnd
+	Name="DerivationDescription"							Type="3"
+	Sequence="DerivationCodeSequence"						Type="3"	VM="1-n"
+		InvokeMacro="CodeSequenceMacro"
+	SequenceEnd
+	Sequence="SourceImageSequence"							Type="3"	VM="1-n"
+		InvokeMacro="ImageSOPInstanceReferenceMacro"
+		Sequence="PurposeOfReferenceCodeSequence"			Type="3"	VM="1"
+			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
+		Name="SpatialLocationsPreserved"					Type="3"	StringEnumValues="YesNoReorientedOnly"
+		Name="PatientOrientation"							Type="1C"	Condition="SpatialLocationsPreservedReorientedOnly"
+	SequenceEnd
+	Sequence="SourceInstanceSequence"						Type="3"	VM="1-n"	NoCondition=""
+		InvokeMacro="SOPInstanceReferenceMacro"
+		Sequence="PurposeOfReferenceCodeSequence"			Type="3"	VM="1"
+			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
+	SequenceEnd
 ModuleEnd
 
 Module="GeneralImage"
@@ -574,30 +723,6 @@ Module="GeneralImage"
 	Name="AcquisitionDate"									Type="3"
 	Name="AcquisitionTime"									Type="3"
 	Name="AcquisitionDateTime"								Type="3"
-	Sequence="ReferencedImageSequence"						Type="3"	VM="1-n"
-		InvokeMacro="ImageSOPInstanceReferenceMacro"
-		Sequence="PurposeOfReferenceCodeSequence"			Type="3"	VM="1"
-			InvokeMacro="CodeSequenceMacro"
-		SequenceEnd
-	SequenceEnd
-	Name="DerivationDescription"							Type="3"
-	Sequence="DerivationCodeSequence"						Type="3"	VM="1-n"
-		InvokeMacro="CodeSequenceMacro"
-	SequenceEnd
-	Sequence="SourceImageSequence"							Type="3"	VM="0-n"
-		InvokeMacro="ImageSOPInstanceReferenceMacro"
-		Sequence="PurposeOfReferenceCodeSequence"			Type="3"	VM="1"
-			InvokeMacro="CodeSequenceMacro"
-		SequenceEnd
-		Name="SpatialLocationsPreserved"					Type="3"	StringEnumValues="YesNoReorientedOnly"
-		Name="PatientOrientation"							Type="1C"	Condition="SpatialLocationsPreservedReorientedOnly"
-	SequenceEnd
-	Sequence="ReferencedInstanceSequence"					Type="3"	VM="1-n"
-		InvokeMacro="SOPInstanceReferenceMacro"
-		Sequence="PurposeOfReferenceCodeSequence"			Type="1"	VM="1"
- 			InvokeMacro="CodeSequenceMacro"
-		SequenceEnd
-	SequenceEnd
 	Name="ImagesInAcquisition"								Type="3"
 	Name="ImageComments"									Type="3"
 	Name="QualityControlImage"								Type="3"	StringEnumValues="YesNoFull"
@@ -615,6 +740,9 @@ Module="GeneralImage"
 	Verify="PresentationLUTShape"							Condition="PhotometricInterpretationIsMonochrome2"			StringEnumValues="IdentityPresentationLUTShape"
 	Verify="PresentationLUTShape"							Condition="PhotometricInterpretationIsColor"				StringEnumValues="IdentityPresentationLUTShape"
 	Name="IrradiationEventUID"								Type="3"
+	Sequence="RealWorldValueMappingSequence"				Type="3"	VM="1-n"
+		InvokeMacro="RealWorldValueMappingItemMacro"
+	SequenceEnd
 ModuleEnd
 
 Module="ImagePlane"
@@ -632,11 +760,13 @@ DefineMacro="ImagePixelMacro" InformationEntity="Instance"
 	Verify="SamplesPerPixel"						Condition="MPEG2TransferSyntaxAndNotThreeSamples"		ThenErrorMessage="May only be 3 for MPEG Transfer Syntax"
 	
 	Name="PhotometricInterpretation"				Type="1"	StringDefinedTerms="PhotometricInterpretation"
-	Verify="PhotometricInterpretation"				Condition="JPEGTransferSyntaxAndThreeSamples"			StringEnumValues="PhotometricInterpretationYBRFull422"
+	Verify="PhotometricInterpretation"				Condition="JPEGLossyTransferSyntaxAndThreeSamples"			StringEnumValues="PhotometricInterpretationYBRFull422"
+	Verify="PhotometricInterpretation"				Condition="JPEGLosslessTransferSyntaxAndThreeSamples"		StringEnumValues="PhotometricInterpretationYBRFullOrRGBorYBR_RCT"
 	Verify="PhotometricInterpretation"				Condition="JPEG2000LosslessTransferSyntaxAndThreeSamples"	StringEnumValues="PhotometricInterpretationYBRRCT"
-	Verify="PhotometricInterpretation"				Condition="JPEG2000TransferSyntaxAndThreeSamples"		StringEnumValues="PhotometricInterpretationYBRRCTOrICT"
-	Verify="PhotometricInterpretation"				Condition="MPEG2TransferSyntax"							StringEnumValues="PhotometricInterpretationYBRPartial420"	# regardless of number of samples (required to be 3 by PS 3.5)
-	Verify="PhotometricInterpretation"				Condition="RLETransferSyntaxAndThreeSamples"			StringEnumValues="PhotometricInterpretationYBRFullOrRGBorYBR_RCTorYBR_ICT"
+	Verify="PhotometricInterpretation"				Condition="JPEG2000TransferSyntaxAndThreeSamples"			StringEnumValues="PhotometricInterpretationYBRRCTOrICT"
+	Verify="PhotometricInterpretation"				Condition="MPEG2TransferSyntax"								StringEnumValues="PhotometricInterpretationYBRPartial420"	# regardless of number of samples (required to be 3 by PS 3.5)
+	Verify="PhotometricInterpretation"				Condition="RLETransferSyntaxAndThreeSamples"				StringEnumValues="PhotometricInterpretationYBRFullOrRGBorYBR_RCTorYBR_ICT"
+	Verify="PhotometricInterpretation"				Condition="UncompressedTransferSyntaxAndThreeSamples"		StringEnumValues="PhotometricInterpretationYBRFullOrRGBorYBR_RCTorYBR_ICT"
 	
 	Name="Rows"										Type="1"	NotZeroError=""
 	Verify="Rows"									Condition="MPEG2MPMLTransferSyntaxAndRowsGreaterThan480NTSCOr576PAL"	ThenErrorMessage="Must be <= 480 (NTSC) or 576 (PAL) for MPEG MP@MLTransfer Syntax"
@@ -651,7 +781,7 @@ DefineMacro="ImagePixelMacro" InformationEntity="Instance"
 	Verify="BitsAllocated"							Condition="MPEG2TransferSyntaxAndNotBitsAllocated8"		ThenErrorMessage="May only be 8 for MPEG Transfer Syntax"
 	
 	Name="BitsStored"								Type="1"	NotZeroError=""
-	Verify="BitsAllocated"							Condition="MPEG2TransferSyntaxAndNotBitsStored8"		ThenErrorMessage="May only be 8 for MPEG Transfer Syntax"
+	Verify="BitsStored"								Condition="MPEG2TransferSyntaxAndNotBitsStored8"		ThenErrorMessage="May only be 8 for MPEG Transfer Syntax"
 	
 	Name="HighBit"									Type="1"
 	Verify="HighBit"								Condition="MPEG2TransferSyntaxAndNotHighBit7"		ThenErrorMessage="May only be 7 for MPEG Transfer Syntax"
@@ -684,7 +814,60 @@ DefineMacro="ImagePixelMacro" InformationEntity="Instance"
 	Name="GreenPaletteColorLookupTableData"			Type="1C"	Condition="ImagePixelMacroNeedsPaletteDescriptorAndNotSegmentedLegallyPresentInPaletteColorModule"
 	Name="BluePaletteColorLookupTableData"			Type="1C"	Condition="ImagePixelMacroNeedsPaletteDescriptorAndNotSegmentedLegallyPresentInPaletteColorModule"
 	Name="ICCProfile"								Type="3"
+	Name="ColorSpace"								Type="3"
 MacroEnd
+
+Module="FloatingPointImagePixel"
+	Name="SamplesPerPixel"							Type="1"	BinaryEnumValues="One"
+	Name="PhotometricInterpretation"				Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
+	Name="Rows"										Type="1"	NotZeroError=""
+	Name="Columns"									Type="1"	NotZeroError=""
+	Name="BitsAllocated"							Type="1"	BinaryEnumValues="BitsAre32"
+	Verify="BitsStored"								Condition="BitsStoredPresent"			ThenErrorMessage="May not be present for Float Pixel Data"
+	Verify="HighBit"								Condition="HighBitPresent"				ThenErrorMessage="May not be present for Float Pixel Data"
+	Verify="PixelRepresentation"					Condition="PixelRepresentationPresent"	ThenErrorMessage="May not be present for Float Pixel Data"
+	Verify="PlanarConfiguration"					Condition="PlanarConfigurationPresent"	ThenErrorMessage="May not be present for Float Pixel Data"
+
+	Name="FloatPixelData"							Type="1"
+
+	# PixelAspectRatio required if the image plane module not applicable and the aspect ratio is not 1:1
+	Name="PixelAspectRatio"							Type="1C"	NoCondition=""	# "if ! image plane module present && not 1:1" ... too hard for now :(
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenPixelSpacingPresent"					ThenErrorMessage="May not be present when Pixel Spacing is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenImagerPixelSpacingPresent"			ThenErrorMessage="May not be present when Imager Pixel Spacing is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenNominalScannedPixelSpacingPresent"	ThenErrorMessage="May not be present when Nominal Scanned Pixel Spacing is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenSharedPixelMeasuresMacro"			ThenErrorMessage="May not be present when Pixel Measures Macro is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenPerFramePixelMeasuresMacro"			ThenErrorMessage="May not be present when Pixel Measures Macro is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenMPEG2MPHLTransferSyntax"				ThenErrorMessage="May not be present for MPEG MP@HLTransfer Syntax"
+
+	Name="FloatPixelPaddingValue"					Type="3"
+	Name="FloatPixelPaddingRangeLimit"				Type="1C"	Condition="FloatPixelPaddingValuePresent"
+ModuleEnd
+
+Module="DoubleFloatingPointImagePixel"
+	Name="SamplesPerPixel"							Type="1"	BinaryEnumValues="One"
+	Name="PhotometricInterpretation"				Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
+	Name="Rows"										Type="1"	NotZeroError=""
+	Name="Columns"									Type="1"	NotZeroError=""
+	Name="BitsAllocated"							Type="1"	BinaryEnumValues="BitsAre64"
+	Verify="BitsStored"								Condition="BitsStoredPresent"			ThenErrorMessage="May not be present for Float Pixel Data"
+	Verify="HighBit"								Condition="HighBitPresent"				ThenErrorMessage="May not be present for Float Pixel Data"
+	Verify="PixelRepresentation"					Condition="PixelRepresentationPresent"	ThenErrorMessage="May not be present for Float Pixel Data"
+	Verify="PlanarConfiguration"					Condition="PlanarConfigurationPresent"	ThenErrorMessage="May not be present for Float Pixel Data"
+
+	Name="DoubleFloatPixelData"						Type="1"
+
+	# PixelAspectRatio required if the image plane module not applicable and the aspect ratio is not 1:1
+	Name="PixelAspectRatio"							Type="1C"	NoCondition=""	# "if ! image plane module present && not 1:1" ... too hard for now :(
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenPixelSpacingPresent"					ThenErrorMessage="May not be present when Pixel Spacing is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenImagerPixelSpacingPresent"			ThenErrorMessage="May not be present when Imager Pixel Spacing is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenNominalScannedPixelSpacingPresent"	ThenErrorMessage="May not be present when Nominal Scanned Pixel Spacing is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenSharedPixelMeasuresMacro"			ThenErrorMessage="May not be present when Pixel Measures Macro is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenPerFramePixelMeasuresMacro"			ThenErrorMessage="May not be present when Pixel Measures Macro is present"
+	Verify="PixelAspectRatio"									Condition="UnwantedPixelAspectRatioWhenMPEG2MPHLTransferSyntax"				ThenErrorMessage="May not be present for MPEG MP@HLTransfer Syntax"
+
+	Name="DoubleFloatPixelPaddingValue"				Type="3"
+	Name="DoubleFloatPixelPaddingRangeLimit"		Type="1C"	Condition="DoubleFloatPixelPaddingValuePresent"
+ModuleEnd
 
 Module="ImagePixel"
 	InvokeMacro="ImagePixelMacro"
@@ -726,6 +909,7 @@ Module="EnhancedContrastBolus"
 		SequenceEnd
 		Name="ContrastBolusVolume"							Type="2"
 		Name="ContrastBolusIngredientConcentration"			Type="2"
+		Name="ContrastBolusIngredientPercentByVolume"		Type="3"
 		Name="ContrastBolusIngredientOpaque"				Type="3"	StringEnumValues="YesNoFull"
 		Sequence="ContrastAdministrationProfileSequence"	Type="3"	VM="1-n"
 			Name="ContrastBolusVolume"						Type="2"
@@ -759,7 +943,7 @@ Module="Cine"
 	Name="ImageTriggerDelay"				Type="3"
 	Name="EffectiveDuration"				Type="3"
 	Name="ActualFrameDuration"				Type="3"
-	Sequence="MultiplexedAudioChannelsDescriptionCodeSequence"	Type="3"	VM="0-n"
+	Sequence="MultiplexedAudioChannelsDescriptionCodeSequence"	Type="3"	VM="1-n"
 		Name="ChannelIdentificationCode"	Type="1"
 		Name="ChannelMode"					Type="1"
 		Sequence="ChannelSourceSequence"	Type="1"	VM="1"
@@ -771,6 +955,7 @@ ModuleEnd
 Module="MultiFrame"
 	Name="NumberOfFrames"					Type="1"	NotZeroError=""
 	Name="FrameIncrementPointer"			Type="1C"	Condition="NotSCMultiFrameOrNumberOfFramesGreaterThanOne"
+	Name="StereoPairsPresent"				Type="3"	StringEnumValues="YesNoFull"
 ModuleEnd
 
 Module="MultiFrameFunctionalGroupsCommon"
@@ -779,6 +964,7 @@ Module="MultiFrameFunctionalGroupsCommon"
 	Name="ContentDate"							Type="1"
 	Name="ContentTime"							Type="1"
 	Name="NumberOfFrames"						Type="1"	NotZeroError=""
+	Name="StereoPairsPresent"					Type="3"	StringEnumValues="YesNoFull"
 	Name="ConcatenationFrameOffsetNumber"		Type="1C"	Condition="ConcatenationUIDIsPresent"
 	Name="RepresentativeFrameNumber"			Type="3"	NotZeroError=""
 	Name="ConcatenationUID"						Type="1C"	NoCondition=""	# real world
@@ -789,23 +975,27 @@ ModuleEnd
 
 DefineMacro="PixelMeasuresMacro" InformationEntity="FunctionalGroup"
 	Sequence="PixelMeasuresSequence"		Type="1"	VM="1"
-		Name="PixelSpacing"					Type="1C"	NotZeroError=""	NoCondition="" mbpo="true" # VolumetricPropertiesIsOtherThanDistoredOrSampled ...
-		Name="SliceThickness"				Type="1C"	NotZeroError=""	NoCondition="" mbpo="true" # ../../EnhancedMRImageModule[MRImageDescriptionMacro]/VolumetricPropertiesIsVolumeOrSampled ...
+		Name="PixelSpacing"					Type="1C"	NotZeroError=""	Condition="PixelSpacingNotPresentInEitherSharedOrPerFrameFunctionalGroupsAndVolumetricPropertiesIsNotDistortedSampledOrSegmentationWithFrameOfReference" mbpo="true"
+		Name="SliceThickness"				Type="1C"	NotZeroError=""	Condition="SliceThicknessNotPresentInEitherSharedOrPerFrameFunctionalGroupsAndVolumetricPropertiesIsVolumeOrSampledOrSegmentationWithFrameOfReference" mbpo="true"
+		Name="SpacingBetweenSlices"			Type="3"	NotZeroError=""
 	SequenceEnd
 MacroEnd
 
 DefineMacro="FrameContentMacro" InformationEntity="FunctionalGroup"
 	Sequence="FrameContentSequence"				Type="1"	VM="1"
 		Name="FrameAcquisitionNumber"			Type="3"
-		Name="FrameReferenceDateTime"			Type="1C"	NoCondition="" mbpo="true" # ../../[SharedFunctionalGroupsSequence|PerFrameFunctionalGroupsSequence]MRImageFrameTypeMacro/FrameType is ORIGINAL
-		Name="FrameAcquisitionDateTime"			Type="1C"	NoCondition="" mbpo="true"
-		Name="FrameAcquisitionDuration"			Type="1C"	NoCondition="" mbpo="true"
+		Name="FrameReferenceDateTime"			Type="1C"	Condition="ImageTypeValue1OriginalOrMixedAndNotLegacyConverted" mbpo="true" # approximates (../../[SharedFunctionalGroupsSequence or PerFrameFunctionalGroupsSequence item for this frame]MRImageFrameTypeMacro/FrameType is ORIGINAL) and not legacy CT, MR or PET ... too hard :(
+		Name="FrameAcquisitionDateTime"			Type="1C"	Condition="ImageTypeValue1OriginalOrMixedAndNotLegacyConverted" mbpo="true" # approximates (../../[SharedFunctionalGroupsSequence or PerFrameFunctionalGroupsSequence item for this frame]MRImageFrameTypeMacro/FrameType is ORIGINAL) and not legacy CT, MR or PET ... too hard :(
+		Name="FrameAcquisitionDuration"			Type="1C"	Condition="ImageTypeValue1OriginalOrMixedAndNotLegacyConverted" mbpo="true" NotZeroWarning=""	# approximates (../../[SharedFunctionalGroupsSequence or PerFrameFunctionalGroupsSequence item for this frame]MRImageFrameTypeMacro/FrameType is ORIGINAL) and not legacy CT, MR or PET ... too hard :(
 		Name="CardiacCyclePosition"				Type="3"	StringDefinedTerms="CardiacCyclePosition"
 		Name="RespiratoryCyclePosition"			Type="3"	StringDefinedTerms="RespiratoryCyclePosition"
-		Name="DimensionIndexValues"				Type="1C"	NoCondition=""	# too hard DimensionIndexSequenceNotEmpty
+		Name="DimensionIndexValues"				Type="1C"	Condition="DimensionIndexSequencePresent"
+		Verify="DimensionIndexValues"						Condition="DimensionIndexValuesContainsZero"	ThenErrorMessage="Must start from one, not zero"
 		Name="TemporalPositionIndex"			Type="1C"	Condition="EnhancedPETImageInstance" mbpo="true"
+		Verify="TemporalPositionIndex"						Condition="TemporalPositionIndexIsZero"	ThenErrorMessage="Must start from one, not zero"
 		Name="StackID"							Type="1C"	Condition="EnhancedPETImageInstance" mbpo="true"
 		Name="InStackPositionNumber"			Type="1C"	Condition="StackIDIsPresent"
+		Verify="InStackPositionNumber"						Condition="InStackPositionNumberIsZero"	ThenErrorMessage="Must start from one, not zero"
 		Name="FrameComments"					Type="3"
 		Name="FrameLabel"						Type="3"
 	SequenceEnd
@@ -813,20 +1003,20 @@ MacroEnd
 
 DefineMacro="PlanePositionMacro" InformationEntity="FunctionalGroup"
 	Sequence="PlanePositionSequence"			Type="1"	VM="1"
-		Name="ImagePositionPatient"				Type="1C"	NoCondition="" mbpo="true" 
+		Name="ImagePositionPatient"				Type="1C"	Condition="ImagePositionPatientNotPresentInEitherSharedOrPerFrameFunctionalGroupsAndEitherFrameTypeIsOriginalAndVolumetricPropertiesIsNotDistortedOrSegmentationWithFrameOfReference" mbpo="true"
 	SequenceEnd
 MacroEnd
 
 DefineMacro="PlaneOrientationMacro" InformationEntity="FunctionalGroup"
 	Sequence="PlaneOrientationSequence"			Type="1"	VM="1"
-		Name="ImageOrientationPatient"			Type="1C"	NoCondition="" mbpo="true" 
+		Name="ImageOrientationPatient"			Type="1C"		Condition="ImageOrientationPatientNotPresentInEitherSharedOrPerFrameFunctionalGroupsAndEitherFrameTypeIsOriginalAndVolumetricPropertiesIsNotDistortedOrSegmentationWithFrameOfReference" mbpo="true"
 	SequenceEnd
 MacroEnd
 
 DefineMacro="ReferencedImageMacro" InformationEntity="FunctionalGroup"
 	Sequence="ReferencedImageSequence"				Type="2"	VM="0-n"
 		InvokeMacro="ImageSOPInstanceReferenceMacro"
-		Sequence="PurposeOfReferenceCodeSequence"	Type="1"	VM="1"
+		Sequence="PurposeOfReferenceCodeSequence"	Type="1C"	VM="1"	Condition="NotLegacyConvertedCTOrMROrPET" mbpo="true"
 			InvokeMacro="CodeSequenceMacro"
 		SequenceEnd
 	SequenceEnd
@@ -835,12 +1025,12 @@ MacroEnd
 DefineMacro="DerivationImageMacro" InformationEntity="FunctionalGroup"
 	Sequence="DerivationImageSequence"					Type="2"	VM="0-n"
 		Name="DerivationDescription"					Type="3" 
-		Sequence="DerivationCodeSequence"				Type="1"	VM="1-n"
+		Sequence="DerivationCodeSequence"				Type="1C"	VM="1-n"	Condition="NotLegacyConvertedCTOrMROrPET" mbpo="true"
 			InvokeMacro="CodeSequenceMacro"
 		SequenceEnd
 		Sequence="SourceImageSequence"					Type="2"	VM="0-n"
 			InvokeMacro="ImageSOPInstanceReferenceMacro"
-			Sequence="PurposeOfReferenceCodeSequence"	Type="1"	VM="1"
+			Sequence="PurposeOfReferenceCodeSequence"	Type="1C"	VM="1"	Condition="NotLegacyConvertedCTOrMROrPET" mbpo="true"
 				InvokeMacro="CodeSequenceMacro"
 			SequenceEnd
 		SequenceEnd
@@ -881,6 +1071,7 @@ DefineMacro="FrameVOILUTMacro" InformationEntity="FunctionalGroup"
 	Sequence="FrameVOILUTSequence"				Type="1"	VM="1"
 		Name="WindowCenter"						Type="1"
 		Name="WindowWidth"						Type="1"	NotZeroError=""
+		Verify="WindowWidth"								Condition="WindowWidthIsNegative"	ThenErrorMessage="Not permitted to be negative" ShowValueWithMessage="true"
 		Name="WindowCenterWidthExplanation"		Type="3"
 		Verify="WindowCenterWidthExplanation"	Type="1C"	StringDefinedTerms="EnhancedCTWindowCenterWidthExplanation"	Condition="ModalityIsCT"
 		Name="VOILUTFunction"					Type="3"	StringDefinedTerms="VOILUTFunction"
@@ -889,16 +1080,25 @@ MacroEnd
 
 DefineMacro="RealWorldValueMappingMacro" InformationEntity="FunctionalGroup"
 	Sequence="RealWorldValueMappingSequence"		Type="1"	VM="1-n"
-		Name="RealWorldValueFirstValueMapped"		Type="1" 
-		Name="RealWorldValueLastValueMapped"		Type="1" 
-		Name="RealWorldValueIntercept"				Type="1C" 	Condition="RealWorldValueLUTDataNotPresent"
-		Name="RealWorldValueSlope"					Type="1C" 	Condition="RealWorldValueLUTDataNotPresent"
-		Name="RealWorldValueLUTData"				Type="1C" 	Condition="RealWorldValueInterceptNotPresent"
-		Name="LUTExplanation"						Type="1" 
-		Name="LUTLabel"								Type="1" 
-		Sequence="MeasurementUnitsCodeSequence"		Type="1"	VM="1"
-			InvokeMacro="CodeSequenceMacro"						DefinedContextID="82"
-		SequenceEnd
+		InvokeMacro="RealWorldValueMappingItemMacro"
+	SequenceEnd
+MacroEnd
+
+DefineMacro="RealWorldValueMappingItemMacro" InformationEntity="FunctionalGroup"
+	Name="RealWorldValueFirstValueMapped"				Type="1C" 	Condition="NeedRealWorldValueFirstValueMapped"
+	Name="RealWorldValueLastValueMapped"				Type="1C" 	Condition="NeedRealWorldValueLastValueMapped"
+	Name="DoubleFloatRealWorldValueFirstValueMapped"	Type="1C" 	Condition="NeedDoubleFloatRealWorldValueFirstValueMapped"
+	Name="DoubleFloatRealWorldValueLastValueMapped"		Type="1C" 	Condition="NeedDoubleFloatRealWorldValueLastValueMapped"
+	Name="RealWorldValueIntercept"				Type="1C" 	Condition="NeedRealWorldValueSlopeAndIntercept"
+	Name="RealWorldValueSlope"					Type="1C" 	Condition="NeedRealWorldValueSlopeAndIntercept"
+	Name="RealWorldValueLUTData"				Type="1C" 	Condition="RealWorldValueInterceptNotPresent"
+	Name="LUTExplanation"						Type="1" 
+	Name="LUTLabel"								Type="1" 
+	Sequence="MeasurementUnitsCodeSequence"		Type="1"	VM="1"
+		InvokeMacro="CodeSequenceMacro"						DefinedContextID="7181"
+	SequenceEnd
+	Sequence="QuantityDefinitionSequence"		Type="3"	VM="1-n"
+		InvokeMacro="ContentItemMacro"
 	SequenceEnd
 MacroEnd
 
@@ -973,11 +1173,14 @@ DefineMacro="PatientPhysiologicalStateMacro" InformationEntity="FunctionalGroup"
 MacroEnd
 
 Module="MultiFrameDimension"
-	Sequence="DimensionOrganizationSequence"	Type="2"	VM="0-n"
+	Sequence="DimensionOrganizationSequence"	Type="1"	VM="1-n"
 		Name="DimensionOrganizationUID"			Type="1" 
 	SequenceEnd
-	Sequence="DimensionIndexSequence"			Type="2"	VM="0-n"
+	Name="DimensionOrganizationType"			Type="3"	StringDefinedTerms="DimensionOrganizationType"
+	Sequence="DimensionIndexSequence"			Type="1"	VM="1-n"
 		Name="DimensionIndexPointer"			Type="1"
+		Verify="DimensionIndexPointer"						Condition="DimensionIndexPointerIsFrameContentSequence"	ThenErrorMessage="May not be FrameContentSequence"
+		Verify="DimensionIndexPointer"						Condition="DimensionIndexPointerIsDimensionIndexValues"	ThenErrorMessage="May not be DimensionIndexValues"
 		Name="DimensionIndexPrivateCreator"		Type="1C"	NoCondition="" # too hard to check
 		Name="FunctionalGroupPointer"			Type="1C"	Condition="DimensionIndexPointerIsNotFunctionalGroup"
 		Name="FunctionalGroupPrivateCreator"	Type="1C"	NoCondition="" # too hard to check
@@ -1032,7 +1235,7 @@ Module="SupplementalPaletteColorLUT"
 	Name="BluePaletteColorLookupTableData"			Type="1"
 ModuleEnd
 
-Module="PaletteColorLookupTable"
+DefineMacro="PaletteColorLookupTableMacro"
 	Name="RedPaletteColorLookupTableDescriptor"			Type="1"
 	Verify="RedPaletteColorLookupTableDescriptor"					Condition="NotColorPaletteInstance"	ValueSelector="2"	BinaryEnumValues="BitsAre16"
 	Verify="RedPaletteColorLookupTableDescriptor"					Condition="ColorPaletteInstance"	ValueSelector="2"	BinaryEnumValues="BitsAre8"
@@ -1049,6 +1252,10 @@ Module="PaletteColorLookupTable"
 	Name="SegmentedRedPaletteColorLookupTableData"		Type="1C"	Condition="NeedsSegmentedLookupTableData"
 	Name="SegmentedGreenPaletteColorLookupTableData"	Type="1C"	Condition="NeedsSegmentedLookupTableData"
 	Name="SegmentedBluePaletteColorLookupTableData"		Type="1C"	Condition="NeedsSegmentedLookupTableData"
+MacroEnd
+
+Module="PaletteColorLookupTable"
+	InvokeMacro="PaletteColorLookupTableMacro"
 ModuleEnd
 
 Module="PatientOrientation"
@@ -1101,6 +1308,7 @@ Module="CRImage"
 	Name="RelativeXRayExposure"						Type="3"	NotZeroWarning=""
 	Name="Sensitivity"								Type="3"	NotZeroWarning=""
 	InvokeMacro="GeneralAnatomyOptionalMacro"
+	InvokeMacro="ExposureIndexMacro"
 ModuleEnd
 
 Module="CTImage"
@@ -1109,10 +1317,13 @@ Module="CTImage"
 	Name="SamplesPerPixel"				Type="1"	BinaryEnumValues="SamplesPerPixelIsOne"
 	Name="PhotometricInterpretation"	Type="1"	StringEnumValues="PhotometricInterpretationMonochrome"
 	Name="BitsAllocated"				Type="1"	BinaryEnumValues="BitsAre16"
-	Name="BitsStored"					Type="1"	BinaryEnumValues="BitsAre12Or16"
-	Name="HighBit"						Type="1"	BinaryEnumValues="BitsAre11Or15"
+	Name="BitsStored"					Type="1"	BinaryEnumValues="BitsAre12To16"
+	Name="HighBit"						Type="1"	BinaryEnumValues="BitsAre11To15"
 	Name="RescaleIntercept"				Type="1"
 	Name="RescaleSlope"					Type="1"	NotZeroError=""
+	Name="RescaleType"					Type="1C"	Condition="RescaleTypeIsPresentAndNotHU"	StringDefinedTerms="RescaleTypeHounsfieldUnits" mbpo="true"
+	Verify="RescaleType"							Condition="RescaleTypeIsPresentAndNotHUAndImageIsOriginalNotLocalizer" ThenErrorMessage="If RescaleType is present, must be HU for ORIGINAL non-LOCALIZER images"
+	Verify="RescaleType"							Condition="RescaleTypeIsPresentAndIsHUAndImageIsOriginalLocalizer"   ThenWarningMessage="If RescaleType is present, should not be HU for ORIGINAL LOCALIZER images"
 	Name="KVP"							Type="2"	NotZeroWarning=""
 	Name="AcquisitionNumber"			Type="2"
 	Name="ScanOptions"					Type="3"
@@ -1152,6 +1363,7 @@ Module="CTImage"
 		InvokeMacro="CodeSequenceMacro"				DefinedContextID="4052"
 	SequenceEnd
 	InvokeMacro="GeneralAnatomyOptionalMacro"
+	InvokeMacro="OptionalViewAndSliceProgressionDirectionMacro"
 	Name="CalciumScoringMassFactorPatient"		Type="3"	NotZeroWarning=""
 	Name="CalciumScoringMassFactorDevice"		Type="3"	NotZeroWarning=""
 	Name="EnergyWeightingFactor"				Type="1C"	Condition="MultiEnergyProportionalWeighting" mbpo="true"
@@ -1165,6 +1377,8 @@ Module="CTImage"
 		Name="ExposureInmAs"					Type="3"	NotZeroWarning=""
 		Name="EnergyWeightingFactor"			Type="1C"	NotZeroWarning=""	Condition="EnergyWeightingFactorPresentInRoot" mbpo="true"	# delegate condition since hard otherwise; same result
 	SequenceEnd
+	Name="IsocenterPosition"					Type="3"
+	InvokeMacro="RTEquipmentCorrelationMacro"
 ModuleEnd
 
 Module="MRImage"
@@ -1218,6 +1432,9 @@ Module="MRImage"
 	Name="NumberOfTemporalPositions"	Type="3"
 	Name="TemporalResolution"			Type="3"
 	InvokeMacro="GeneralAnatomyOptionalMacro"
+	InvokeMacro="OptionalViewAndSliceProgressionDirectionMacro"
+	Name="IsocenterPosition"			Type="3"
+	Name="B1rms"						Type="3"
 ModuleEnd
 
 Module="NMPETPatientOrientation"
@@ -1314,8 +1531,8 @@ Module="NMImage"
 	Name="ScanLength"						Type="2C"	Condition="ImageTypeValue3WholeBody"
 	Name="TriggerSourceOrType"   			Type="3"	StringDefinedTerms="EKG"
 	InvokeMacro="GeneralAnatomyOptionalMacro"
-	Sequence="ReferencedImageRealWorldValueMappingSequence"		Type="3"	VM="1-n"
-		InvokeMacro="RealWorldValueMappingMacro"
+	Sequence="RealWorldValueMappingSequence"		Type="3"	VM="1-n"
+		InvokeMacro="RealWorldValueMappingItemMacro"
 	SequenceEnd
 ModuleEnd
 	
@@ -1349,7 +1566,7 @@ Module="NMIsotope"
 			InvokeMacro="CodeSequenceMeaningOptionalMacro"		BaselineContextID="25"
 	    SequenceEnd
 	SequenceEnd
-	Sequence="InterventionDrugInformationSequence"   	Type="3"	VM="0-n"
+	Sequence="InterventionDrugInformationSequence"   	Type="3"	VM="1-n"
 		Name="InterventionDrugName"						Type="3"
 		Sequence="InterventionDrugCodeSequence"   		Type="3"	VM="1"
 			InvokeMacro="CodeSequenceMeaningOptionalMacro"		BaselineContextID="10"
@@ -1446,7 +1663,7 @@ Module="NMReconstruction"
 	Name="ConvolutionKernel"			Type="3"
 	Name="SliceThickness"				Type="2"	NotZeroWarning=""
 	Name="SliceLocation"				Type="3"
-	Name="SliceProgressionDirection"	Type="3"	StringEnumValues="NMSliceProgressionDirection"
+	Name="SliceProgressionDirection"	Type="3"	StringEnumValues="CardiacSliceProgressionDirection"
 ModuleEnd
 
 Module="USRegionCalibration"
@@ -1532,12 +1749,7 @@ Module="USImage"
 	Name="EventElapsedTimes"						Type="3"
 	Name="EventTimerNames"							Type="3"
 	InvokeMacro="GeneralAnatomyOptionalMacro"
-	Sequence="ViewCodeSequence"						Type="3"	VM="1"
-		InvokeMacro="CodeSequenceMacro"
-		Sequence="ViewModifierCodeSequence"			Type="3"	VM="0-n"
-			InvokeMacro="CodeSequenceMacro"
-		SequenceEnd
-	SequenceEnd
+	InvokeMacro="OptionalViewAndSliceProgressionDirectionMacro"
 	Name="AcquisitionDateTime"						Type="1C"	Condition="ModalityIsIVUS" mbpo="true"
 	Name="TriggerTime"								Type="3"
 	Name="NominalInterval"							Type="3"
@@ -1582,18 +1794,18 @@ Module="SCImage"
 	Name="TimeOfSecondaryCapture"						Type="3"
 	Name="NominalScannedPixelSpacing"					Type="3"	NotZeroError=""
 	InvokeMacro="BasicPixelSpacingCalibrationMacro"
+	InvokeMacro="OptionalViewAndSliceProgressionDirectionMacro"
 ModuleEnd
 
 Module="SCMultiFrameImage"
-
 	Name="BurnedInAnnotation"							Type="1"	StringEnumValues="YesNoFull"
 	Name="RecognizableVisualFeatures"					Type="3"	StringEnumValues="YesNoFull"
 	Name="PresentationLUTShape"							Type="1C"	StringEnumValues="SecondaryCapturePresentationLUTShape"	Condition="MonochromeNotBitmapPhotometricInterpretation"
 	Name="Illumination"									Type="3"
 	Name="ReflectedAmbientLight"						Type="3"
-	Name="RescaleIntercept"								Type="1C"	BinaryEnumValues="Zero"				Condition="MonochromeNotBitmapPhotometricInterpretation"
-	Name="RescaleSlope"									Type="1C"	BinaryEnumValues="One"				Condition="MonochromeNotBitmapPhotometricInterpretation"
-	Name="RescaleType"									Type="1C"	StringEnumValues="RescaleTypeUnspecified"	Condition="MonochromeNotBitmapPhotometricInterpretation"
+	Name="RescaleIntercept"								Type="1C"	Condition="MonochromeNotBitmapPhotometricInterpretation"
+	Name="RescaleSlope"									Type="1C"	Condition="MonochromeNotBitmapPhotometricInterpretation"
+	Name="RescaleType"									Type="1C"	StringDefinedTerms="RescaleTypeUnspecified"	Condition="MonochromeNotBitmapPhotometricInterpretation"
 	Name="FrameIncrementPointer"						Type="1C"	Condition="NumberOfFramesGreaterThanOne"
 	Name="NominalScannedPixelSpacing"					Type="1C"	Condition="ConversionTypeDigitizedFilm"	mbpo="true" NotZeroError=""
 	Verify="NominalScannedPixelSpacing"								Condition="NominalScannedPixelSpacingPresentAndConversionTypeNotDigitizedFilmScannedDocumentScannedImage" ThenErrorMessage="May not be present unless ConversionType is DF, SD or SI"
@@ -1610,6 +1822,19 @@ Module="SCMultiFrameVector"
 	Name="FrameSecondaryAngleVector"					Type="1C"	Condition="FrameIncrementPointerContainsFrameSecondaryAngleVector"
 	Name="SliceLocationVector"							Type="1C"	Condition="FrameIncrementPointerContainsSliceLocationVector"
 	Name="DisplayWindowLabelVector"						Type="1C"	Condition="FrameIncrementPointerContainsDisplayWindowLabelVector"
+ModuleEnd
+
+Module="MultiFrameFunctionalGroupsForMFSC"
+	Sequence="SharedFunctionalGroupsSequence"	Type="1"	VM="1"
+		InvokeMacro="PixelMeasuresMacro"		Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequenceAndPlanePositionSequenceOrPlaneOrientationSequencePresent"
+		InvokeMacro="PlanePositionMacro"		Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequenceAndPixelMeasuresSequenceOrPlaneOrientationSequencePresent"
+		InvokeMacro="PlaneOrientationMacro"		Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequenceAndPixelMeasuresSequenceOrPlanePositionSequencePresent"
+	SequenceEnd
+	Sequence="PerFrameFunctionalGroupsSequence"	Type="1"	VM="1-n"
+		InvokeMacro="PixelMeasuresMacro"		Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequenceAndPlanePositionSequenceOrPlaneOrientationSequencePresent"
+		InvokeMacro="PlanePositionMacro"		Condition="PlanePositionSequenceNotInSharedFunctionalGroupSequenceAndPixelMeasuresSequenceOrPlaneOrientationSequencePresent"
+		InvokeMacro="PlaneOrientationMacro"		Condition="PlaneOrientationSequenceNotInSharedFunctionalGroupSequenceAndPixelMeasuresSequenceOrPlanePositionSequencePresent"
+	SequenceEnd
 ModuleEnd
 
 Module="OverlayIdentification"
@@ -1651,11 +1876,11 @@ Module="CurveIdentification"
 		Name="ReferencedSOPClassUID"					Type="1"
 		Name="ReferencedSOPInstanceUID"					Type="1"
 	SequenceEnd
-	Sequence="ReferencedOverlaySequence"				Type="3"	VM="0-n"
+	Sequence="ReferencedOverlaySequence"				Type="3"	VM="1-n"
 		Name="ReferencedSOPClassUID"					Type="1"
 		Name="ReferencedSOPInstanceUID"					Type="1"
 	SequenceEnd
-	Sequence="ReferencedCurveSequence"					Type="3"	VM="0-n"
+	Sequence="ReferencedCurveSequence"					Type="3"	VM="1-n"
 		Name="ReferencedSOPClassUID"					Type="1"
 		Name="ReferencedSOPInstanceUID"					Type="1"
 	SequenceEnd
@@ -1726,6 +1951,7 @@ DefineMacro="VOILUTMacro"	InformationEntity="Frame"
 	SequenceEnd
 	Name="WindowCenter"									Type="1C"	Condition="MonochromeAndVOILUTSequenceNotPresent" mbpo="true"
 	Name="WindowWidth"									Type="1C"	Condition="WindowCenterPresent"	NotZeroError=""
+	Verify="WindowWidth"											Condition="WindowWidthIsNegative"	ThenErrorMessage="Not permitted to be negative" ShowValueWithMessage="true"
 	Name="WindowCenterWidthExplanation"					Type="3"
 	Name="VOILUTFunction"								Type="3"	StringDefinedTerms="VOILUTFunction"
 	Verify="PhotometricInterpretation"					Condition="PhotometricInterpretationIsGrayscaleOrAbsent"	ElseWarningMessage="VOI LUT Module (Window Center and Width) not appropriate for non-grayscale images" ShowValueWithMessage="true"
@@ -1771,6 +1997,7 @@ Module="SOPCommon"
 	Name="SpecificCharacterSet"							Type="1C"	NoCondition=""	StringDefinedTerms="SpecificCharacterSet"
 	Name="InstanceCreationDate"							Type="3"
 	Name="InstanceCreationTime"							Type="3"
+	Name="InstanceCoercionDateTime"						Type="3"
 	Name="InstanceCreatorUID"							Type="3"
 	Name="RelatedGeneralSOPClassUID"					Type="3"
 	Name="OriginalSpecializedSOPClassUID"				Type="3"
@@ -1783,6 +2010,7 @@ Module="SOPCommon"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsC4"				StringEnumValues="CodingSchemeUIDForC4"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsC5"				StringEnumValues="CodingSchemeUIDForC5"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsCD2"				StringEnumValues="CodingSchemeUIDForCD2"
+		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsCTV3"			StringEnumValues="CodingSchemeUIDForCTV3"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsDCM"				StringEnumValues="CodingSchemeUIDForDCM"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsDCMUID"			StringEnumValues="CodingSchemeUIDForDCMUID"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsHPC"				StringEnumValues="CodingSchemeUIDForHPC"
@@ -1797,6 +2025,7 @@ Module="SOPCommon"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsPOS"				StringEnumValues="CodingSchemeUIDForPOS"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsRFC3066"			StringEnumValues="CodingSchemeUIDForRFC3066"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsSNM3"			StringEnumValues="CodingSchemeUIDForSNM3"
+		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsSCT"				StringEnumValues="CodingSchemeUIDForSCT"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsSRT"				StringEnumValues="CodingSchemeUIDForSRT"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsUCUM"			StringEnumValues="CodingSchemeUIDForUCUM"
 		Verify="CodingSchemeUID"						Condition="CodingSchemeDesignatorIsUMLS"			StringEnumValues="CodingSchemeUIDForUMLS"
@@ -1805,6 +2034,17 @@ Module="SOPCommon"
 		Name="CodingSchemeName"							Type="3"
 		Name="CodingSchemeVersion"						Type="3"
 		Name="CodingSchemeResponsibleOrganization"		Type="3"
+	SequenceEnd
+	Sequence="ContextGroupIdentificationSequence"		Type="3"	VM="1-n"
+		Name="ContextIdentifier"						Type="1"
+		Name="ContextUID"								Type="3"
+		Name="MappingResource"							Type="1"	StringDefinedTerms="MappingResources"
+		Name="ContextGroupVersion"						Type="1"
+	SequenceEnd
+	Sequence="MappingResourceIdentificationSequence"	Type="3"	VM="1-n"
+		Name="MappingResource"							Type="1"	StringDefinedTerms="MappingResources"
+		Name="MappingResourceUID"						Type="3"	StringDefinedTerms="MappingResourceUIDs"
+		Name="MappingResourceName"						Type="3"	StringDefinedTerms="MappingResourceNames"
 	SequenceEnd
 	Name="TimezoneOffsetFromUTC"						Type="3"
 	Sequence="ContributingEquipmentSequence"			Type="3"	VM="1-n"
@@ -1854,6 +2094,11 @@ Module="SOPCommon"
 		Name="RetrieveURI"								Type="1"
 	SequenceEnd
 	Name="LongitudinalTemporalInformationModified"		Type="3"	StringEnumValues="LongitudinalTemporalInformationModified"
+	Name="QueryRetrieveView"							Type="1C"	NoCondition=""	StringEnumValues="QueryRetrieveView"
+	Sequence="ConversionSourceAttributesSequence"		Type="1C"	VM="1-n"	NoCondition=""
+		InvokeMacro="ImageSOPInstanceReferenceMacro"
+	SequenceEnd
+	Name="ContentQualification"							Type="3"	StringEnumValues="ContentQualification"
 ModuleEnd
 
 Module="FrameExtraction"
@@ -1866,39 +2111,36 @@ Module="FrameExtraction"
 ModuleEnd
 
 Module="MultiframeSingleBitSCImagePseudo"
-
 	Name="SamplesPerPixel"				Type="1"	BinaryEnumValues="One"
-	Name="PhotometricInterpretation"		Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
+	Name="PhotometricInterpretation"	Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
 	Name="BitsAllocated"				Type="1"	BinaryEnumValues="One"
-	Name="BitsStored"				Type="1"	BinaryEnumValues="One"
-	Name="HighBit"					Type="1"	BinaryEnumValues="Zero"
+	Name="BitsStored"					Type="1"	BinaryEnumValues="One"
+	Name="HighBit"						Type="1"	BinaryEnumValues="Zero"
 	Name="PixelRepresentation"			Type="1"	BinaryEnumValues="Zero"
-	Name="PlanarConfiguration"						Type="1C"	BinaryEnumValues="PlanarConfiguration"	Condition="Never"
-
+	Name="PlanarConfiguration"			Type="1C"	BinaryEnumValues="PlanarConfiguration"	Condition="Never"
 ModuleEnd
 
 Module="MultiframeGrayscaleByteSCImagePseudo"
-
 	Name="SamplesPerPixel"				Type="1"	BinaryEnumValues="One"
-	Name="PhotometricInterpretation"		Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
+	Name="PhotometricInterpretation"	Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
 	Name="BitsAllocated"				Type="1"	BinaryEnumValues="BitsAre8"
-	Name="BitsStored"				Type="1"	BinaryEnumValues="BitsAre8"
-	Name="HighBit"					Type="1"	BinaryEnumValues="BitsAre7"
+	Name="BitsStored"					Type="1"	BinaryEnumValues="BitsAre8"
+	Name="HighBit"						Type="1"	BinaryEnumValues="BitsAre7"
 	Name="PixelRepresentation"			Type="1"	BinaryEnumValues="Zero"
-	Name="PlanarConfiguration"						Type="1C"	BinaryEnumValues="PlanarConfiguration"	Condition="Never"
-
+	Name="PlanarConfiguration"			Type="1C"	BinaryEnumValues="PlanarConfiguration"	Condition="Never"
+ 	Name="RescaleIntercept"				Type="1"	BinaryEnumValues="Zero"
+ 	Name="RescaleSlope"					Type="1"	BinaryEnumValues="One"
+ 	Name="RescaleType"					Type="1"	StringEnumValues="RescaleTypeUnspecified"
 ModuleEnd
 
 Module="MultiframeGrayscaleWordSCImagePseudo"
-
 	Name="SamplesPerPixel"				Type="1"	BinaryEnumValues="One"
-	Name="PhotometricInterpretation"		Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
+	Name="PhotometricInterpretation"	Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
 	Name="BitsAllocated"				Type="1"	BinaryEnumValues="BitsAre16"
-	Name="BitsStored"				Type="1"	BinaryEnumValues="BitsAre9To16"
-	Name="HighBit"					Type="1"	BinaryEnumValues="BitsAre8To15"	# :( should be one less than bits stored
+	Name="BitsStored"					Type="1"	BinaryEnumValues="BitsAre9To16"
+	Name="HighBit"						Type="1"	BinaryEnumValues="BitsAre8To15"	# :( should be one less than bits stored
 	Name="PixelRepresentation"			Type="1"	BinaryEnumValues="Zero"
-	Name="PlanarConfiguration"						Type="1C"	BinaryEnumValues="PlanarConfiguration"	Condition="Never"
-
+	Name="PlanarConfiguration"			Type="1C"	BinaryEnumValues="PlanarConfiguration"	Condition="Never"
 ModuleEnd
 
 Module="MultiframeTrueColorSCImagePseudo"
@@ -1910,8 +2152,8 @@ Module="MultiframeTrueColorSCImagePseudo"
 	Verify="PhotometricInterpretation"				Condition="JPEG2000TransferSyntaxButNotYBR_RCTorYBR_ICT"	ThenErrorMessage="JPEG 2000 transfer syntax is required to have Photometric Interpretation of YBR_RCT or YBR_ICT" ShowValueWithMessage="true"
 	# MPEG2TransferSyntaxButNotYBR_PARTIAL_420 is generic too ImagePixelMacro and not repeated here (PS 3.5 requirement)
 	Name="BitsAllocated"				Type="1"	BinaryEnumValues="BitsAre8"
-	Name="BitsStored"				Type="1"	BinaryEnumValues="BitsAre8"
-	Name="HighBit"					Type="1"	BinaryEnumValues="BitsAre7"
+	Name="BitsStored"					Type="1"	BinaryEnumValues="BitsAre8"
+	Name="HighBit"						Type="1"	BinaryEnumValues="BitsAre7"
 	Name="PixelRepresentation"			Type="1"	BinaryEnumValues="Zero"
 	Name="PlanarConfiguration"			Type="1"	BinaryEnumValues="Zero"		# only needs to be 0 for RGB
 
@@ -1923,6 +2165,7 @@ Module="CommonInstanceReference"
 	# may be present otherwise because cannot check whether or not both sequences are needed
 	Sequence="ReferencedSeriesSequence"								Type="1C"	VM="1-n"	Condition="InstancesAreReferencedAndStudiesContainingOtherReferencedInstancesSequenceAbsent" mbpo="true"
 		Name="SeriesInstanceUID"									Type="1"
+		Verify="StudyInstanceUID"															Condition="StudyInstanceUIDIsPresent"	ThenErrorMessage="StudyInstanceUID should not be present in ReferencedSeriesSequence in CommonInstanceReference Module - use StudiesContainingOtherReferencedInstancesSequence if not the same Study"
 		Sequence="ReferencedInstanceSequence"						Type="1"	VM="1-n"
 			InvokeMacro="SOPInstanceReferenceMacro"
 		SequenceEnd
@@ -1936,7 +2179,7 @@ ModuleEnd
 Module="SegmentationSeries"
 	Name="Modality"												Type="1"	StringEnumValues="SEGModality"
 	Name="SeriesNumber"											Type="1"
-	Sequence="ReferencedPerformedProcedureStepSequence"			Type="1C"	VM="1"	NoCondition=""
+	Sequence="ReferencedPerformedProcedureStepSequence"			Type="1C"	VM="1"	Condition="SeriesNeedReferencedPerformedProcedureStepSequence"
 		InvokeMacro="SOPInstanceReferenceMacro"
 	SequenceEnd
 ModuleEnd
@@ -1968,22 +2211,34 @@ Module="SegmentationImage"
 	Name="MaximumFractionalValue"							Type="1C"	Condition="SegmentationTypeIsFractional"
 	# should verify than 0 < MaximumFractionalValue < 256 :(
 	Sequence="SegmentSequence"								Type="1"	VM="1-n"
-		Name="SegmentNumber"								Type="1"
-		Name="SegmentLabel"									Type="1"
-		Name="SegmentDescription"							Type="3"
-		Name="SegmentAlgorithmType"							Type="1"	StringEnumValues="SegmentAlgorithmType"
+		InvokeMacro="SegmentDescriptionMacro"
 		Name="SegmentAlgorithmName"							Type="1C"	Condition="SegmentAlgorithmTypeIsNotManual"
-		InvokeMacro="GeneralAnatomyMandatoryMacro"
-		Sequence="SegmentedPropertyCategoryCodeSequence"	Type="1"	VM="1"
-			InvokeMacro="CodeSequenceMacro"								BaselineContextID="7150"
-		SequenceEnd
-		Sequence="SegmentedPropertyTypeCodeSequence"		Type="1"	VM="1"
-			InvokeMacro="CodeSequenceMacro"								BaselineContextID="7151"
+		Sequence="SegmentationAlgorithmIdentificationSequence"	Type="3"	VM="1"
+			InvokeMacro="AlgorithmIdentificationMacro"									BaselineContextID="7162"
 		SequenceEnd
 		Name="RecommendedDisplayGrayscaleValue"				Type="3"
 		Name="RecommendedDisplayCIELabValue"				Type="3"
 	SequenceEnd
 ModuleEnd
+
+DefineMacro="SegmentDescriptionMacro" InformationEntity="Instance"
+	Name="SegmentNumber"										Type="1"	NotZeroError=""
+	Name="SegmentLabel"											Type="1"
+	Name="SegmentDescription"									Type="3"
+	Name="SegmentAlgorithmType"									Type="1"	StringEnumValues="SegmentAlgorithmType"
+	InvokeMacro="GeneralAnatomyOptionalMacro"
+	Sequence="SegmentedPropertyCategoryCodeSequence"			Type="1"	VM="1"
+		InvokeMacro="CodeSequenceMacro"										BaselineContextID="7150"
+	SequenceEnd
+	Sequence="SegmentedPropertyTypeCodeSequence"				Type="1"	VM="1"
+		InvokeMacro="CodeSequenceMacro"										BaselineContextID="7151"
+		Sequence="SegmentedPropertyTypeModifierCodeSequence"	Type="3"	VM="1-n"
+			InvokeMacro="CodeSequenceMacro"									BaselineContextID="244"
+		SequenceEnd
+	SequenceEnd
+	Name="TrackingID"											Type="1C"	Condition="TrackingUIDIsPresent"
+	Name="TrackingUID"											Type="1C"	Condition="TrackingIDIsPresent"
+MacroEnd
 
 DefineMacro="SegmentationMacro" InformationEntity="FunctionalGroup"
 	Sequence="SegmentIdentificationSequence"				Type="1"	VM="1"
@@ -1991,20 +2246,112 @@ DefineMacro="SegmentationMacro" InformationEntity="FunctionalGroup"
 	SequenceEnd
 MacroEnd
 
+Module="SurfaceSegmentation"
+	InvokeMacro="ContentIdentificationMacro"
+	Name="ContentDate"															Type="1"
+	Name="ContentTime"															Type="1"
+	Sequence="SegmentSequence"													Type="1"	VM="1-n"
+		InvokeMacro="SegmentDescriptionMacro"
+		Name="SurfaceCount"														Type="1"	NotZeroError="" 
+		Sequence="ReferencedSurfaceSequence"									Type="1"	VM="1-n"				# should check that number of items equals SurfaceCount :(
+			Name="ReferencedSurfaceNumber"										Type="1"	VM="1" 	NotZeroError=""	# should check that SurfaceNumber exists in SurfaceSequence :(
+			Sequence="SegmentSurfaceGenerationAlgorithmIdentificationSequence"	Type="1"	VM="1"
+				InvokeMacro="AlgorithmIdentificationMacro"									BaselineContextID="7162"
+			SequenceEnd
+			Sequence="SegmentSurfaceSourceInstanceSequence"						Type="2"	VM="0-n"
+				InvokeMacro="ImageSOPInstanceReferenceMacro"
+			SequenceEnd
+		SequenceEnd
+	SequenceEnd
+ModuleEnd
+
+DefineMacro="PointsMacro" InformationEntity="Surface"
+	Name="NumberOfSurfacePoints"												Type="1"	NotZeroError=""
+	Name="PointCoordinatesData"													Type="1"
+	Name="PointPositionAccuracy"												Type="3"
+	Name="MeanPointDistance"													Type="3"
+	Name="MaximumPointDistance"													Type="3"
+	Name="PointsBoundingBoxCoordinates"											Type="3"
+	Name="AxisOfRotation"														Type="3"
+	Name="CenterOfRotation"														Type="1C"	Condition="AxisOfRotationIsPresent" mbpo="true"
+MacroEnd
+
+DefineMacro="VectorsMacro" InformationEntity="Surface"
+	Name="NumberOfVectors"														Type="1"	NotZeroError=""
+	Name="VectorDimensionality"													Type="1"	NotZeroError=""
+	Name="VectorAccuracy"														Type="3"
+	Name="VectorCoordinateData"													Type="1"
+MacroEnd
+
+DefineMacro="SurfaceMeshPrimitivesMacro" InformationEntity="Surface"
+	Name="LongVertexPointIndexList"												Type="2"
+	Name="LongEdgePointIndexList"												Type="2"						# should check has 2n values :(
+	Name="LongTrianglePointIndexList"											Type="2"						# should check has 3n values :(
+	Sequence="TriangleStripSequence"											Type="2"	VM="0-n"
+		Name="LongPrimitivePointIndexList"										Type="1"
+	SequenceEnd
+	Sequence="TriangleFanSequence"												Type="2"	VM="0-n"
+		Name="LongPrimitivePointIndexList"										Type="1"
+	SequenceEnd
+	Sequence="LineSequence"														Type="2"	VM="0-n"
+		Name="LongPrimitivePointIndexList"										Type="1"
+	SequenceEnd
+	Sequence="FacetSequence"													Type="2"	VM="0-n"
+		Name="LongPrimitivePointIndexList"										Type="1"
+	SequenceEnd
+MacroEnd
+
+Module="SurfaceMesh"
+	Name="NumberOfSurfaces"														Type="1"	NotZeroError=""
+	Sequence="SurfaceSequence"													Type="1"	VM="1-n"				# should check that number of items equals NumberOfSurfaces :(
+		Name="SurfaceNumber"													Type="1"	NotZeroError=""			# should check that starts at a value of 1, and increases monotonically by 1 :(
+		Name="SurfaceComments"													Type="3"
+		Sequence="SegmentedPropertyCategoryCodeSequence"						Type="3"	VM="1"
+			InvokeMacro="CodeSequenceMacro"													BaselineContextID="7150"
+		SequenceEnd
+		Sequence="SegmentedPropertyTypeCodeSequence"							Type="3"	VM="1"
+			InvokeMacro="CodeSequenceMacro"													BaselineContextID="7151"
+		SequenceEnd
+		Name="SurfaceProcessing"												Type="2"	StringEnumValues="YesNoFull"
+		Name="SurfaceProcessingRatio"											Type="2C"	Condition="SurfaceProcessingIsYes"
+		Name="SurfaceProcessingDescription"										Type="3"
+		Sequence="SurfaceProcessingAlgorithmIdentificationSequence"				Type="2C"	VM="0-n"	Condition="SurfaceProcessingIsYes"
+			InvokeMacro="AlgorithmIdentificationMacro"										BaselineContextID="7162"
+		SequenceEnd
+		Name="RecommendedDisplayGrayscaleValue"									Type="1"
+		Name="RecommendedDisplayCIELabValue"									Type="1"
+		Name="RecommendedPresentationOpacity"									Type="1"
+		Name="RecommendedPresentationType"										Type="1"	StringDefinedTerms="RecommendedPresentationType"
+		Name="RecommendedPointRadius"											Type="3"
+		Name="RecommendedLineThickness"											Type="3"
+		Name="FiniteVolume"														Type="1"	StringEnumValues="YesNoFullUnknown"
+		Name="Manifold"															Type="1"	StringEnumValues="YesNoFullUnknown"
+		Sequence="SurfacePointsSequence"										Type="1"	VM="1"
+			InvokeMacro="PointsMacro"
+		SequenceEnd
+		Sequence="SurfacePointsNormalsSequence"									Type="2"	VM="0-1"
+			InvokeMacro="VectorsMacro"																				# should check that NumberOfVectors equals NumberOfSurfacePoints in SurfacePointsSequence, and VectorDimensionality equals 3 :(
+		SequenceEnd
+		Sequence="SurfaceMeshPrimitivesSequence"								Type="1"	VM="1"
+			InvokeMacro="SurfaceMeshPrimitivesMacro"																# should check that indices do not exceed NumberOfSurfacePoints in SurfacePointsSequence :(
+		SequenceEnd
+	SequenceEnd
+ModuleEnd
+
 Module="MultiFrameFunctionalGroupsForSegmentation"
-	Sequence="SharedFunctionalGroupsSequence"	Type="2"	VM="0-1"
-		InvokeMacro="PixelMeasuresMacro"		Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequence"
-		InvokeMacro="PlanePositionMacro"		Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequence"
-		InvokeMacro="PlaneOrientationMacro"		Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequence"
-		InvokeMacro="DerivationImageMacro"		Condition="DerivationImageMacroOKInSharedFunctionalGroupSequence"
+	Sequence="SharedFunctionalGroupsSequence"	Type="1"	VM="1"
+		InvokeMacro="PixelMeasuresMacro"		Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
+		InvokeMacro="PlanePositionMacro"		Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
+		InvokeMacro="PlaneOrientationMacro"		Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
+		InvokeMacro="DerivationImageMacro"		Condition="DerivationImageSequenceNotInPerFrameFunctionalGroupSequenceAndPixelMeasuresPlanePositionPlaneOrientationNotPresentInEitherMBPO"
 		InvokeMacro="SegmentationMacro"			Condition="SegmentIdentificationSequenceNotInPerFrameFunctionalGroupSequence"
 	SequenceEnd
 	Sequence="PerFrameFunctionalGroupsSequence"	Type="1"	VM="1-n"
-		InvokeMacro="PixelMeasuresMacro"		Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="PixelMeasuresMacro"		Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
 		InvokeMacro="FrameContentMacro"
-		InvokeMacro="PlanePositionMacro"		Condition="PlanePositionSequenceNotInSharedFunctionalGroupSequence"
-		InvokeMacro="PlaneOrientationMacro"		Condition="PlaneOrientationSequenceNotInSharedFunctionalGroupSequence"
-		InvokeMacro="DerivationImageMacro"		Condition="DerivationImageMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="PlanePositionMacro"		Condition="PlanePositionSequenceNotInSharedFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
+		InvokeMacro="PlaneOrientationMacro"		Condition="PlaneOrientationSequenceNotInSharedFunctionalGroupSequenceAndDerivationImageMacroNotPresentInEitherMBPO"
+		InvokeMacro="DerivationImageMacro"		Condition="DerivationImageSequenceNotInSharedFunctionalGroupSequenceAndPixelMeasuresPlanePositionPlaneOrientationNotPresentInEitherMBPO"
 		InvokeMacro="SegmentationMacro"			Condition="SegmentIdentificationSequenceNotInSharedFunctionalGroupSequence"
 	SequenceEnd
 ModuleEnd
@@ -2029,12 +2376,16 @@ Module="SpatialRegistration"
 			SequenceEnd
 			Sequence="MatrixSequence"							Type="1"	VM="1-n"
 				Name="FrameOfReferenceTransformationMatrix"		Type="1"
-				Name="FrameOfReferenceTransformationMatrixType"	Type="1"	StringDefinedTerms="FrameOfReferenceTransformationMatrixType"
+				Name="FrameOfReferenceTransformationMatrixType"	Type="1"	StringEnumValues="FrameOfReferenceTransformationMatrixType"
 			SequenceEnd
 		SequenceEnd
 		Sequence="UsedFiducialsSequence"						Type="3"	VM="1-n"
 			InvokeMacro="SOPInstanceReferenceMacro"
 			Name="FiducialUID"									Type="1"
+		SequenceEnd
+		Sequence="UsedSegmentsSequence"							Type="3"	VM="1-n"
+			InvokeMacro="SOPInstanceReferenceMacro"
+			Name="ReferencedSegmentNumber"						Type="1"
 		SequenceEnd
 	SequenceEnd
 ModuleEnd
@@ -2054,7 +2405,7 @@ Module="DeformableSpatialRegistration"
 		SequenceEnd
 		Sequence="PreDeformationMatrixRegistrationSequence"		Type="1C"	VM="1"	NoCondition=""
 			Name="FrameOfReferenceTransformationMatrix"			Type="1"
-			Name="FrameOfReferenceTransformationMatrixType"		Type="1"	StringDefinedTerms="FrameOfReferenceTransformationMatrixType"
+			Name="FrameOfReferenceTransformationMatrixType"		Type="1"	StringEnumValues="FrameOfReferenceTransformationMatrixType"
 		SequenceEnd
 		Sequence="PostDeformationMatrixRegistrationSequence"	Type="1C"	VM="1"	NoCondition=""
 			Name="FrameOfReferenceTransformationMatrix"			Type="1"
@@ -2089,6 +2440,9 @@ Module="SpatialFiducials"
 		SequenceEnd
 		Sequence="FiducialSequence"								Type="1"	VM="1-n"
 			Name="FiducialIdentifier"							Type="1"
+			Sequence="FiducialsPropertyCategoryCodeSequence"	Type="3"	VM="1"
+				InvokeMacro="CodeSequenceMacro"
+			SequenceEnd
 			Sequence="FiducialIdentifierCodeSequence"			Type="1C"	VM="1"	Condition="FiducialIdentifierNotPresent"
 				InvokeMacro="CodeSequenceMacro"
 			SequenceEnd
@@ -2115,6 +2469,7 @@ Module="EncapsulatedDocumentSeries"
 	Sequence="ReferencedPerformedProcedureStepSequence"			Type="3"	VM="1"
 		InvokeMacro="SOPInstanceReferenceMacro"
 	SequenceEnd
+	Name="ProtocolName"											Type="3"
 	Name="SeriesDescription"									Type="3"
 	Sequence="SeriesDescriptionCodeSequence"					Type="3"	VM="1"
 		InvokeMacro="CodeSequenceMacro"
@@ -2134,6 +2489,9 @@ Module="EncapsulatedDocument"
 	Name="RecognizableVisualFeatures"							Type="3"	StringEnumValues="YesNoFull"
 	Sequence="SourceInstanceSequence"							Type="1C"	VM="1-n"	NoCondition=""
 		InvokeMacro="SOPInstanceReferenceMacro"
+		Sequence="PurposeOfReferenceCodeSequence"				Type="3"	VM="1"
+			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
 	SequenceEnd
 	Name="DocumentTitle"										Type="2"
 	Sequence="ConceptNameCodeSequence"							Type="2"	VM="0-1"
@@ -2173,4 +2531,248 @@ Module="RealWorldValueMapping"
 		SequenceEnd
 	SequenceEnd
 ModuleEnd
+
+
+Module="IntravascularOCTSeries"
+	Name="Modality"											Type="1"	StringEnumValues="IVOCTModality"
+	Name="SeriesNumber"										Type="1"
+	Sequence="ReferencedPerformedProcedureStepSequence"		Type="1C"	VM="1"	Condition="SeriesNeedReferencedPerformedProcedureStepSequence"
+		InvokeMacro="SOPInstanceReferenceMacro"
+	SequenceEnd
+	Name="PresentationIntentType"							Type="1"	StringEnumValues="PresentationIntentType"
+	Verify="PresentationIntentType"										Condition="IsForProcessingSOPClass"		StringEnumValues="ForProcessing"
+	Verify="PresentationIntentType"										Condition="IsForPresentationSOPClass"	StringEnumValues="ForPresentation"
+ModuleEnd
+
+Module="IntravascularOCTImage"
+	Name="ImageType"								Type="1"	VM="4"
+	Verify="ImageType"											ValueSelector="0"	StringEnumValues="CommonEnhancedImageType1"
+	Verify="ImageType"											ValueSelector="1"	StringEnumValues="CommonEnhancedImageAndFrameType2"
+	Verify="ImageType"											ValueSelector="2"	StringDefinedTerms="IVOCTImageAndFrameTypeValue3"
+	Verify="ImageType"											ValueSelector="3"	StringDefinedTerms="CommonEnhancedImageType4"
+
+	Name="VolumetricProperties"						Type="1"	StringEnumValues="IVOCTVolumetricProperties"
+	Name="PixelPresentation"						Type="1"	StringEnumValues="IVOCTPixelPresentationImageLevel"
+	Name="SamplesPerPixel"							Type="1"	BinaryEnumValues="SamplesPerPixelIsOne"
+	Name="AcquisitionDateTime"						Type="1"
+	Name="AcquisitionDuration"						Type="1C"	Condition="ImageTypeValue1Original"
+	Name="AcquisitionNumber"						Type="1"
+	Name="PhotometricInterpretation"				Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
+	Name="PixelRepresentation"						Type="1"	BinaryEnumValues="PixelRepresentationUnsigned"
+	Name="BitsAllocated"							Type="1"	BinaryEnumValues="BitsAre8Or12Or16"
+	Name="BitsStored"								Type="1"	BinaryEnumValues="BitsAre8Or12Or16"
+	Name="HighBit"									Type="1"	BinaryEnumValues="BitsAre7Or11Or15"
+	Name="PresentationLUTShape"						Type="1C"	Condition="PresentationIntentTypeIsForPresentation"	StringEnumValues="IdentityPresentationLUTShape"
+	Name="LossyImageCompression"					Type="1"	StringEnumValues="LossyImageCompression"
+	Name="LossyImageCompressionRatio"				Type="1C"	Condition="LossyImageCompressionIs01"
+	Name="LossyImageCompressionMethod"				Type="1C"	StringDefinedTerms="LossyImageCompressionMethod"	Condition="LossyImageCompressionIs01"
+	Name="BurnedInAnnotation"						Type="1"	StringEnumValues="NoFull"
+	Name="RecognizableVisualFeatures"				Type="1"	StringEnumValues="NoFull"
+	Sequence="ReferencedInstanceSequence"			Type="3"	VM="1-n"
+		InvokeMacro="SOPInstanceReferenceMacro"
+		Sequence="PurposeOfReferenceCodeSequence"	Type="1"	VM="1"
+			InvokeMacro="CodeSequenceMacro"
+		SequenceEnd
+	SequenceEnd
+	Name="ImageComments"							Type="3"
+	Name="RecommendedDisplayFrameRate"				Type="3"
+	Name="InterpolationType"						Type="1C"	Condition="PresentationIntentTypeIsForPresentation"	StringEnumValues="IVOCTInterpolationType"
+	Name="ReferencedColorPaletteInstanceUID"		Type="1C"	Condition="PixelPresentationIsColorRef"				StringDefinedTerms="WellKnownColorPaletteInstanceUIDs"
+ModuleEnd
+
+Module="IntravascularOCTAcquisitionParameters"
+	Name="OCTFocalDistance"						Type="2"
+	Name="BeamSpotSize"							Type="2"
+	Name="EffectiveRefractiveIndex"				Type="2C"		Condition="PresentationIntentTypeIsForProcessing"
+	Name="OCTAcquisitionDomain"					Type="1"		StringDefinedTerms="OCTAcquisitionDomain"
+	Name="OCTOpticalCenterWavelength"			Type="2"
+	Name="AxialResolution"						Type="2"
+	Name="RangingDepth"							Type="1"
+	Name="ALineRate"							Type="1"
+	Name="ALinesPerFrame"						Type="1"
+ModuleEnd
+
+Module="IntravascularImageAcquisitionParameters"
+	Name="IVUSAcquisition"						Type="1"	StringEnumValues="IVOCTIVUSAcquisition"
+	Name="IVUSPullbackRate"						Type="1C"	Condition="IVUSAcquisitionIsMotorized"
+	Name="IVUSPullbackStartFrameNumber"			Type="1C"	Condition="IVUSAcquisitionIsMotorized"
+	Name="IVUSPullbackStopFrameNumber"			Type="1C"	Condition="IVUSAcquisitionIsMotorized"
+	Name="CatheterDirectionOfRotation"			Type="1C"	Condition="RotationalCatheterInformationIsPresent"	StringEnumValues="CatheterDirectionOfRotation"
+	Name="CatheterRotationalRate"				Type="1C"	Condition="RotationalCatheterInformationIsPresent"				
+	Sequence="ModeOfPercutaneousAccessSequence"	Type="2"	VM="0-1"
+		InvokeMacro="CodeSequenceMacro"
+	SequenceEnd				
+ModuleEnd
+
+Module="IntravascularOCTProcessingParameters"
+	Name="OCTZOffsetApplied"					Type="1"	StringEnumValues="YesNoFull"
+	Name="RefractiveIndexApplied"				Type="1"	StringEnumValues="YesNoFull"
+	Name="ALinePixelSpacing"					Type="1"
+	Name="PixelIntensityRelationship"			Type="1"	StringEnumValues="IVOCTPixelIntensityRelationship"
+	Name="FirstALineLocation"					Type="1"
+ModuleEnd
+
+DefineMacro="IntravascularOCTFrameTypeMacro"		InformationEntity="FunctionalGroup"
+	Sequence="IntravascularOCTFrameTypeSequence"	Type="1"	VM="1"
+		Name="FrameType"							Type="1"	VM="4"
+		Verify="FrameType"										ValueSelector="0"	StringEnumValues="CommonEnhancedImageType1"
+		Verify="FrameType"										ValueSelector="1"	StringEnumValues="CommonEnhancedImageAndFrameType2"
+		Verify="FrameType"										VaueSelector="2"	StringDefinedTerms="IVOCTImageAndFrameTypeValue3"
+		Verify="FrameType"										ValueSelector="3"	StringDefinedTerms="CommonEnhancedImageType4"
+	SequenceEnd
+MacroEnd
+
+DefineMacro="IntravascularFrameContentMacro"		InformationEntity="FunctionalGroup"
+	Sequence="IntravascularFrameContentSequence"	Type="1"	VM="1"
+		Name="IntravascularLongitudinalDistance"	Type="1C"	Condition="IVUSAcquisitionIsMeasured"
+		Name="SeamLineLocation"						Type="2C"	Condition="PresentationIntentTypeIsForPresentation"
+	SequenceEnd
+MacroEnd
+
+DefineMacro="IntravascularOCTFrameContentMacro"		InformationEntity="FunctionalGroup"
+	Sequence="IntravascularOCTFrameContentSequence"	Type="1"	VM="1"
+		Name="OCTZOffsetCorrection"					Type="1"
+		Name="SeamLineIndex"						Type="1"
+		Name="NumberOfPaddedALines"					Type="1C"	NoCondition=""
+		Verify="NumberOfPaddedALines"							Condition="PresentationIntentTypeIsForPresentation"	ThenErrorMessage="Only permitted for FOR PROCESSING images"
+	SequenceEnd
+MacroEnd
+
+Module="MultiFrameFunctionalGroupsForIVOCTImageForPresentation"
+	Sequence="SharedFunctionalGroupsSequence"	Type="1"	VM="1"
+		InvokeMacro="PixelMeasuresMacro"					Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="NeedCardiacSynchronizationMacroInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameVOILUTMacro"						Condition="FrameVOILUTMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="PixelIntensityRelationshipLUTMacro"	Condition="NeedPixelIntensityRelationshipLUTMacroInSharedFunctionalGroupSequence"
+		InvokeMacro="IntravascularOCTFrameTypeMacro"		Condition="IntravascularOCTFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="IntravascularFrameContentMacro"		Condition="IntravascularFrameContentSequenceNotInPerFrameFunctionalGroupSequence"
+	SequenceEnd
+	Sequence="PerFrameFunctionalGroupsSequence"	Type="1"	VM="1-n"
+		InvokeMacro="FrameContentMacro"
+		InvokeMacro="PixelMeasuresMacro"					Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="NeedCardiacSynchronizationMacroInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameVOILUTMacro"						Condition="FrameVOILUTMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="PixelIntensityRelationshipLUTMacro"	Condition="NeedPixelIntensityRelationshipLUTMacroInPerFrameFunctionalGroupSequence"
+		InvokeMacro="IntravascularOCTFrameTypeMacro"		Condition="IntravascularOCTFrameTypeSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="IntravascularFrameContentMacro"		Condition="IntravascularFrameContentSequenceNotInSharedFunctionalGroupSequence"
+	SequenceEnd
+ModuleEnd
+
+Module="MultiFrameFunctionalGroupsForIVOCTImageForProcessing"
+	Sequence="SharedFunctionalGroupsSequence"	Type="1"	VM="1"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="NeedCardiacSynchronizationMacroInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameVOILUTMacro"						Condition="FrameVOILUTMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="PixelIntensityRelationshipLUTMacro"	Condition="NeedPixelIntensityRelationshipLUTMacroInSharedFunctionalGroupSequence"
+		InvokeMacro="IntravascularOCTFrameTypeMacro"		Condition="IntravascularOCTFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="IntravascularFrameContentMacro"		Condition="IntravascularFrameContentSequenceNotInPerFrameFunctionalGroupSequenceAndAcquisitionIsMeasured"
+		InvokeMacro="IntravascularOCTFrameContentMacro"		Condition="IntravascularOCTFrameContentSequenceNotInPerFrameFunctionalGroupSequence"
+	SequenceEnd
+	Sequence="PerFrameFunctionalGroupsSequence"	Type="1"	VM="1-n"
+		InvokeMacro="FrameContentMacro"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="NeedCardiacSynchronizationMacroInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameVOILUTMacro"						Condition="FrameVOILUTMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="PixelIntensityRelationshipLUTMacro"	Condition="NeedPixelIntensityRelationshipLUTMacroInPerFrameFunctionalGroupSequence"
+		InvokeMacro="IntravascularOCTFrameTypeMacro"		Condition="IntravascularOCTFrameTypeSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="IntravascularFrameContentMacro"		Condition="IntravascularFrameContentSequenceNotInSharedFunctionalGroupSequenceAndAcquisitionIsMeasured"
+		InvokeMacro="IntravascularOCTFrameContentMacro"		Condition="IntravascularOCTFrameContentSequenceNotInSharedFunctionalGroupSequence"
+	SequenceEnd
+ModuleEnd
+
+Module="ParametricMapSeries"
+	Name="Modality"												Type="1"
+	Name="SeriesNumber"											Type="1"
+	Sequence="ReferencedPerformedProcedureStepSequence"			Type="1C"	VM="1"	Condition="SeriesNeedReferencedPerformedProcedureStepSequence"
+		InvokeMacro="SOPInstanceReferenceMacro"
+	SequenceEnd
+ModuleEnd
+
+Module="ParametricMapImage"
+	Name="ImageType"										Type="1"	VM="4"
+	Verify="ImageType"										ValueSelector="0"	StringEnumValues="ParametricMapImageAndFrameType1"
+	Verify="ImageType"										ValueSelector="1"	StringEnumValues="CommonEnhancedImageAndFrameType2"
+	Verify="ImageType"										ValueSelector="2"	StringDefinedTerms="CommonEnhancedImageAndFrameType3"
+	Verify="ImageType"										ValueSelector="3"	StringDefinedTerms="EnhancedMRImageType4"
+	InvokeMacro="ContentIdentificationMacro"
+	Name="PixelPresentation"								Type="3"	StringEnumValues="ParametricMapImagePixelPresentation"
+	Name="SamplesPerPixel"									Type="1"	BinaryEnumValues="One"
+	Name="PhotometricInterpretation"						Type="1"	StringEnumValues="PhotometricInterpretationMonochrome2"
+	Name="BitsAllocated"									Type="1"
+	Verify="BitsAllocated"												Condition="PixelDataPresent"			BinaryEnumValues="BitsAre16"
+	Verify="BitsAllocated"												Condition="FloatPixelDataPresent"		BinaryEnumValues="BitsAre32"
+	Verify="BitsAllocated"												Condition="DoubleFloatPixelDataPresent"	BinaryEnumValues="BitsAre64"
+	Name="BitsStored"										Type="1C"	Condition="PixelDataPresent"			BinaryEnumValues="BitsAre16"
+	Name="HighBit"											Type="1C"	Condition="PixelDataPresent"			BinaryEnumValues="BitsAre15"
+	Name="PresentationLUTShape"								Type="1"	StringEnumValues="IdentityPresentationLUTShape"
+	Name="LossyImageCompression"							Type="1"	StringEnumValues="LossyImageCompression"
+	Name="LossyImageCompressionRatio"						Type="1C"	NoCondition=""
+	Name="LossyImageCompressionMethod"						Type="1C"	NoCondition=""
+	Verify="LossyImageCompressionMethod"								Condition="LossyImageCompressionMethodInconsistentWithTransferSyntax"	ThenWarningMessage="method inconsistent with transfer syntax" ShowValueWithMessage="true"
+	Name="BurnedInAnnotation"								Type="1"	StringEnumValues="NoFull"
+	Name="RecognizableVisualFeatures"						Type="1"	StringEnumValues="YesNoFull"
+	Name="ContentQualification"								Type="1"	StringEnumValues="ContentQualification"
+	Name="PaletteColorLookupTableUID"						Type="1C"	Condition="PixelPresentationIsColorRangeAndPaletteColorLookupTableModuleAbsent"
+	Name="ICCProfile"										Type="1C"	Condition="PixelPresentationIsColorRange"
+	Name="ColorSpace"										Type="3"
+ModuleEnd
+
+Module="MultiFrameFunctionalGroupsForParametricMap"
+	Sequence="SharedFunctionalGroupsSequence"	Type="1"	VM="1"
+		InvokeMacro="PixelMeasuresMacro"					Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="PlanePositionMacro"					Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="PlaneOrientationMacro"					Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="ReferencedImageMacro"					Condition="ReferencedImageMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="CardiacSynchronizationMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="IdentityPixelValueTransformationMacro"	Condition="PixelValueTransformationSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameVOILUTWithLUTMacro"				Condition="FrameVOILUTMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="RealWorldValueMappingMacro"			Condition="RealWorldValueMappingSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="ContrastBolusUsageMacro"				Condition="NeedContrastBolusUsageMacroInSharedFunctionalGroupSequence"
+		InvokeMacro="RespiratorySynchronizationMacro"		Condition="RespiratorySynchronizationMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="ParametricMapFrameTypeMacro"			Condition="ParametricMapFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="StoredValueColorRangeMacro"			Condition="StoredValueColorRangeSequenceNotInPerFrameFunctionalGroupSequenceAndPixelPresentationIsColorRange"
+	SequenceEnd
+	Sequence="PerFrameFunctionalGroupsSequence"	Type="1"	VM="1-n"
+		InvokeMacro="PixelMeasuresMacro"					Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="PlanePositionMacro"					Condition="PlanePositionSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="PlaneOrientationMacro"					Condition="PlaneOrientationSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="ReferencedImageMacro"					Condition="ReferencedImageMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameContentMacro"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="CardiacSynchronizationMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="IdentityPixelValueTransformationMacro"	Condition="PixelValueTransformationSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameVOILUTWithLUTMacro"				Condition="FrameVOILUTMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="RealWorldValueMappingMacro"			Condition="RealWorldValueMappingSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="ContrastBolusUsageMacro"				Condition="NeedContrastBolusUsageMacroInPerFrameFunctionalGroupSequence"
+		InvokeMacro="RespiratorySynchronizationMacro"		Condition="RespiratorySynchronizationMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="ParametricMapFrameTypeMacro"			Condition="ParametricMapFrameTypeSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="StoredValueColorRangeMacro"			Condition="StoredValueColorRangeSequenceeNotInSharedFunctionalGroupSequenceAndPixelPresentationIsColorRange"
+	SequenceEnd
+ModuleEnd
+
+DefineMacro="ParametricMapFrameTypeMacro" InformationEntity="FunctionalGroup"
+	Sequence="ParametricMapFrameTypeSequence"	Type="1"	VM="1"
+		Name="FrameType"						Type="1"	VM="4"
+		Verify="FrameType"								ValueSelector="0"	StringEnumValues="ParametricMapImageAndFrameType1"
+		Verify="FrameType"								ValueSelector="1"	StringEnumValues="CommonEnhancedImageAndFrameType2"
+		Verify="FrameType"								ValueSelector="2"	StringDefinedTerms="CommonEnhancedImageAndFrameType3"
+		Verify="FrameType"								ValueSelector="3"	StringDefinedTerms="EnhancedMRFrameType4"
+	SequenceEnd
+MacroEnd
+
+DefineMacro="StoredValueColorRangeMacro" InformationEntity="FunctionalGroup"
+	Sequence="StoredValueColorRangeSequence"	Type="1"	VM="1"
+		Name="MinimumStoredValueMapped"			Type="1"	VM="1"
+		Name="MaximumStoredValueMapped"			Type="1"	VM="1"
+	SequenceEnd
+MacroEnd
 

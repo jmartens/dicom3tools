@@ -1,9 +1,10 @@
-.TH GE9800DUMP 1 "02 May 2010" "DICOM PS3" "ge9800 dump"
+.TH GE9800DUMP 1 "06 March 2014" "DICOM PS3" "ge9800 dump"
 .SH NAME
 ge9800dump \- ACR/NEMA DICOM PS3 ... ge9800 dump contents
 .SH SYNOPSIS
 .HP 10
 .B ge9800dump
+.so man1/gen.so
 .I inputfilename
 .SH DESCRIPTION
 .LP
@@ -38,5 +39,5 @@ The basic switches are described in dcintro(1).
 .BR dcintro(1) ,
 .BR ge9800todc(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

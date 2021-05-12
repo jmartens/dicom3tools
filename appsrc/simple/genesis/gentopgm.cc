@@ -1,5 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)gentopgm.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#else
 #include <iostream.h>
+#endif
 
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 #include "basetype.h"
 
 #ifndef PNMBIGRAW
@@ -194,7 +202,7 @@ main(int argc,char *argv[])
 		Uint16 map_wide[512];
 
 		if (compress == 2 || compress == 4) { // packed or compacked
-			if (seekword(cin,mapblock,0) == OurStreamPos(EOF)) {
+			if (seekword(cin,mapblock,0) == OurStreamPos(istream::traits_type::eof())) {
 				cerr << "Map seek failed\n" << flush;
 				return 1;
 			}
@@ -215,7 +223,7 @@ main(int argc,char *argv[])
 
 		// Decompress and output the image data ...
 
-		if (seekword(cin,datablock,0) == OurStreamPos(EOF)) {
+		if (seekword(cin,datablock,0) == OurStreamPos(istream::traits_type::eof())) {
 			cerr << "Image seek failed\n" << flush;
 			return 1;
 		}

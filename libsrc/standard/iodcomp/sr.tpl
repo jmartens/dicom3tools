@@ -79,6 +79,33 @@ CompositeIOD="ComprehensiveSR"				Condition="ComprehensiveSRStorageInstance"
 	InformationEntityEnd
 CompositeIODEnd
 
+CompositeIOD="Comprehensive3DSR"				Condition="Comprehensive3DSRStorageInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"		Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"					Usage="M"
+		Module="ClinicalTrialSubject"		Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd	
+	InformationEntity="Study"
+		Module="GeneralStudy"				Usage="M"
+		Module="PatientStudy"				Usage="U"
+		Module="ClinicalTrialStudy"			Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="SRDocumentSeries"			Usage="M"
+		Module="ClinicalTrialSeries"		Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"			Usage="M"
+	InformationEntityEnd
+	InformationEntity="Document"
+		Module="SRDocumentGeneral"			Usage="M"
+		Module="SRDocumentContent"			Usage="M"
+		Module="SOPCommon"					Usage="M"
+	InformationEntityEnd
+CompositeIODEnd
+
 CompositeIOD="KeyObjectSelectionDocument"		Condition="KeyObjectSelectionDocumentStorageInstance"
 	InformationEntity="File"
 		Module="FileMetaInformation"		Usage="C"	Condition="NeedModuleFileMetaInformation"
@@ -103,6 +130,34 @@ CompositeIOD="KeyObjectSelectionDocument"		Condition="KeyObjectSelectionDocument
 		Module="KeyObjectDocument"			Usage="M"
 		Module="SRDocumentContent"			Usage="M"
 		Module="SOPCommon"					Usage="M"
+	InformationEntityEnd
+CompositeIODEnd
+
+CompositeIOD="KeyObjectSelectionDocumentIHEXDSIManifest"		Condition="KeyObjectSelectionDocumentStorageInstance"	Profile="IHEXDSIManifest"
+	InformationEntity="File"
+		Module="FileMetaInformation"		Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"					Usage="M"
+		Module="ClinicalTrialSubject"		Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd	
+	InformationEntity="Study"
+		Module="GeneralStudy"				Usage="M"
+		Module="PatientStudy"				Usage="U"
+		Module="ClinicalTrialStudy"			Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="KeyObjectDocumentSeries"	Usage="M"
+		Module="ClinicalTrialSeries"		Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"			Usage="M"
+	InformationEntityEnd
+	InformationEntity="Document"
+		Module="KeyObjectDocument"			Usage="M"
+		Module="SRDocumentContent"			Usage="M"
+		Module="SOPCommon"					Usage="M"
+		Module="IHEXDSIManifestProfile"		Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
 
@@ -250,4 +305,88 @@ CompositeIOD="XRayRadiationDoseSRIHEREM"				Condition="XRayRadiationDoseSRStorag
 	InformationEntityEnd
 CompositeIODEnd
 
+CompositeIOD="RadiopharmaceuticalRadiationDoseSR"	Condition="RadiopharmaceuticalRadiationDoseSRStorageInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"		Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"					Usage="M"
+		Module="ClinicalTrialSubject"		Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd	
+	InformationEntity="Study"
+		Module="GeneralStudy"				Usage="M"
+		Module="PatientStudy"				Usage="U"
+		Module="ClinicalTrialStudy"			Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="SRDocumentSeries"			Usage="M"
+		Module="ClinicalTrialSeries"		Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="Synchronization"			Usage="C"	Condition="NeedToCheckModuleSynchronization"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"			Usage="M"
+	InformationEntityEnd
+	InformationEntity="Document"
+		Module="SRDocumentGeneral"			Usage="M"
+		Module="SRDocumentContent"			Usage="M"
+		Module="SOPCommon"					Usage="M"
+	InformationEntityEnd
+CompositeIODEnd
+
+CompositeIOD="SpectaclePrescriptionReport" Condition="SpectaclePrescriptionReportInstance"
+	InformationEntity="Patient"
+		Module="Patient"					Usage="M"
+		Module="ClinicalTrialSubject"		Usage="U"
+	InformationEntityEnd
+	InformationEntity="Study"
+		Module="GeneralStudy"				Usage="M"
+		Module="PatientStudy"				Usage="U"
+		Module="ClinicalTrialStudy"			Usage="U"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="SRDocumentSeries"			Usage="M"
+		Module="ClinicalTrialSeries"		Usage="U"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"			Usage="M"
+		Module="EnhancedGeneralEquipment"	Usage="M"
+	InformationEntityEnd
+	InformationEntity="Document"
+		Module="SRDocumentGeneral"			Usage="M"
+		Module="SRDocumentContent"			Usage="M"
+		Module="SOPCommon"					Usage="M"
+	InformationEntityEnd
+CompositeIODEnd
+
+CompositeIOD="AcquisitionContextSR"	Condition="AcquisitionContextSRStorageInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"		Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"					Usage="M"
+		Module="ClinicalTrialSubject"		Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd	
+	InformationEntity="Study"
+		Module="GeneralStudy"				Usage="M"
+		Module="PatientStudy"				Usage="U"
+		Module="ClinicalTrialStudy"			Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="SRDocumentSeries"			Usage="M"
+		Module="ClinicalTrialSeries"		Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="Synchronization"			Usage="C"	Condition="NeedToCheckModuleSynchronization"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"			Usage="M"
+	InformationEntityEnd
+	InformationEntity="Document"
+		Module="SRDocumentGeneral"			Usage="M"
+		Module="SRDocumentContent"			Usage="M"
+		Module="SOPCommon"					Usage="M"
+	InformationEntityEnd
+CompositeIODEnd
 

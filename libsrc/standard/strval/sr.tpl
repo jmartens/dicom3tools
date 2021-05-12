@@ -53,6 +53,24 @@ StringValues="SRValueTypes" {
 	WAVEFORM,
 	COMPOSITE,
 	SCOORD,
+	SCOORD3D,
+	TCOORD,
+	CONTAINER
+}
+
+StringValues="EnhancedAndComprehensiveSRValueTypes" {
+	TEXT,
+	NUM,
+	CODE,
+	DATETIME,
+	DATE,
+	TIME,
+	UIDREF,
+	PNAME,
+	IMAGE,
+	WAVEFORM,
+	COMPOSITE,
+	SCOORD,
 	TCOORD,
 	CONTAINER
 }
@@ -146,6 +164,15 @@ StringValues="SRGraphicType" {
 	ELLIPSE
 }
 
+StringValues="SRGraphicType3D" {
+	POINT,
+	MULTIPOINT,
+	POLYLINE,
+	POLYGON,
+	ELLIPSE,
+	ELLIPSOID
+}
+
 StringValues="TemporalRangeType" {
 	POINT,
 	MULTIPOINT,
@@ -168,6 +195,8 @@ StringValues="ObserverType" {
 
 StringValues="SRTemplateMappingResource" {
 	DCMR,
-	99RPH 
+	99RPH,
+	99SMS_CTMR = Siemens CT MR,
+	99PMP = PixelMed,
+	99QIICR = NCI QIICR Project 3DSlicer BWH
 }
-

@@ -178,3 +178,35 @@ CompositeIOD="ColorPalette"	Condition="ColorPaletteInstance"
 		Module="SOPCommon"					Usage="M"
 	InformationEntityEnd
 CompositeIODEnd
+
+CompositeIOD="BasicStructuredDisplay"	Condition="BasicStructuredDisplayInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"				Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"							Usage="M"
+		Module="ClinicalTrialSubject"				Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd
+	InformationEntity="Study"
+		Module="GeneralStudy"						Usage="M"
+		Module="PatientStudy"						Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"					Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="GeneralSeries"						Usage="M"
+		Module="ClinicalTrialSeries"				Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+		Module="PresentationSeries"					Usage="M"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"					Usage="M"
+		Module="EnhancedGeneralEquipment"			Usage="U"	Condition="EnhancedGeneralEquipmentIsPresent"
+	InformationEntityEnd
+	InformationEntity="Presentation"
+		Module="StructuredDisplay"					Usage="M"
+		Module="StructuredDisplayImageBox"			Usage="M"
+		Module="StructuredDisplayAnnotation"		Usage="U"	Condition="NeedModuleStructuredDisplayAnnotation"
+		Module="CommonInstanceReference"			Usage="M"
+		Module="SOPCommon"							Usage="M"
+	InformationEntityEnd
+CompositeIODEnd
+

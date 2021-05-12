@@ -1,10 +1,11 @@
-.TH DCDIRMK 1 "9 August 2007" "DICOM PS3" "DICOM PS3 - Create DICOMDIR"
+.TH DCDIRMK 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Create DICOMDIR"
 .SH NAME
 dcdirmk \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Create DICOMDIR
 .SH SYNOPSIS
 .HP 10
 .B dcdirmk
 " inputfile1 [ inputfile2 ... ]"
+.so man1/gen.so
 [
 .B \-v|verbose|vv|veryverbose
 ]
@@ -187,7 +188,7 @@ PATIENT Patient 3 000003
 .BR dcintro(1), 
 .BR dcdirdmp(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 .LP
 The approach to making the icon image is make everything 8 bit, and

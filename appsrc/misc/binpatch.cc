@@ -1,9 +1,21 @@
+static const char *CopyrightIdentifier(void) { return "@(#)binpatch.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>          // for listsimp.h
+#include <iomanip>           // for listsimp.h
+#include <fstream>
+#include <cstdlib>            // for atoi()
+#include <cctype>             // for isdigit()
+#else
 #include <iostream.h>          // for listsimp.h
 #include <iomanip.h>           // for listsimp.h
 #include <fstream.h>
 #include <stdlib.h>            // for atoi()
-#include <string.h>            // for strlen()
 #include <ctype.h>             // for isdigit()
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 #include "listsort.h"
@@ -302,7 +314,7 @@ main(int argc, char *argv[])
 	SortedListIterator<PatchPtr> pi(patchlist);
 	Patch *patch=!pi ? (Patch *)pi() : 0;
 	unsigned offset=0;
-	while (in.good() && in.peek() != EOF) {
+	while (in.good() && in.peek() != istream::traits_type::eof()) {
 		char c;
 		in.read(&c,1);
 		if (!in.good()) {

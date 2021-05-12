@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcdump.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "mesgtext.h"
 #include "dcopt.h"
@@ -49,9 +50,11 @@ main(int argc, char *argv[])
 		log << "Filename: \"" << (filenameused && strlen(filenameused) > 0 ? filenameused : "-") << "\"" << endl;
 	}
 
-	if (verbose) log << "******** While reading ... ********" << endl; 
+	if (verbose) log << "******** While reading ... ********" << endl;
+//clock_t start = clock();
 	list.read(din,&log,verbose,0xffffffff,true,dicom_input_options.uselengthtoend,dicom_input_options.ignoreoutofordertags,dicom_input_options.useUSVRForLUTDataIfNotExplicit);
-
+//log << "Elapsed time " << (double((clock() - start))/CLOCKS_PER_SEC*1000.0) << " ms" <<endl;
+	
 	const char *errors=list.errors();
 	if (errors) log << errors << flush;
 	if (!list.good()) {

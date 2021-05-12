@@ -19,6 +19,15 @@ StringValues="PETUnits" {
 	STDDEV = standard deviations
 }
 
+StringValues="SUVType"	{
+	BSA,
+	BW,
+	LBM,
+	LBMJAMES128,
+	LBMJANMA,
+	IBW 
+}
+
 StringValues="CountsSource"	{
 	EMISSION,
 	TRANSMISSION

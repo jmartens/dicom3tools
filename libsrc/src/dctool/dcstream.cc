@@ -1,4 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcstream.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <cctype>	// for isupper()
+#else
 #include <ctype.h>	// for isupper()
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "dcstream.h"
 
@@ -87,36 +96,10 @@ DicomInputStream::initializeTransferSyntax(const char *uid,bool meta)
 	
 	if (!TransferSyntaxToReadDataSet && !TransferSyntaxToReadMetaHeader){	// was not specified on the command line and there is no metaheader
 //cerr << "DicomInputStream::initializeTransferSyntax() no metaheader found and no transfer syntax prespecified, guessing" << endl;
-		bool bigendian = false;
-		bool explicitvr	= false;
 		clear();
 		seekg(0,ios::beg);
-		if (good() && read(b,8)) {
-			// examine probable group number ... assume <= 0x00ff
-			if (b[0] < b[1]) bigendian=true;
-			else if (b[0] == 0 && b[1] == 0) {
-				// blech ... group number is zero
-				// no point in looking at element number
-				// as it will probably be zero too (group length)
-				// try the 32 bit value length of implicit vr
-				if (b[4] < b[7]) bigendian=true;
-			}
-			// else littleendian
-			if (isupper(b[4]) && isupper(b[5])) explicitvr=true;
-			else if (bigendian) setswapped32big=checkSwapped32BigEndian(b+4);
-		}
-		// else unrecognized ... assume default
 
-		if (bigendian)
-			if (explicitvr)
-				TransferSyntaxToReadDataSet = new TransferSyntax(ExplicitVRBigEndianTransferSyntaxUID);
-			else
-				TransferSyntaxToReadDataSet = new TransferSyntax(ImplicitVR,BigEndian);
-		else
-			if (explicitvr)
-				TransferSyntaxToReadDataSet = new TransferSyntax(ExplicitVRLittleEndianTransferSyntaxUID);
-			else
-				TransferSyntaxToReadDataSet = new TransferSyntax(ImplicitVRLittleEndianTransferSyntaxUID);
+		guessTransferSyntaxToReadDataSet(setswapped32big);
 
 		// leaves positioned at start of dataset
 		clear();
@@ -131,6 +114,42 @@ DicomInputStream::initializeTransferSyntax(const char *uid,bool meta)
 //cerr << "DicomInputStream::initializeTransferSyntax() at end, TransferSyntaxToReadMetaHeader=" << (TransferSyntaxToReadMetaHeader ? TransferSyntaxToReadMetaHeader->getUID() : "") << endl;
 //cerr << "DicomInputStream::initializeTransferSyntax() at end, TransferSyntaxToReadDataSet=" << (TransferSyntaxToReadDataSet ? TransferSyntaxToReadDataSet->getUID() : "") << endl;
 //cerr << "DicomInputStream::initializeTransferSyntax() at end, TransferSyntaxInUse=" << (TransferSyntaxInUse ? TransferSyntaxInUse->getUID() : "") << endl;
+}
+
+void
+DicomInputStream::guessTransferSyntaxToReadDataSet(bool& setswapped32big) {
+	bool bigendian = false;
+	bool explicitvr	= false;
+	setswapped32big = false;
+	char b[8];
+	if (good() && read(b,8)) {
+		// examine probable group number ... assume <= 0x00ff
+		if (b[0] < b[1]) bigendian=true;
+		else if (b[0] == 0 && b[1] == 0) {
+			// blech ... group number is zero
+			// no point in looking at element number
+			// as it will probably be zero too (group length)
+			// try the 32 bit value length of implicit vr
+			if (b[4] < b[7]) bigendian=true;
+		}
+		// else littleendian
+		if (isupper(b[4]) && isupper(b[5])) explicitvr=true;
+		else if (bigendian) setswapped32big=checkSwapped32BigEndian(b+4);
+
+		seekg(-8l,ios::cur);
+	}
+	// else unrecognized ... assume default
+
+	if (bigendian)
+		if (explicitvr)
+			TransferSyntaxToReadDataSet = new TransferSyntax(ExplicitVRBigEndianTransferSyntaxUID);
+		else
+			TransferSyntaxToReadDataSet = new TransferSyntax(ImplicitVR,BigEndian);
+	else
+		if (explicitvr)
+			TransferSyntaxToReadDataSet = new TransferSyntax(ExplicitVRLittleEndianTransferSyntaxUID);
+		else
+			TransferSyntaxToReadDataSet = new TransferSyntax(ImplicitVRLittleEndianTransferSyntaxUID);
 }
 
 DicomInputStream::DicomInputStream(streambuf *buf,const char *uid,bool meta)

@@ -1,3 +1,4 @@
+/* attrtag.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_attrtag__
 #define __Header_attrtag__
 
@@ -49,7 +50,7 @@ public:
 
 	// Private groups ... see PS3.5-1993-7.1
 
-	bool	isPrivateGroup(void) const
+	bool	isPrivateGroup(void) const			// for the purpose of parsing
 		{
 			return (group % 2) == 1
 		     	     //&& group > 0x0007
@@ -62,7 +63,17 @@ public:
 					// if we encounter too large a number of variable data groups
 					// (and PS 3.2 6.0 specifically allows 0x7f00 thru 0x7fff8 :( )
 					// can't see a way around this without looking at other elements :(
-			     && group != 0xffff;
+			     ;
+		}
+
+	bool	isValidPrivateGroup(void) const		// for the purpose of validation
+		{
+			return (group % 2) == 1 && group > 0x0007 && group != 0xffff;	// these groups are forbidden (and have been since 1993)
+		}
+
+	bool	isStandardGroup(void) const
+		{
+			return (group % 2) == 0;
 		}
 
 	bool	isPrivateOwner(void) const

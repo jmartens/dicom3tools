@@ -1,4 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrtypv.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <cctype>
+#else
 #include <ctype.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "attr.h"
 #include "attrtype.h"
@@ -960,6 +969,91 @@ UIStringAttribute::validateVR(TextOutputStream& log,SpecificCharacterSetInfo *sp
 	// null is OK as trailing character, but trailing space is not
 	if (trailingSpace) {		// set during StringAttribute::read()
 		writeErrorBadTrailingChar(log,dict,getTag(),getVR(),' ');
+		ok=false;
+	}
+	return ok;
+}
+
+
+bool
+UniversalResourceAttribute::validateVR(TextOutputStream& log,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const
+{
+	bool ok=true;
+	int vn=0;
+	ValueListIterator<char *> i(values);
+	while (!i) {
+		char *s=i();
+		const char *p=s;
+		while (*p) {
+			// pct-encoded = "%" HEXDIG HEXDIG
+			// reserved    = gen-delims / sub-delims
+			// gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@"
+			// sub-delims  = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+			// unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
+			if (!isalnum(*p)
+			 && *p != ':' && *p != '/' && *p != '?' && *p != '#' && *p != '[' && *p != ']' && *p != '@'
+			 && *p != '!' && *p != '$' && *p != '&' && *p != '\'' && *p != '(' && *p != ')' && *p != '*' && *p != '+' && *p != ',' && *p != ';' && *p != '='
+			 && *p != '-' && *p != '.' && *p != '_' && *p != '~' && *p != '%') {
+				writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
+				ok=false;
+			}
+			++p;
+		}
+		if (specificCharacterSetInfo) {
+			int badCharacterPosition;
+			if (!specificCharacterSetInfo->isValidString(s,badCharacterPosition)) {
+				Assert(badCharacterPosition >= 0);
+				writeErrorBadCharacterRepertoireCharNL(log,dict,getTag(),getVR(),vn,s,*(s+badCharacterPosition));
+				ok=false;
+			}
+		}
+		++vn; ++i;
+		//if (s) delete[] s;
+	}
+	if (embeddedNullByte) {		// set during StringAttribute::read()
+		writeErrorBadVRCharNL(log,dict,getTag(),getVR(),0);
+		ok=false;
+	}
+	if (trailingNullByte) {		// set during StringAttribute::read()
+		writeErrorBadTrailingChar(log,dict,getTag(),getVR(),0);
+		ok=false;
+	}
+	return ok;
+}
+
+bool
+UnlimitedCharactersAttribute::validateVR(TextOutputStream& log,SpecificCharacterSetInfo *specificCharacterSetInfo,ElementDictionary *dict) const
+{
+	bool ok=true;
+	int vn=0;
+	ValueListIterator<char *> i(values);
+	while (!i) {
+		char *s=i();
+		if (specificCharacterSetInfo) {
+			int badCharacterPosition;
+			if (!specificCharacterSetInfo->isValidString(s,badCharacterPosition)) {
+				Assert(badCharacterPosition >= 0);
+				writeErrorBadCharacterRepertoireCharNL(log,dict,getTag(),getVR(),vn,s,*(s+badCharacterPosition));
+				ok=false;
+			}
+		}
+		const char *p=s;
+		while (*p) {
+			if ((iscntrl(*p) && !isescape(*p)) || *p == '\\') {
+				writeErrorBadVRCharNL(log,dict,getTag(),getVR(),vn,s,*p);
+				ok=false;
+			}
+			++p;
+		}
+		++vn; ++i;
+		//if (s) delete[] s;
+	}
+	if (embeddedNullByte) {		// set during StringAttribute::read()
+		writeErrorBadVRCharNL(log,dict,getTag(),getVR(),0);
+		ok=false;
+	}
+	if (trailingNullByte) {		// set during StringAttribute::read()
+		writeErrorBadTrailingChar(log,dict,getTag(),getVR(),0);
 		ok=false;
 	}
 	return ok;

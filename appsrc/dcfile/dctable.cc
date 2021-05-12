@@ -1,4 +1,14 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dctable.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
+
 
 #include "attrmxls.h"
 #include "attrnew.h"
@@ -43,12 +53,16 @@ static void dumpCodeSequenceAsString(SequenceAttribute *as,TextOutputStream &log
 	}
 }
 
+// the list will have already been checked before calling; check only the sequences within the list ...
 static Attribute *
 findFirstInstanceOfAttributeNestedAnywhereInList(Tag tag,AttributeList& list) {
+//cerr << "findFirstInstanceOfAttributeNestedAnywhereInList(): Searching for Tag ("; writeZeroPaddedHexNumber(cerr,tag.getGroup(),4); cerr << ","; writeZeroPaddedHexNumber(cerr,tag.getElement(),4); cerr << ")" << endl;
 	AttributeListIterator listi(list);
 	while (!listi) {
 		Attribute *a=listi();
+//cerr << "findFirstInstanceOfAttributeNestedAnywhereInList(): Checking Attribute ("; writeZeroPaddedHexNumber(cerr,a->getTag().getGroup(),4); cerr << ","; writeZeroPaddedHexNumber(cerr,a->getTag().getElement(),4); cerr << ")" << endl;
 		if (a->isSequence()) {
+//cerr << "findFirstInstanceOfAttributeNestedAnywhereInList(): Checking within Sequence ("; writeZeroPaddedHexNumber(cerr,a->getTag().getGroup(),4); cerr << ","; writeZeroPaddedHexNumber(cerr,a->getTag().getElement(),4); cerr << ")" << endl;
 			SequenceAttribute *as = (SequenceAttribute *)a;
 			AttributeList **itemLists;
 			int nItems = as->getLists(&itemLists);
@@ -56,7 +70,11 @@ findFirstInstanceOfAttributeNestedAnywhereInList(Tag tag,AttributeList& list) {
 				AttributeList *thisItemList = itemLists[i];
 				if (thisItemList) {
 					Attribute *aFound = (*thisItemList)[tag];
+					if (!aFound) {
+						 aFound = findFirstInstanceOfAttributeNestedAnywhereInList(tag,(*thisItemList));
+					}
 					if (aFound) {
+//cerr << "findFirstInstanceOfAttributeNestedAnywhereInList(): Found ("; writeZeroPaddedHexNumber(cerr,aFound->getTag().getGroup(),4); cerr << ","; writeZeroPaddedHexNumber(cerr,aFound->getTag().getElement(),4); cerr << ")" << endl;
 						return aFound;
 					}
 				}
@@ -72,6 +90,9 @@ writeQuoteRemovedDecimalConvertedData(Attribute *a,TextOutputStream &stream)
 {
 	int n = a->getVM();
 	for (int i=0; i<n; ++i) {
+		if (i>0) {
+			stream << "\\";
+		}
 		char *string;
 		Uint32 l = strlen(string);
 		if (a->getValue((Uint16)i,string)) {
@@ -86,10 +107,6 @@ writeQuoteRemovedDecimalConvertedData(Attribute *a,TextOutputStream &stream)
 			if (c != '"') {
 				stream << c;
 			}
-		}
-		++i;
-		if (!i) {
-			stream << "\\";
 		}
 	}
 }			
@@ -110,7 +127,7 @@ main(int argc,char **argv)
 	
 	bool ignorereaderrors=options.get("ignorereaderrors");
 	
-	bool noembeddedquotes=options.get("noembeddedquotes");
+	bool noembeddedquotes=options.get("noembeddedquotes") || options.get("decimal");
 
 	bool bad=false;
 
@@ -169,7 +186,7 @@ main(int argc,char **argv)
 			<< " [-ignorereaderrors]"
 			<< " [-describe]"
 			<< " [-nofilename]"
-			<< " [-noembeddedquotes]"
+			<< " [-noembeddedquotes|decimal]"
 			<< " [-key|k elementname|(0xgggg,0xeeee)]"
 			<< " [-recurse|r]"
 			<< " [-verbose|v]"
@@ -177,6 +194,10 @@ main(int argc,char **argv)
 			<< " >" << MMsgDC(OutputFile)
 			<< endl;
 		return 1;
+	}
+	
+	if (!keylist) {	// (000482) and Debian 715809
+		return 0;
 	}
 
 	bool success=true;

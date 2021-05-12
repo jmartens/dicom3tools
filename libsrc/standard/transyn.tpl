@@ -39,6 +39,9 @@ Name="MPEG2MPHL"		Desc="MPEG2 Main Profile @ High Level"				Uid="1.2.840.10008.1
 
 Name="MPEG4HP41"		Desc="MPEG-4 AVC/H.264 High Profile/Level 4.1"					Uid="1.2.840.10008.1.2.4.102"	Endian="little" VR="explicit"	Encap="yes"
 Name="MPEG4HP41BD"		Desc="MPEG-4 AVC/H.264 BD-compatible High Profile/Level 4.1"	Uid="1.2.840.10008.1.2.4.103"	Endian="little" VR="explicit"	Encap="yes"
+Name="MPEG4HP422D"		Desc="MPEG-4 AVC/H.264 High Profile / Level 4.2 For 2D Video"	Uid="1.2.840.10008.1.2.4.104"	Endian="little" VR="explicit"	Encap="yes"
+Name="MPEG4HP423D"		Desc="MPEG-4 AVC/H.264 High Profile / Level 4.2 For 3D Video"	Uid="1.2.840.10008.1.2.4.105"	Endian="little" VR="explicit"	Encap="yes"
+Name="MPEG4HP42ST"		Desc="MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2"			Uid="1.2.840.10008.1.2.4.106"	Endian="little" VR="explicit"	Encap="yes"
 
 Name="RLELossless"		Desc="RLE Lossless"						Uid="1.2.840.10008.1.2.5"	Endian="little" VR="explicit"	Encap="yes"
 
@@ -51,3 +54,8 @@ Name="PixelMedEncapsulatedRawLittleEndian"	Desc="PixelMed Encapsulated Raw Littl
 
 Name="AlgotecCompressed"	Desc="Algotec Compressed"				Uid="1.2.840.113704.7.0.4.4"	Endian="little" VR="explicit"	Encap="no"
 Name="ALIWavelet"			Desc="ALI Wavelet"						Uid="1.2.840.113711.1.2.100.1"	Endian="little" VR="explicit"	Encap="yes"
+
+Name="SectraCompression"	Desc="Sectra Compression"				Uid="1.2.752.24.3.7.6"	Endian="little" VR="explicit"	Encap="yes"
+Name="SectraCompressionLS"	Desc="Sectra Compression LS"			Uid="1.2.752.24.3.7.7"	Endian="little" VR="explicit"	Encap="yes"
+
+

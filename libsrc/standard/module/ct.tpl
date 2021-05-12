@@ -2,6 +2,7 @@ DefineMacro="CTFrameVOILUTMacro" InformationEntity="FunctionalGroup"
 	Sequence="FrameVOILUTSequence"				Type="1"	VM="1"
 		Name="WindowCenter"						Type="1" 
 		Name="WindowWidth"						Type="1"	NotZeroError=""
+		Verify="WindowWidth"								Condition="WindowWidthIsNegative"	ThenErrorMessage="Not permitted to be negative" ShowValueWithMessage="true"
 		Name="WindowCenterWidthExplanation"		Type="3"	StringDefinedTerms="EnhancedCTWindowCenterWidthExplanation"
 		Name="VOILUTFunction"					Type="3"	StringDefinedTerms="VOILUTFunction"
 	SequenceEnd
@@ -22,18 +23,18 @@ Module="EnhancedCTImage"
 	Verify="ImageType"													ValueSelector="3"	StringDefinedTerms="EnhancedCTImageType4"
 	InvokeMacro="CommonCTMRImageDescriptionImageLevelMacro"
 	Name="AcquisitionNumber"								Type="3"
-	Name="AcquisitionDateTime"								Type="1C"	Condition="ImageTypeValue1OriginalOrMixed"
-	Name="AcquisitionDuration"								Type="2C"	Condition="ImageTypeValue1OriginalOrMixed"
+	Name="AcquisitionDateTime"								Type="1C"	Condition="ImageTypeValue1OriginalOrMixedAndNotLegacyConvertedCT" mbpo="true"
+	Name="AcquisitionDuration"								Type="2C"	Condition="ImageTypeValue1OriginalOrMixedAndNotLegacyConvertedCT" mbpo="true"
 	Sequence="ReferencedRawDataSequence"					Type="3"	VM="1-n"
 		InvokeMacro="HierarchicalSOPInstanceReferenceMacro"
 	SequenceEnd
 	Sequence="ReferencedWaveformSequence"					Type="3"	VM="1-n"
 		InvokeMacro="HierarchicalSOPInstanceReferenceMacro"
 	SequenceEnd
-	Sequence="ReferencedImageEvidenceSequence"				Type="1C"	VM="1-n"	Condition="ReferencedImageSequenceIsPresent"
+	Sequence="ReferencedImageEvidenceSequence"				Type="1C"	VM="1-n"	Condition="ReferencedImageSequenceIsPresentInFunctionalGroups"
 		InvokeMacro="HierarchicalSOPInstanceReferenceMacro"
 	SequenceEnd
-	Sequence="SourceImageEvidenceSequence"					Type="1C"	VM="1-n"	Condition="SourceImageSequenceIsPresent"
+	Sequence="SourceImageEvidenceSequence"					Type="1C"	VM="1-n"	Condition="SourceImageSequenceIsPresentInFunctionalGroups"
 		InvokeMacro="HierarchicalSOPInstanceReferenceMacro"
 	SequenceEnd
 	Sequence="ReferencedPresentationStateSequence"	Type="1C"	VM="1-n"	NoCondition=""	# real world
@@ -44,18 +45,21 @@ Module="EnhancedCTImage"
 	Name="BitsAllocated"									Type="1"	BinaryEnumValues="BitsAre16"
 	Name="BitsStored"										Type="1"	BinaryEnumValues="BitsAre12Or16"
 	Name="HighBit"											Type="1"	BinaryEnumValues="BitsAre11Or15"
-	Name="ContentQualification"								Type="1"	StringEnumValues="ContentQualification"
+	Name="ContentQualification"								Type="1C"	StringEnumValues="ContentQualification"		Condition="NotLegacyConvertedCT" mbpo="true"
 	Name="ImageComments"									Type="3"
-	Name="BurnedInAnnotation"								Type="1"	StringEnumValues="NoFull"
+	Name="BurnedInAnnotation"								Type="1C"	StringEnumValues="NoFull"					Condition="NotLegacyConvertedCT" mbpo="true"
 	Name="RecognizableVisualFeatures"						Type="3"	StringEnumValues="YesNoFull"
-	Name="LossyImageCompression"							Type="1"	StringEnumValues="LossyImageCompression"
-	Name="LossyImageCompressionRatio"						Type="1C"	Condition="LossyImageCompressionIs01"
+	Name="LossyImageCompression"							Type="1C"	StringEnumValues="LossyImageCompression"	Condition="NotLegacyConvertedCT" mbpo="true"
+	Name="LossyImageCompressionRatio"						Type="1C"	Condition="LossyImageCompressionIs01"	NotZeroError=""
 	Name="LossyImageCompressionMethod"						Type="1C"	StringDefinedTerms="LossyImageCompressionMethod"	Condition="LossyImageCompressionIs01"
 	Verify="LossyImageCompressionMethod"								Condition="LossyImageCompressionMethodInconsistentWithTransferSyntax"	ThenWarningMessage="method inconsistent with transfer syntax" ShowValueWithMessage="true"
 	Name="PresentationLUTShape"								Type="1"	StringEnumValues="IdentityPresentationLUTShape"
 	Sequence="IconImageSequence"							Type="3"	VM="1"
 		InvokeMacro="IconImageSequenceMacro"
 	SequenceEnd
+	InvokeMacro="OptionalViewAndSliceProgressionDirectionMacro"
+	Name="IsocenterPosition"								Type="3"
+	InvokeMacro="RTEquipmentCorrelationMacro"
 ModuleEnd
 
 DefineMacro="CTImageFrameTypeMacro" InformationEntity="FunctionalGroup"
@@ -80,8 +84,8 @@ MacroEnd
 
 DefineMacro="CTAcquisitionDetailsMacro" InformationEntity="FunctionalGroup"
 	Sequence="CTAcquisitionDetailsSequence"			Type="1"	VM="1"
-		Name="RotationDirection"					Type="1C"	StringEnumValues="RotationDirection"		Condition="AcquisitionTypeNotConstantAngle"				# and ORIGINAL mbpo
-		Name="RevolutionTime"						Type="1C"	Condition="AcquisitionTypeNotConstantAngle"	NotZeroWarning=""				# and ORIGINAL mbpo
+		Name="RotationDirection"					Type="1C"	StringEnumValues="RotationDirection"		NoCondition=""		# :( cannot check since in sibling functional groups: Frame Type Value 1 of this frame is ORIGINAL and AcquisitionType not CONSTANT_ANGLE; mbpo only if DERIVED and same AcquisitionType
+		Name="RevolutionTime"						Type="1C"	NoCondition=""	NotZeroWarning=""								# :( cannot check since in sibling functional groups: Frame Type Value 1 of this frame is ORIGINAL and AcquisitionType not CONSTANT_ANGLE; mbpo only if DERIVED and same AcquisitionType
 		Name="SingleCollimationWidth"				Type="1C"	Condition="Always"	NotZeroWarning=""		# ORIGINAL mbpo
 		Name="TotalCollimationWidth"				Type="1C"	Condition="Always"	NotZeroWarning=""		# ORIGINAL mbpo
 		Name="TableHeight"							Type="1C"	Condition="Always"							# ORIGINAL mbpo
@@ -92,9 +96,9 @@ MacroEnd
 
 DefineMacro="CTTableDynamicsMacro" InformationEntity="FunctionalGroup"
 	Sequence="CTTableDynamicsSequence"			Type="1"	VM="1"
-		Name="TableSpeed"						Type="1C"	Condition="AcquisitionTypeConstantAngleOrSpiral"	NotZeroWarning=""	# and ORIGINAL mbpo
-		Name="TableFeedPerRotation"				Type="1C"	Condition="AcquisitionTypeSpiral"	NotZeroWarning=""					# and ORIGINAL mbpo
-		Name="SpiralPitchFactor"				Type="1C"	Condition="AcquisitionTypeSpiral"	NotZeroWarning=""					# and ORIGINAL mbpo
+		Name="TableSpeed"						Type="1C"	NoCondition=""	NotZeroWarning=""	# :( cannot check since in sibling functional groups: Frame Type Value 1 of this frame is ORIGINAL and AcquisitionType SPIRAL or CONSTANT_ANGLE; mbpo only if DERIVED and same AcquisitionType
+		Name="TableFeedPerRotation"				Type="1C"	NoCondition=""	NotZeroWarning=""	# :( cannot check since in sibling functional groups: Frame Type Value 1 of this frame is ORIGINAL and AcquisitionType SPIRAL or CONSTANT_ANGLE; mbpo only if DERIVED and same AcquisitionType
+		Name="SpiralPitchFactor"				Type="1C"	NoCondition=""	NotZeroWarning=""	# :( cannot check since in sibling functional groups: Frame Type Value 1 of this frame is ORIGINAL and AcquisitionType SPIRAL or CONSTANT_ANGLE; mbpo only if DERIVED and same AcquisitionType
 	SequenceEnd
 MacroEnd
 
@@ -173,8 +177,24 @@ DefineMacro="CTAdditionalXRaySourceMacro" InformationEntity="FunctionalGroup"
 	SequenceEnd
 MacroEnd
 
+DefineMacro="UnassignedSharedConvertedAttributesMacro" InformationEntity="FunctionalGroup"
+	Sequence="UnassignedSharedConvertedAttributesSequence"		Type="2"	VM="1"
+	SequenceEnd
+MacroEnd
+
+DefineMacro="UnassignedPerFrameConvertedAttributesMacro" InformationEntity="FunctionalGroup"
+	Sequence="UnassignedPerFrameConvertedAttributesSequence"	Type="2"	VM="1"
+	SequenceEnd
+MacroEnd
+
+DefineMacro="ImageFrameConversionSourceMacro" InformationEntity="FunctionalGroup"
+	Sequence="ConversionSourceAttributesSequence"				Type="1"	VM="1-n"
+		InvokeMacro="ImageSOPInstanceReferenceMacro"
+	SequenceEnd
+MacroEnd
+
 Module="MultiFrameFunctionalGroupsForEnhancedCTImage"
-	Sequence="SharedFunctionalGroupsSequence"	Type="2"	VM="0-1"
+	Sequence="SharedFunctionalGroupsSequence"	Type="1"	VM="1"
 		InvokeMacro="PixelMeasuresMacro"		Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequence"
 		InvokeMacro="PlanePositionMacro"		Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequence"
 		InvokeMacro="PlaneOrientationMacro"		Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequence"
@@ -225,6 +245,84 @@ Module="MultiFrameFunctionalGroupsForEnhancedCTImage"
 		InvokeMacro="CTXRayDetailsMacro"		Condition="NeedCTXRayDetailsMacroInPerFrameFunctionalGroupSequence"
 		InvokeMacro="CTPixelValueTransformationMacro"	Condition="PixelValueTransformationSequenceNotInSharedFunctionalGroupSequence"
 		InvokeMacro="CTAdditionalXRaySourceMacro"		Condition="CTAdditionalXRaySourceMacroInPerFrameFunctionalGroupSequence"
+	SequenceEnd
+ModuleEnd
+
+Module="MultiFrameFunctionalGroupsForLegacyConvertedEnhancedCTImage"
+	Sequence="SharedFunctionalGroupsSequence"				Type="1"	VM="1"
+		InvokeMacro="PixelMeasuresMacro"					Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="PlanePositionMacro"					Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="PlaneOrientationMacro"					Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="ReferencedImageMacro"					Condition="ReferencedImageMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="CardiacSynchronizationMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomyMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameVOILUTMacro"						Condition="FrameVOILUTMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="ContrastBolusUsageMacro"				Condition="NeedContrastBolusUsageMacroInSharedFunctionalGroupSequence"
+		InvokeMacro="RespiratorySynchronizationMacro"		Condition="RespiratorySynchronizationMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="IrradiationEventIdentificationMacro"	Condition="IrradiationEventIdentificationMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="CTImageFrameTypeMacro"					Condition="CTImageFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="CTPixelValueTransformationMacro"		Condition="PixelValueTransformationSequenceOKInSharedFunctionalGroupSequence"
+		InvokeMacro="UnassignedSharedConvertedAttributesMacro"
+	SequenceEnd
+
+	Sequence="PerFrameFunctionalGroupsSequence"				Type="1"	VM="1-n"
+		InvokeMacro="PixelMeasuresMacro"					Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameContentMacro"
+		InvokeMacro="PlanePositionMacro"					Condition="PlanePositionSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="PlaneOrientationMacro"					Condition="PlaneOrientationSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="ReferencedImageMacro"					Condition="ReferencedImageMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="CardiacSynchronizationMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomyMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameVOILUTMacro"						Condition="FrameVOILUTMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="ContrastBolusUsageMacro"				Condition="NeedContrastBolusUsageMacroInPerFrameFunctionalGroupSequence"
+		InvokeMacro="RespiratorySynchronizationMacro"		Condition="RespiratorySynchronizationMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="IrradiationEventIdentificationMacro"	Condition="IrradiationEventIdentificationMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="CTImageFrameTypeMacro"					Condition="CTImageFrameTypeSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="CTPixelValueTransformationMacro"		Condition="PixelValueTransformationSequenceOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="UnassignedPerFrameConvertedAttributesMacro"
+		InvokeMacro="ImageFrameConversionSourceMacro"
+	SequenceEnd
+ModuleEnd
+
+
+Module="MultiFrameFunctionalGroupsForPrivatePixelMedLegacyConvertedEnhancedCTImage"
+	Sequence="SharedFunctionalGroupsSequence"				Type="1"	VM="1"
+		InvokeMacro="PixelMeasuresMacro"					Condition="PixelMeasuresSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="PlanePositionMacro"					Condition="PlanePositionSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="PlaneOrientationMacro"					Condition="PlaneOrientationSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="ReferencedImageMacro"					Condition="ReferencedImageMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="CardiacSynchronizationMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomyMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="CTFrameVOILUTMacro"					Condition="FrameVOILUTSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="ContrastBolusUsageMacro"				Condition="NeedContrastBolusUsageMacroInSharedFunctionalGroupSequence"
+		InvokeMacro="RespiratorySynchronizationMacro"		Condition="RespiratorySynchronizationMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="IrradiationEventIdentificationMacro"	Condition="IrradiationEventIdentificationMacroOKInSharedFunctionalGroupSequence"
+		InvokeMacro="CTImageFrameTypeMacro"					Condition="CTImageFrameTypeSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="CTPixelValueTransformationMacro"		Condition="PixelValueTransformationSequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="UnassignedSharedConvertedAttributesMacro"
+		InvokeMacro="ImageFrameConversionSourceMacro"		Condition="ConversionSourceAttributesSequenceNotInPerFrameFunctionalGroupSequence"
+	SequenceEnd
+
+	Sequence="PerFrameFunctionalGroupsSequence"				Type="1"	VM="1-n"
+		InvokeMacro="PixelMeasuresMacro"					Condition="PixelMeasuresSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameContentMacro"
+		InvokeMacro="PlanePositionMacro"					Condition="PlanePositionSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="PlaneOrientationMacro"					Condition="PlaneOrientationSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="ReferencedImageMacro"					Condition="ReferencedImageMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="CardiacSynchronizationMacro"			Condition="CardiacSynchronizationMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomyMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="CTFrameVOILUTMacro"					Condition="FrameVOILUTSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="ContrastBolusUsageMacro"				Condition="NeedContrastBolusUsageMacroInPerFrameFunctionalGroupSequence"
+		InvokeMacro="RespiratorySynchronizationMacro"		Condition="RespiratorySynchronizationMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="IrradiationEventIdentificationMacro"	Condition="IrradiationEventIdentificationMacroOKInPerFrameFunctionalGroupSequence"
+		InvokeMacro="CTImageFrameTypeMacro"					Condition="CTImageFrameTypeSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="CTPixelValueTransformationMacro"		Condition="PixelValueTransformationSequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="UnassignedPerFrameConvertedAttributesMacro"
+		InvokeMacro="ImageFrameConversionSourceMacro"		Condition="ConversionSourceAttributesSequenceNotInSharedFunctionalGroupSequence"
 	SequenceEnd
 ModuleEnd
 

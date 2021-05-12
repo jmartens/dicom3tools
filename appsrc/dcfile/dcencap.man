@@ -1,9 +1,10 @@
-.TH DCENCAP 1 "19 April 2009" "DICOM PS3" "DICOM PS3 - Encapsulate in DICOM file"
+.TH DCENCAP 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Encapsulate in DICOM file"
 .SH NAME
 dcencap \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Encapsulate compressed stream in a DICOM file
 .SH SYNOPSIS
 .HP 10
 .B dcencap
+.so man1/gen.so
 .B dicomheader rawpixeldata
 .B \-transfersyntax " uid"
 [
@@ -73,7 +74,7 @@ Wrote total of 9072492
 .SH SEE ALSO
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 Cannot add further attributes after the encapsulated Pixel Data attribute.
 .LP

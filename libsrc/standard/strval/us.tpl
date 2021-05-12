@@ -701,5 +701,265 @@ StringValues="USStageName" {
 	PEAK DOSE
 }
 
+StringValues="UltrasoundAcquisitionGeometry" {
+	APEX
+}
 
+StringValues="UltrasoundAcquisitionGeometryPatient" {
+	PATIENT
+}
+
+StringValues="PatientFrameOfReferenceSource" {
+	TABLE,
+	ESTIMATED,
+	REGISTRATION
+}
+
+StringValues="PatientFrameOfReferenceSourceTable" {
+	TABLE
+}
+
+StringValues="USOrIVUSModality" {
+	US,
+	IVUS
+}
+
+StringValues="PerformedProtocolType" {
+	STAGED,
+	NON_STAGED
+}
+
+StringValues="DimensionOrganizationType3DOr3DTemporal" {
+	3D,
+	3D_TEMPORAL
+}
+
+StringValues="PositionMeasuringDeviceUsed" {
+	RIGID,
+	FREEHAND
+}
+
+StringValues="PositionMeasuringDeviceUsedRigid" {
+	RIGID
+}
+
+StringValues="EnhancedUSVolumeDataType" {
+	TISSUE_INTENSITY,
+	TISSUE_VELOCITY,
+	FLOW_VELOCITY,
+	FLOW_POWER,
+	FLOW_VARIANCE,
+	ELASTICITY,
+	PERFUSION,
+	SOUND_SPEED,
+	ATTENUATION
+}
+
+StringValues="DataPathAssignment" {
+	PRIMARY_PVALUES,
+	PRIMARY_SINGLE,
+	SECONDARY_SINGLE,
+	SECONDARY_HIGH,
+	SECONDARY_LOW
+}
+
+StringValues="BlendingLUT1TransferFunction" {
+	CONSTANT,
+	ALPHA_1,
+	ALPHA_2,
+	TABLE
+}
+
+StringValues="BlendingLUT2TransferFunction" {
+	CONSTANT,
+	ONE_MINUS,
+	ALPHA_1,
+	ALPHA_2,
+	TABLE
+}
+
+StringValues="DataPathID" {
+	PRIMARY,
+	SECONDARY
+}
+
+StringValues="RGBLUTTransferFunction" {
+	EQUAL_RGB,
+	TABLE
+}
+
+StringValues="AlphaLUTTransferFunction" {
+	NONE,
+	IDENTITY,
+	TABLE
+}
+
+StringValues="VolumeToTransducerRelationship" {
+	FIXED,
+	POSITION_VAR,
+	ORIENTATION_VAR,
+	VARIABLE
+}
+
+StringValues="VolumeToTransducerRelationshipFixed" {
+	FIXED
+}
+
+StringValues="BodyPartExaminedBreast" {
+	BREAST
+}
+
+StringValues="BreastCodeValue" {
+	T-04000
+}
+
+StringValues="BreastCodingSchemeDesignator" {
+	SRT
+}
+
+StringValues="BreastCodeMeaning" {
+	Breast
+}
+
+StringValues="CoronalCodeValue" {
+	G-A138
+}
+
+StringValues="CoronalCodingSchemeDesignator" {
+	SRT
+}
+
+StringValues="CoronalCodeMeaning" {
+	Coronal
+}
+
+StringValues="TransducerScanPatternCodeSequenceCodeValue" {
+	125242
+}
+
+StringValues="TransducerScanPatternCodeSequenceCodingSchemeDesignator" {
+	DCM
+}
+
+StringValues="TransducerScanPatternCodeSequenceCodeMeaning" {
+	Volume scan pattern
+}
+
+StringValues="TransducerGeometryCodeSequenceCodeValueForReflection" {
+	125253
+}
+
+StringValues="TransducerGeometryCodeSequenceCodeMeaningForReflection" {
+	Curved ultrasound transducer geometry
+}
+
+StringValues="TransducerGeometryCodeSequenceCodingSchemeDesignator" {
+	DCM
+}
+
+StringValues="TransducerGeometryCodeSequenceCodeValueForTransmission" {
+	125252
+}
+
+StringValues="TransducerGeometryCodeSequenceCodeMeaningForTransmission" {
+	Linear ultrasound transducer geometry
+}
+
+StringValues="TransducerBeamSteeringCodeSequenceCodeValue" {
+	125258
+}
+
+StringValues="TransducerBeamSteeringCodeSequenceCodingSchemeDesignator" {
+	DCM
+}
+
+StringValues="TransducerBeamSteeringCodeSequenceCodeMeaning" {
+	Mechanical beam steering
+}
+
+StringValues="TransducerApplicationCodeSequenceCodeValue" {
+	125261
+}
+
+StringValues="TransducerApplicationCodeSequenceCodingSchemeDesignator" {
+	DCM
+}
+
+StringValues="TransducerApplicationCodeSequenceCodeMeaning" {
+	External
+}
+
+StringValues="QTUSImageAndFrameTypeValue3" {
+	TISSUE_INTENSITY,
+	SOUND_SPEED,
+	ATTENUATION
+}
+
+StringValues="QTUSEnhancedUSVolumeDataType" {
+	TISSUE_INTENSITY,
+	SOUND_SPEED,
+	ATTENUATION
+}
+
+StringValues="EnhancedUSVolumeDataTypeTissueIntensity" {
+	TISSUE_INTENSITY
+}
+
+StringValues="EnhancedUSVolumeDataTypeAttenuation" {
+	ATTENUATION
+}
+
+StringValues="EnhancedUSVolumeDataTypeSoundSpeed" {
+	SOUND_SPEED
+}
+
+StringValues="QTUSImageAndFrameTypeValue3TissueIntensity" {
+	TISSUE_INTENSITY
+}
+
+StringValues="QTUSImageAndFrameTypeValue3Attenuation" {
+	ATTENUATION
+}
+
+StringValues="QTUSImageAndFrameTypeValue3SoundSpeed" {
+	SOUND_SPEED
+}
+
+StringValues="QTUSDimensionDescriptionLabel" {
+	time,
+	position,
+	data type
+}
+
+StringValues="QTUSRealWorldValueMappingLUTExplanation" {
+	Atten dB/m/MHz,
+	Speed Sound m/s,
+	Imp Mismatch dB
+}
+
+StringValues="QTUSRealWorldValueMappingLUTLabel" {
+	Atten dB/m/MHz,
+	Speed Sound m/s,
+	Imp Mismatch dB
+}
+
+StringValues="QTUSRealWorldValueMappingMeasurementUnitsCodeValue" {
+	dB/m/MHz,
+	m/s,
+	dB
+}
+
+StringValues="QTUSRealWorldValueMappingMeasurementUnitsCodeMeaning" {
+	dB/m/MHz,
+	m/s,
+	dB
+}
+
+StringValues="CodeValueForLOINCBreastUltrasound" {
+	24601-7
+}
+
+StringValues="CodeMeaningForLOINCBreastUltrasound" {
+	Breast US
+}
 

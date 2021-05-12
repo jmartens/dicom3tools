@@ -1,9 +1,10 @@
-.TH RAWTODC 1 "9 December 2005" "DICOM PS3" "Create DICOM from raw file"
+.TH RAWTODC 1 "6 March 2014" "DICOM PS3" "Create DICOM from raw file"
 .SH NAME
 rawtodc \- ACR/NEMA DICOM PS3 ... Create DICOM from raw file
 .SH SYNOPSIS
 .HP 10
 .B rawtodc
+.so man1/gen.so
 .B \-rows|\-height|\-h " rows"
 .B \-columns|\-width|\-w " cols"
 .B \-bits|\-depth|\-d " bits"
@@ -313,5 +314,5 @@ Converting ...
 .BR dcintro(1) ,
 .BR dcmerge(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

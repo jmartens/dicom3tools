@@ -1,5 +1,8 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrtypo.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attr.h"
 #include "attrtypo.h"
+#include "attrtag.h"
+#include "elmdict.h"
 #include "srcsink.h"
 #include "convtype.h"
 #include "tobyte.h"
@@ -55,9 +58,18 @@ TextOutputStream&
 OtherByteSmallNonPixelAttributeBase::write(TextOutputStream& stream,ElementDictionary *dict,bool verbose,bool showUsedAndIE)
 {
 	Attribute::writeBase(stream,dict,verbose,showUsedAndIE);
-	stream << "[";
-	writeData(stream);
-	stream << "] ";
+	Tag t = getTag();
+	if (dict->isRenderAsString(t)) {
+		stream << "<";
+		stream << data;
+		if (strlen((const char *)data)%2) stream << ' ';		// pad for consistency with string attribute writes
+		stream << "> ";
+	}
+	else {
+		stream << "[";
+		writeData(stream);
+		stream << "] ";
+	}
 	return stream;
 }
 
@@ -354,50 +366,61 @@ OtherWordLargeNonPixelAttributeBase::setValue(const Uint16 *,Uint32 )
 	Assert(0);
 }
 
-/* ********************* OF VR Attributes ********************* */
+/* ********************* OL VR Attributes ********************* */
 
-// OtherFloatSmallAttributeBase not yet implemented ... need to do swab on read and write like OtherFloatLargeAttributeBase
-
-#ifdef CRAP
-OtherFloatSmallAttributeBase::OtherFloatSmallAttributeBase(Tag t)
+OtherLongLargeAttributeBase::OtherLongLargeAttributeBase(Tag t,
+		BinaryInputStream &stream,OurStreamPos pos)
 	 : OtherNonPixelAttribute(t)
 {
-	data=0;
+	srcstream=&stream;
+	Assert(srcstream);
+	srcpos=pos;
+	srcendian=srcstream->getEndian();
+	Assert(srcendian != NoEndian);
+	Assert(srcendian != ByteEndian);
 }
 
-OtherFloatSmallAttributeBase:: ~OtherFloatSmallAttributeBase(void)
+OtherLongLargeAttributeBase::~OtherLongLargeAttributeBase()
 {
-	if (data) delete[] data;
 }
 
 BinaryOutputStream&
-OtherFloatSmallAttributeBase::writeValues(BinaryOutputStream& stream)
+OtherLongLargeAttributeBase::writeValues(BinaryOutputStream& dststream)
 {
-	if (lengthinbytes) {
-		Assert(data);
-		stream.write((char *)data,size_t(lengthinbytes));
-	}
-	return stream;
-}
+	// use current dststream endian, not getTransferSyntaxToReadDataSet()->getEndian()
+	Endian dstendian=dststream.getEndian();
+	Assert(dstendian != NoEndian);
+	Assert(dstendian != ByteEndian);
 
-TextOutputStream&
-OtherFloatSmallAttributeBase::writeData(TextOutputStream& stream)
-{
-	Uint32 i = lengthinbytes;
-	unsigned char *ptr = data;
-	while (i > 0) {
-		writeZeroPaddedHexNumber(stream,unsigned(*ptr++),2);
-		--i;
-		if (i > 0) {
-			stream << ",";
-			if (i%16 == 0) stream << "\n\t";
+	Assert(getVL()%4 == 0);
+
+	srcstream->clear();
+	srcstream->seekg(srcpos);
+	if (srcstream->good()) {
+		// we don't have a ConvertByteToUint32, analogous to the ConvertByteToUint16 used for OW, so do it like we do for OF and OD ...
+		Source<unsigned char> srcinput (*srcstream,1024,getVL());
+		if (dstendian != srcendian) {
+			ConvertSourceToSinkSwapping<unsigned char,unsigned char,4> swab(srcinput);
+			Sink<unsigned char> output(dststream,swab);
+			output.write(getVL());
+		}
+		else {
+			Sink<unsigned char> output(dststream,srcinput);
+			output.write(getVL());
 		}
 	}
+	return dststream;
+}
+
+TextOutputStream&
+OtherLongLargeAttributeBase::writeData(TextOutputStream& stream)
+{
+	stream << "...";
 	return stream;
 }
 
 TextOutputStream&
-OtherFloatSmallAttributeBase::write(TextOutputStream& stream,ElementDictionary *dict,bool verbose,bool showUsedAndIE)
+OtherLongLargeAttributeBase::write(TextOutputStream& stream,ElementDictionary *dict,bool verbose,bool showUsedAndIE)
 {
 	Attribute::writeBase(stream,dict,verbose,showUsedAndIE);
 	stream << "[";
@@ -407,39 +430,28 @@ OtherFloatSmallAttributeBase::write(TextOutputStream& stream,ElementDictionary *
 }
 
 BinaryInputStream&
-OtherFloatSmallAttributeBase::read(BinaryInputStream& stream,Uint32 length)
+OtherLongLargeAttributeBase::read(BinaryInputStream& stream,Uint32 vl)
 {
-	Assert(lengthinbytes == 0);
-	Assert(data == 0);
-	Assert(length%2 == 0);	// DICOM likes even things
-	data=new unsigned char[length];
-	Assert(data);
-	if (length) stream.read((char *)data,size_t(length));
-	lengthinbytes=length;
+	Assert(&stream == srcstream);
+	stream.seekg(vl,ios::cur);
+	lengthinbytes=vl;
 	return stream;
 }
 
 bool
-OtherFloatSmallAttributeBase::getValue(const unsigned char * & rvalue,Uint32 &rlength) const
+OtherLongLargeAttributeBase::getValue(const Uint16 * &,Uint32 &) const
 {
-	rlength=lengthinbytes;
-	rvalue=data;
-	return true;	// ? should this be false if zero length ? :(
+	Assert(0);
+	return false;
 }
 
 void
-OtherFloatSmallAttributeBase::setValue(const unsigned char *values,Uint32 length)
+OtherLongLargeAttributeBase::setValue(const Uint16 *,Uint32 )
 {
-	Assert(lengthinbytes == 0);
-	Assert(data == 0);
-	Assert(length%2 == 0);	// DICOM likes even things
-	data=new unsigned char[length];
-	Assert(data);
-	memcpy(data,values,size_t(length));
-	lengthinbytes=length;
+	Assert(0);
 }
 
-#endif
+/* ********************* OF VR Attributes ********************* */
 
 OtherFloatLargeAttributeBase::OtherFloatLargeAttributeBase(Tag t,
 		BinaryInputStream &stream,OurStreamPos pos)
@@ -465,7 +477,7 @@ OtherFloatLargeAttributeBase::writeValues(BinaryOutputStream& dststream)
 	Assert(dstendian != NoEndian);
 	Assert(dstendian != ByteEndian);
 
-	Assert(getVL()%2 == 0);
+	Assert(getVL()%4 == 0);
 
 	srcstream->clear();
 	srcstream->seekg(srcpos);
@@ -523,6 +535,90 @@ OtherFloatLargeAttributeBase::setValue(const unsigned char *,Uint32 )
 	Assert(0);
 }
 
+
+/* ********************* OD VR Attributes ********************* */
+
+OtherDoubleLargeAttributeBase::OtherDoubleLargeAttributeBase(Tag t,
+		BinaryInputStream &stream,OurStreamPos pos)
+	 : OtherNonPixelAttribute(t)
+{
+	srcstream=&stream;
+	Assert(srcstream);
+	srcpos=pos;
+	srcendian=srcstream->getEndian();
+	Assert(srcendian != NoEndian);
+	Assert(srcendian != ByteEndian);
+}
+
+OtherDoubleLargeAttributeBase::~OtherDoubleLargeAttributeBase()
+{
+}
+
+BinaryOutputStream&
+OtherDoubleLargeAttributeBase::writeValues(BinaryOutputStream& dststream)
+{
+	// use current dststream endian, not getTransferSyntaxToReadDataSet()->getEndian()
+	Endian dstendian=dststream.getEndian();
+	Assert(dstendian != NoEndian);
+	Assert(dstendian != ByteEndian);
+
+	Assert(getVL()%8 == 0);
+	
+	srcstream->clear();
+	srcstream->seekg(srcpos);
+	if (srcstream->good()) {
+		Source<unsigned char> srcinput (*srcstream,1024,getVL());
+		if (dstendian != srcendian) {
+			ConvertSourceToSinkSwapping<unsigned char,unsigned char,8> swab(srcinput);
+			Sink<unsigned char> output(dststream,swab);
+			output.write(getVL());
+		}
+		else {
+			Sink<unsigned char> output(dststream,srcinput);
+			output.write(getVL());
+		}
+	}
+	return dststream;
+}
+
+TextOutputStream&
+OtherDoubleLargeAttributeBase::writeData(TextOutputStream& stream)
+{
+	stream << "...";
+	return stream;
+}
+
+TextOutputStream&
+OtherDoubleLargeAttributeBase::write(TextOutputStream& stream,ElementDictionary *dict,bool verbose,bool showUsedAndIE)
+{
+	Attribute::writeBase(stream,dict,verbose,showUsedAndIE);
+	stream << "[";
+	writeData(stream);
+	stream << "] ";
+	return stream;
+}
+
+BinaryInputStream&
+OtherDoubleLargeAttributeBase::read(BinaryInputStream& stream,Uint32 vl)
+{
+	Assert(&stream == srcstream);
+	stream.seekg(vl,ios::cur);
+	lengthinbytes=vl;
+	return stream;
+}
+
+bool
+OtherDoubleLargeAttributeBase::getValue(const unsigned char * &,Uint32 &) const
+{
+	Assert(0);
+	return false;
+}
+
+void
+OtherDoubleLargeAttributeBase::setValue(const unsigned char *,Uint32 )
+{
+	Assert(0);
+}
 
 /* ********************* Unknown VR Attributes ********************* */
 

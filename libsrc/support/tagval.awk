@@ -1,3 +1,4 @@
+#  tagval.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 # create C++ headers from tag values template 
 
 # can set these values on the command line:
@@ -43,10 +44,10 @@ NR==1	{
 
 	}
 
-/^[ 	]*[0-9][x0-9a-f]*/ {
+/^[ 	]*0x[0-9a-fA-F]*/ {
 
 	valueline=$0
-	if (!match(valueline,"[0-9][x0-9a-f]*,[0-9][x0-9a-f]*")) {
+	if (!match(valueline,"[0-9][x0-9a-fA-F]*,[0-9][x0-9a-fA-F]*")) {
 		print "Line " FNR \
 			": error in value line - no group,element code <" \
 			valueline ">" >"/dev/tty"
@@ -56,11 +57,11 @@ NR==1	{
 	valueline=substr(valueline,RSTART+RLENGTH)
 
 	group=""
-	if (match(code,"[0-9][x0-9a-f]*,")) {
+	if (match(code,"[0-9][x0-9a-fA-F]*,")) {
 		group=substr(code,RSTART,RLENGTH-1)
 	}
 	element=""
-	if (match(code,",[0-9][x0-9a-f]*")) {
+	if (match(code,",[0-9][x0-9a-fA-F]*")) {
 		element=substr(code,RSTART+1,RLENGTH-1)
 	}
 

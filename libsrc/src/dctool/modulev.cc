@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)modulev.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attr.h"
 #include "attrlist.h"
 #include "attrval.h"
@@ -61,7 +62,7 @@ verifyRequired(Attribute *attr,
 	const char *module,const char *element,
 	bool verbose,TextOutputStream& log,
 	ElementDictionary *dict,
-	Uint16 multiplicityMin,Uint16 multiplicityMax)
+	Uint32 multiplicityMin,Uint32 multiplicityMax)
 {
 	// Normalized Required Data Element
 
@@ -98,7 +99,7 @@ verifyType1 (Attribute *attr,
 	const char *module,const char *element,
 	bool verbose,TextOutputStream& log,
 	ElementDictionary *dict,
-	Uint16 multiplicityMin,Uint16 multiplicityMax)
+	Uint32 multiplicityMin,Uint32 multiplicityMax)
 {
 	// Type 1 - Required Data Element
 
@@ -140,7 +141,7 @@ verifyType1C(Attribute *attr,
 	AttributeList *list,
 	AttributeList *parentlist,
 	AttributeList *rootlist,
-	Uint16 multiplicityMin,Uint16 multiplicityMax)
+	Uint32 multiplicityMin,Uint32 multiplicityMax)
 {
 //cerr << "verifyType1C(): " << element << endl;
 	// Type 1C - Conditional Data Element
@@ -196,7 +197,7 @@ verifyType2 (Attribute *attr,
 	const char *module,const char *element,
 	bool verbose,TextOutputStream& log,
 	ElementDictionary *dict,
-	Uint16 multiplicityMin,Uint16 multiplicityMax)
+	Uint32 multiplicityMin,Uint32 multiplicityMax)
 {
 	// Type 2 - Required Data Element (May be Empty)
 
@@ -238,7 +239,7 @@ verifyType2C(Attribute *attr,
 	AttributeList *list,
 	AttributeList *parentlist,
 	AttributeList *rootlist,
-	Uint16 multiplicityMin,Uint16 multiplicityMax)
+	Uint32 multiplicityMin,Uint32 multiplicityMax)
 {
 	// Type 2C - Conditional Data Element (May be Empty)
 
@@ -284,7 +285,7 @@ verifyType3 (Attribute *attr,
 	const char *module,const char *element,
 	bool verbose,TextOutputStream& log,
 	ElementDictionary *dict,
-	Uint16 multiplicityMin,Uint16 multiplicityMax)
+	Uint32 multiplicityMin,Uint32 multiplicityMax)
 {
 	// Type 3 - Optional Data Element
 
@@ -326,7 +327,7 @@ verifyType3C(Attribute *attr,
 	AttributeList *list,
 	AttributeList *parentlist,
 	AttributeList *rootlist,
-	Uint16 multiplicityMin,Uint16 multiplicityMax)
+	Uint32 multiplicityMin,Uint32 multiplicityMax)
 {
 	// Type 3C - Optional Data Element that can only be present when condition is true
 

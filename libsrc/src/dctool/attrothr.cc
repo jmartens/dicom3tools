@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrothr.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attr.h"
 #include "attrothr.h"
 #include "convtype.h"
@@ -530,7 +531,18 @@ OtherUnspecifiedLargeAttributeEncapsulated::OtherUnspecifiedLargeAttributeEncaps
 	dstbitsallocated=srcbitsallocated;
 	dstbitsstored=srcbitsstored;
 	dsthighbit=srchighbit;
-	dstlength=((long(r)*c*f*sperp*srcbitsallocated-1u)/16u+1u)*2u;	// note cast to ensure that result is not truncated - 32 bits are NOT enough
+	// note cast to Uint32 to ensure that result is not truncated
+	if (srcbitsallocated % 8 == 0) {
+		dstlength= Uint32(r)*c*f*sperp*(srcbitsallocated/8);
+	}
+	else {
+		// account for packed data, as in old ACR-NEMA objects, instead of assuming whole number of bytes
+		// but this may overflow 32 bits if too long :(
+		dstlength= ((Uint32(r)*c*f*sperp*srcbitsallocated-1)/8+1);
+	}
+	if (dstlength%2 == 1) {
+		++dstlength;	// odd lengths are always padded by one byte to even
+	}
 }
 
 OtherUnspecifiedLargeAttributeEncapsulated::~OtherUnspecifiedLargeAttributeEncapsulated()

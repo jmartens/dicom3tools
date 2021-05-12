@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dctopnm.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "attrothr.h"
 #include "attrval.h"
@@ -95,6 +96,10 @@ main(int argc, char *argv[])
 	if (aNumberOfFrames)	// optional
 		vNumberOfFrames=AttributeValue(aNumberOfFrames);
 
+	if (vNumberOfFrames == 0) {
+		vNumberOfFrames = 1;	// need to treat it as 1 if missing for later byteCount calculation
+	}
+
 	char *vPhotometricInterpretation = 0;
 	Attribute *aPhotometricInterpretation = list[TagFromName(PhotometricInterpretation)];
 	if (!aPhotometricInterpretation)
@@ -158,6 +163,8 @@ main(int argc, char *argv[])
 	else
 		vPlanarConfiguration=AttributeValue(aPlanarConfiguration);
 
+	Uint32 byteCount = ((Uint32)vRows) * vColumns * vNumberOfFrames * vSamplesPerPixel * ((vBitsAllocated-1)/8 + 1);
+
 	if (!quiet) {
 		log << "\tRows = " << dec << vRows << endl;
 		log << "\tColumns = " << dec << vColumns << endl;
@@ -171,38 +178,35 @@ main(int argc, char *argv[])
 		log << "\tHighBit = " << dec << vHighBit << endl;
 		log << "\tPixelRepresentation = " << dec << vPixelRepresentation << endl;
 		log << "\tPlanarConfiguration = " << hex << vPlanarConfiguration << dec << endl;
-		log << "\tRows*Columns*SamplesPerPixel*BitsAllocated/8 = "
-		    << hex << (Uint32)vRows*vColumns*vSamplesPerPixel*vBitsAllocated/8
-		    << dec << endl;
+		log << "\tRows*Columns*vNumberOfFrames*SamplesPerPixel*((vBitsAllocated-1)/8+1) = "
+		    << hex << byteCount
+		    << dec << " (" << byteCount << " dec)" << endl;
 	}
 
 	if (vNumberOfFrames > 1) {
-		log << "Multiple frames not supported" << endl;
+		log << "Error - Multiple frames not supported" << endl;
 		success=false;
 	}
 
 	if (din.getTransferSyntaxToReadDataSet()->isEncapsulated()) {
-		log << "Encapsulated (compressed) input data not supported" << endl;
+		log << "Error - Encapsulated (compressed) input data not supported" << endl;
 		success=false;
 	}
 
 	if (vBitsAllocated > 8) {
 		if (output_options.byteorder == ByteEndian || output_options.byteorder == NoEndian) {
-			log << "Need to specify output byte order for > 8 bit data" << endl;
+			log << "Error - Need to specify output byte order for > 8 bit data" << endl;
 			success=false;
 		}
 		else if (din.getEndian() != output_options.byteorder) {
-			log << "Need to specify same byte order as input for > 8 bit data" << endl;
+			log << "Error - Need to specify same byte order as input for > 8 bit data" << endl;
 			success=false;
 		}
 	}
 
 	const char *pnmstring=0;
 
-	if (vSamplesPerPixel == 1
-	 && vPhotometricInterpretation
-	 && (strcmp(vPhotometricInterpretation,"MONOCHROME1") == 0
-	  || strcmp(vPhotometricInterpretation,"MONOCHROME2") == 0) ) {
+	if (vSamplesPerPixel == 1) {
 		pnmstring="P5";
 	}
 	else if (vSamplesPerPixel == 3
@@ -211,7 +215,7 @@ main(int argc, char *argv[])
 		pnmstring="P6";
 	}
 	else {
-		log << "Only greyscale and RGB interleaved images supported" << endl;
+		log << "Error - Only single channel or 3 channel RGB interleaved images supported" << endl;
 		success=false;
 	}
 
@@ -238,10 +242,20 @@ main(int argc, char *argv[])
 			opixeldata = apixeldata->castToOtherData();
 		Assert(opixeldata);
 
-		if (!quiet) log << "Writing ..." << endl;
 
-		opixeldata->writeRaw(out);
-
+		// do NOT want to write all available bytes, since odd number will have ab even padding byte
+		// and netpbm utilities freak if this is present with "Error reading magic number from Netpbm image stream.  Most often, this means your input file is empty." ...
+		
+		if (byteCount == 0) {
+			// do it the "old" way, if for some reason we could not find a suitable value for something that contributes to the desired count; should never happen
+			if (!quiet) log << "Writing VL " << dec << opixeldata->getVL() << " (dec) bytes ..." << endl;
+			opixeldata->writeRaw(out);
+		}
+		else {
+			if (!quiet) log << "Writing unpadded " << dec << byteCount << " (dec) bytes ..." << endl;
+			opixeldata->writeRaw(out,0/*byte offset*/,byteCount);
+		}
+		
 		if (!out.good()) {
 			log << EMsgDC(Writefailed) << endl;
 			success=false;

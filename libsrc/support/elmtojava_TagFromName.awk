@@ -1,3 +1,4 @@
+#  elmtojava_TagFromName.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 # create XML from element dictionary template 
 
 NR==1	{
@@ -9,7 +10,7 @@ NR==1	{
 	print ""
 	print "public class TagFromName {"
 	print ""
-	print "private static final String identString = \"@(#) $Header: /userland/cvs/dicom3tools/libsrc/support/elmtojava_TagFromName.awk,v 1.4 2011/05/04 21:56:48 dclunie Exp $\";"
+	print "private static final String identString = \"@(#) $Header: /userland/cvs/dicom3tools/libsrc/support/elmtojava_TagFromName.awk,v 1.7 2015/08/26 13:00:43 dclunie Exp $\";"
 	print ""
 }
 

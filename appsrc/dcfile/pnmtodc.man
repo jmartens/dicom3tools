@@ -1,9 +1,10 @@
-.TH PNMTODC 1 "9 December 2005" "DICOM PS3" "DICOM PS3 - Create DICOM from PNM file"
+.TH PNMTODC 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Create DICOM from PNM file"
 .SH NAME
 pnmtodc \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Create DICOM from PNM file
 .SH SYNOPSIS
 .HP 10
 .B pnmtodc
+.so man1/gen.so
 [
 .B \-little|\-l|\-big|\-b
 ]
@@ -190,7 +191,7 @@ Converting ...
 .BR dcintro(1) ,
 .BR dcmerge(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 Only raw grayscale PGM (P5) and RGB PPM (P6) PNM files are supported, not
 text or PBM files.

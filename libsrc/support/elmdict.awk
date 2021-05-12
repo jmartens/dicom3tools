@@ -1,3 +1,4 @@
+#  elmdict.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 # create C++ code from element dictionary template 
 
 NR==1	{
@@ -135,6 +136,15 @@ NR==1	{
 		retired="false"
 	}
 
+	renderAsString="false"
+	if (match($0,"RenderAsString=\"[^\"]*\""))
+		renderAsString=substr($0,RSTART+length("RenderAsString=\""),
+			RLENGTH-length("RenderAsString=\"")-1);
+
+	if (renderAsString == "true" && vr != "OB") {
+		print "Warning - (0x" group ",0x" element ",\"" owner "\") renderAsString only valid for OB VR not " vr >"/dev/tty"
+	}
+
 	if (role == "constant") {
 		if (owner == "") {
 			print "#define\t" keyword "_GROUP\t0x" group
@@ -142,7 +152,7 @@ NR==1	{
 		}
 	}
 	else if (role == "table") {
-		print "\t0x" group ",0x" element ",0x" privateblock ",\"" vr "\"," vmmin "," vmmax ",\"" owner "\",\"" keyword "\",\"" name "\"," retired ","
+		print "\t0x" group ",0x" element ",0x" privateblock ",\"" vr "\"," vmmin "," vmmax ",\"" owner "\",\"" keyword "\",\"" name "\"," retired "," renderAsString ","
 	}
 
 	}
@@ -153,7 +163,7 @@ END {
 		print "#endif /* __Header_" outname "__ */"
 	}
 	if (role == "table") {
-		print "\t0, 0, 0, 0, 0, 0, 0"
+		print "\t0, 0, 0, NULL, 0, 0, NULL, NULL, NULL, false, false"
 		print "};"
 		print ""
 		print "#endif /* __Header_" outname "__ */"

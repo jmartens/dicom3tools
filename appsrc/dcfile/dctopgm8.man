@@ -1,9 +1,10 @@
-.TH DCTOPGM8 1 "04 December 2010" "DICOM PS3" "DICOM PS3 - DICOM image to PNM file"
+.TH DCTOPGM8 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - DICOM image to PNM file"
 .SH NAME
 dctopgm8 \- ACR/NEMA DICOM PS3 ... DICOM PS3 - DICOM image to PNM file
 .SH SYNOPSIS
 .HP 10
 .B dctopgm8
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -180,5 +181,5 @@ Applying VOILUT 0
 .BR dctoraw(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

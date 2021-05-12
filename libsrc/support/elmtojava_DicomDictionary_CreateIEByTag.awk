@@ -1,3 +1,4 @@
+#  elmtojava_DicomDictionary_CreateIEByTag.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 NR==1	{
 	if (role != "java" && role != "csv") {
 		print "Error - role " role " invalid" >"/dev/tty"
@@ -255,6 +256,7 @@ NR==1	{
 			else if (ourie == "Waveform") useie="INSTANCE"
 			else if (ourie == "Presentation") useie="INSTANCE"
 			else if (ourie == "Instance") useie="INSTANCE"
+			else if (ourie == "Surface") useie="INSTANCE"
 			else if (ourie == "Frame") {
 				if (emitFrameLevel) {
 					useie="FRAME"

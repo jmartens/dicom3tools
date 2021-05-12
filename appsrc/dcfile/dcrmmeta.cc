@@ -1,7 +1,17 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcrmmeta.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#include <iomanip>
+#include <cctype>
+#else
 #include <iostream.h>
 #include <iomanip.h>
-#include <string.h>
 #include <ctype.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "attrtag.h"
 #include "dcstream.h"

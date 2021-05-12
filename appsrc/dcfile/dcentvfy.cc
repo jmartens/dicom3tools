@@ -1,4 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcentvfy.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "attrmxls.h"
 #include "mesgtext.h"
@@ -9,6 +18,8 @@
 #include "attrseq.h"
 
 #include "iodcomp.h"
+
+#include "hash.h"
 
 static const char *
 getStringValueElseDefault(AttributeList &list,Tag tag,const char *def)
@@ -447,7 +458,85 @@ checkAllRecords(RecordBase *record,bool verbose,bool veryverbose,TextOutputStrea
 	return success;
 }
 
-static bool readOneFile(const char *filename,PatientRecord *&headPatient,DicomInputOptions &dicom_input_options,bool success,bool verbose,bool veryverbose,TextOutputStream &log) {
+// This hash table stuff was based on elmhash.h, but differs in that value is string, not an index number
+//
+// ********************* stuff for StringByString *********************
+
+class StringEntryString {
+	HashKeyString key;
+	const char *value;
+public:
+	StringEntryString(void)		{}
+	StringEntryString(const char *s,const char *v)
+					{ key=HashKeyString(s); value=v; }
+	StringEntryString(StringEntryString *e)
+					{ key=e->key; value=e->value; }
+
+	HashKeyString	getKey(void) const	{ return key; }
+	const char *	getValue(void) const	{ return value; }
+
+	bool operator==(StringEntryString e)
+					{ return key == e.getKey(); }
+};
+
+class StringEntryStringList : public SimpleList<StringEntryString>
+{
+public:
+	~StringEntryStringList() {}	// only because buggy g++ 2.7.0 freaks
+};
+
+class StringEntryStringListIterator : public SimpleListIterator<StringEntryString>
+{
+public:
+	StringEntryStringListIterator(void)
+		: SimpleListIterator<StringEntryString>() {}
+	StringEntryStringListIterator(StringEntryStringList& list)
+		: SimpleListIterator<StringEntryString>(list) {}
+};
+
+class StringByString : public OpenHashTable <StringEntryString,
+					HashKeyString,
+					StringEntryStringList,
+					StringEntryStringListIterator>
+{
+public:
+	StringByString(unsigned long size)
+		: OpenHashTable<StringEntryString,
+				HashKeyString,
+				StringEntryStringList,
+				StringEntryStringListIterator>(size)
+		{}
+
+	// supply virtual functions for OpenHashTable ...
+
+	unsigned long	hash(const HashKeyString &key,unsigned long size)
+		{
+			const unsigned nchars = 10;
+			const unsigned shift  = 4;
+
+			unsigned n=nchars;
+			unsigned long value=0;
+			const char *s=key.getString();
+			while (n-- && *s) {
+				value=(value<<shift)|*s++;
+			}
+			return value%size; 
+		}
+
+	HashKeyString key(const StringEntryString &e)	{ return e.getKey(); }
+	
+	const char * get(const char *key) { StringEntryString *e=operator[](key); return e ? e->getValue() : NULL; }
+};
+
+
+static bool readOneFile(const char *filename,PatientRecord *&headPatient,DicomInputOptions &dicom_input_options,bool success,bool verbose,bool veryverbose,TextOutputStream &log,
+		StringByString &patientIDForSOPInstanceUID,
+		StringByString &studyInstanceUIDForSOPInstanceUID,
+		StringByString &seriesInstanceUIDForSOPInstanceUID,
+		StringByString &patientIDForSeriesInstanceUID,
+		StringByString &studyInstanceUIDForSeriesInstanceUID,
+		StringByString &patientIDForStudyInstanceUID
+	) {
 	Assert(filename);
 	if (verbose) log << "Reading \"" << filename << "\"" << endl;
 
@@ -533,7 +622,8 @@ static bool readOneFile(const char *filename,PatientRecord *&headPatient,DicomIn
 	while (ptrInstance && !ptrInstance->matches(sopInstanceUID)) ptrInstance=(InstanceRecord *)ptrInstance->getSibling();
 
 	if (ptrInstance) {
-		log << "Error - duplicate SOP instance " << sopInstanceUID << " within Series for file <" << filename << "> versus <" << ptrInstance->getFileName() << ">" << endl;
+		log << EMsgDC(DuplicateSOPInstanceUID) << " - " << sopInstanceUID << " within Series for file <" << filename << "> versus <" << ptrInstance->getFileName() << ">" << endl;
+		success = false;
 	}
 	else {
 		ptrInstance=headInstance=new InstanceRecord(sopInstanceUID,headInstance,list,StrDup(filename));
@@ -542,7 +632,118 @@ static bool readOneFile(const char *filename,PatientRecord *&headPatient,DicomIn
 
 		if (!ptrInstance->getCompositeIOD()) {
 			const char *sopClassUID=getStringValueElseDefault(*list,TagFromName(SOPClassUID),"");
-			log << "Warning - unrecognized SOP Class " << sopClassUID << " so cannot determine information entity of attributes within file <" << filename << ">" << endl;
+			log << WMsgDC(UnrecognizedSOPClass) << " - " << sopClassUID << " - so cannot determine information entity of attributes within file <" << filename << ">" << endl;
+		}
+	}
+
+	{
+		const char *existingPatientID = patientIDForStudyInstanceUID.get(studyInstanceUID);
+		if (existingPatientID) {
+			if (strcmp(existingPatientID,patientID) == 0) {
+				if (verbose) log << "Checked PatientID " << patientID << " for StudyInstanceUID " << studyInstanceUID << " is OK" << endl;
+			}
+			else {
+				log << EMsgDC(DifferentPatientIDForStudyInstanceUID)
+					<< " - " << MMsgDC(StudyInstanceUID) << "=<" << studyInstanceUID << "> " << MMsgDC(PatientID) << "=<" << patientID << "> for file <" << filename << "> versus existing " << MMsgDC(PatientID) << "=<" << existingPatientID << ">"
+					<< endl;
+				success = false;
+			}
+		}
+		else {
+			if (verbose) log << "Set PatientID " << patientID << " for StudyInstanceUID " << studyInstanceUID << endl;
+			patientIDForStudyInstanceUID+=new StringEntryString(studyInstanceUID,patientID);
+		}
+	}
+
+	{
+		const char *existingPatientID = patientIDForSeriesInstanceUID.get(seriesInstanceUID);
+		if (existingPatientID) {
+			if (strcmp(existingPatientID,patientID) == 0) {
+				if (verbose) log << "Checked PatientID " << patientID << " for SeriesInstanceUID " << seriesInstanceUID << " is OK" << endl;
+			}
+			else {
+				log << EMsgDC(DifferentPatientIDForSeriesInstanceUID)
+					<< " - " << MMsgDC(SeriesInstanceUID) << "=<" << seriesInstanceUID << "> " << MMsgDC(PatientID) << "=<" << patientID << "> for file <" << filename << "> versus existing " << MMsgDC(PatientID) << "=<" << existingPatientID << ">"
+					<< endl;
+				success = false;
+			}
+		}
+		else {
+			if (verbose) log << "Set PatientID " << patientID << " for SeriesInstanceUID " << seriesInstanceUID << endl;
+			patientIDForSeriesInstanceUID+=new StringEntryString(seriesInstanceUID,patientID);
+		}
+	}
+	{
+		const char *existingStudyInstanceUID = studyInstanceUIDForSeriesInstanceUID.get(seriesInstanceUID);
+		if (existingStudyInstanceUID) {
+			if (strcmp(existingStudyInstanceUID,studyInstanceUID) == 0) {
+				if (verbose) log << "Checked StudyInstanceUID " << studyInstanceUID << " for SeriesInstanceUID " << seriesInstanceUID << " is OK" << endl;
+			}
+			else {
+				log << EMsgDC(DifferentStudyInstanceUIDForSeriesInstanceUID)
+					<< " - " << MMsgDC(SeriesInstanceUID) << "=<" << seriesInstanceUID << "> " << MMsgDC(StudyInstanceUID) << "=<" << studyInstanceUID << "> for file <" << filename << "> versus existing " << MMsgDC(StudyInstanceUID) << "=<" << existingStudyInstanceUID << ">"
+					<< endl;
+				success = false;
+			}
+		}
+		else {
+			if (verbose) log << "Set StudyInstanceUID " << studyInstanceUID << " for SeriesInstanceUID " << seriesInstanceUID << endl;
+			studyInstanceUIDForSeriesInstanceUID+=new StringEntryString(seriesInstanceUID,studyInstanceUID);
+		}
+	}
+	
+	{
+		const char *existingPatientID = patientIDForSOPInstanceUID.get(sopInstanceUID);
+		if (existingPatientID) {
+			if (strcmp(existingPatientID,patientID) == 0) {
+				if (verbose) log << "Checked PatientID " << patientID << " for SOPInstanceUID " << sopInstanceUID << " is OK" << endl;
+			}
+			else {
+				log << EMsgDC(DifferentPatientIDForSOPInstanceUID)
+					<< " - " << MMsgDC(SOPInstanceUID) << "=<" << sopInstanceUID << "> " << MMsgDC(PatientID) << "=<" << patientID << "> for file <" << filename << "> versus existing " << MMsgDC(PatientID) << "=<" << existingPatientID << ">"
+					<< endl;
+				success = false;
+			}
+		}
+		else {
+			if (verbose) log << "Set PatientID " << patientID << " for SOPInstanceUID " << sopInstanceUID << endl;
+			patientIDForSOPInstanceUID+=new StringEntryString(sopInstanceUID,patientID);
+		}
+	}
+	{
+		const char *existingStudyInstanceUID = studyInstanceUIDForSOPInstanceUID.get(sopInstanceUID);
+		if (existingStudyInstanceUID) {
+			if (strcmp(existingStudyInstanceUID,studyInstanceUID) == 0) {
+				if (verbose) log << "Checked StudyInstanceUID " << studyInstanceUID << " for SOPInstanceUID " << sopInstanceUID << " is OK" << endl;
+			}
+			else {
+				log << EMsgDC(DifferentStudyInstanceUIDForSOPInstanceUID)
+					<< " - " << MMsgDC(SOPInstanceUID) << "=<" << sopInstanceUID << "> " << MMsgDC(StudyInstanceUID) << "=<" << studyInstanceUID << "> for file <" << filename << "> versus existing " << MMsgDC(StudyInstanceUID) << "=<" << existingStudyInstanceUID << ">"
+					<< endl;
+				success = false;
+			}
+		}
+		else {
+			if (verbose) log << "Set StudyInstanceUID " << studyInstanceUID << " for SOPInstanceUID " << sopInstanceUID << endl;
+			studyInstanceUIDForSOPInstanceUID+=new StringEntryString(sopInstanceUID,studyInstanceUID);
+		}
+	}
+	{
+		const char *existingSeriesInstanceUID = seriesInstanceUIDForSOPInstanceUID.get(sopInstanceUID);
+		if (existingSeriesInstanceUID) {
+			if (strcmp(existingSeriesInstanceUID,seriesInstanceUID) == 0) {
+				if (verbose) log << "Checked SeriesInstanceUID " << seriesInstanceUID << " for SOPInstanceUID " << sopInstanceUID << " is OK" << endl;
+			}
+			else {
+				log << EMsgDC(DifferentSeriesInstanceUIDForSOPInstanceUID)
+					<< " - " << MMsgDC(SOPInstanceUID) << "=<" << sopInstanceUID << "> " << MMsgDC(SeriesInstanceUID) << "=<" << seriesInstanceUID << "> for file <" << filename << "> versus existing " << MMsgDC(SeriesInstanceUID) << "=<" << existingSeriesInstanceUID << ">"
+					<< endl;
+				success = false;
+			}
+		}
+		else {
+			if (verbose) log << "Set SeriesInstanceUID " << seriesInstanceUID << " for SOPInstanceUID " << sopInstanceUID << endl;
+			seriesInstanceUIDForSOPInstanceUID+=new StringEntryString(sopInstanceUID,seriesInstanceUID);
 		}
 	}
 
@@ -551,7 +752,7 @@ static bool readOneFile(const char *filename,PatientRecord *&headPatient,DicomIn
 		fstr->close();
 		delete fstr;
 	}
-	return true;
+	return success;
 }
 
 int
@@ -611,9 +812,19 @@ main(int argc, char *argv[])
 
 	PatientRecord *headPatient = NULL;
 
+	StringByString patientIDForSOPInstanceUID(1000);
+	StringByString studyInstanceUIDForSOPInstanceUID(1000);
+	StringByString seriesInstanceUIDForSOPInstanceUID(1000);
+
+	StringByString patientIDForSeriesInstanceUID(100);
+	StringByString studyInstanceUIDForSeriesInstanceUID(100);
+
+	StringByString patientIDForStudyInstanceUID(100);
+
 	int i;
 	for (i=0; i < numberofinputfiles; ++i) {
-		bool thisFileSucceeded = readOneFile(listoffilenames[i],headPatient,dicom_input_options,success,verbose,veryverbose,log);
+		bool thisFileSucceeded = readOneFile(listoffilenames[i],headPatient,dicom_input_options,success,verbose,veryverbose,log,
+			patientIDForSOPInstanceUID,studyInstanceUIDForSOPInstanceUID,seriesInstanceUIDForSOPInstanceUID,patientIDForSeriesInstanceUID,studyInstanceUIDForSeriesInstanceUID,patientIDForStudyInstanceUID);
 		if (!thisFileSucceeded) success=false;
 	}
 
@@ -626,12 +837,13 @@ main(int argc, char *argv[])
 			bad=true;
 		}
 		else {
-			while (flfstr->peek() != EOF) {
+			while (flfstr->peek() != istream::traits_type::eof()) {
 				const int lineBufferSize=2048;
 				char lineBuffer[lineBufferSize];
 				flfstr->getline(lineBuffer,2048);
 				if (strlen(lineBuffer)) {
-					bool thisFileSucceeded = readOneFile(lineBuffer,headPatient,dicom_input_options,success,verbose,veryverbose,log);
+					bool thisFileSucceeded = readOneFile(lineBuffer,headPatient,dicom_input_options,success,verbose,veryverbose,log,
+						patientIDForSOPInstanceUID,studyInstanceUIDForSOPInstanceUID,seriesInstanceUIDForSOPInstanceUID,patientIDForSeriesInstanceUID,studyInstanceUIDForSeriesInstanceUID,patientIDForStudyInstanceUID);
 					if (!thisFileSucceeded) success=false;
 				}
 				// else skip blank lines
@@ -639,9 +851,12 @@ main(int argc, char *argv[])
 		}
 	}
 	
-	if (success) {
-		success = checkAllRecords(headPatient,verbose,veryverbose,log);
+	//if (success) {
+	{
+		bool successfulCheck = checkAllRecords(headPatient,verbose,veryverbose,log);
+		if (!successfulCheck) success=false;
 	}
+	//}
 
 	return success ? 0 : 1;
 }

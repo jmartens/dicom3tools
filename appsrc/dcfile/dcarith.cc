@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcarith.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "attrothr.h"
 #include "attrval.h"
@@ -126,6 +127,27 @@ public:
 		}
 };
 
+
+class InvertGrayscaleFilter : public PointFilterIndependentOfOffset<Uint16,Uint16> {
+private:
+	Uint16 mask;
+public:
+	InvertGrayscaleFilter(Uint16 inputBits)
+			: PointFilterIndependentOfOffset<Uint16,Uint16>()
+		{
+			Assert(inputBits > 0);
+			Assert(inputBits <= 16);
+			mask = Uint16((Uint32(1)<<inputBits)-1u);
+			
+		}
+
+	Uint16 filter(Uint16 value)
+		{
+			return value=(Uint16)(mask - (value&mask));
+		}
+};
+
+
 int
 main(int argc, char *argv[])
 {
@@ -168,14 +190,29 @@ main(int argc, char *argv[])
 	float scalefactor=1.0;
 	bool operation_scale=options.get("scale",scalefactor);
 
-	bool makeidentityrescale=options.get("makeidentityrescale");
+	bool operation_makeidentityrescale=options.get("makeidentityrescale");
+	
+	bool operation_invertgrayscale=options.get("invertgrayscale");
 
-	Assert(!(operation_maskhighbits && operation_addvalueoffset && operation_zerovalue && operation_replacevalue && operation_scale));
+	int operation_count = 
+		  (operation_maskhighbits ? 1 : 0)
+		+ (operation_addvalueoffset ? 1 : 0)
+		+ (operation_zerovalue ? 1 : 0)
+		+ (operation_replacevalue ? 1 : 0)
+		+ (operation_scale ? 1 : 0)
+		+ (operation_makeidentityrescale ? 1 : 0)
+		+ (operation_invertgrayscale? 1 : 0)
+		;
 
+	if (operation_count > 1) {
+		cerr << "Error: Can only request one operation" << endl;
+		bad = true;
+	}
+	
 	bool verbose=options.get("verbose") || options.get("v");
 	bool ignorereaderrors=options.get("ignorereaderrors");
 	bool pixelpaddingvalue=options.get("pixelpaddingvalue");
-	if (makeidentityrescale) {
+	if (operation_makeidentityrescale) {
 		pixelpaddingvalue = true;
 	}
 
@@ -213,6 +250,7 @@ main(int argc, char *argv[])
 			<< " [-replacevalue startvalue endvalue newvalue]"
 			<< " [-scale scalefactor]"
 			<< " [-makeidentityrescale]"
+			<< " [-invertgrayscale]"
 			<< " [" << MMsgDC(InputFile)
 				<< "[" << MMsgDC(OutputFile) << "]]"
 			<< " <" << MMsgDC(InputFile)
@@ -262,7 +300,7 @@ main(int argc, char *argv[])
 		else if (operation_scale) {
 			filter = new ScaleValueFilter(scalefactor);
 		}
-		else if (makeidentityrescale) {
+		else if (operation_makeidentityrescale) {
 			Uint16 vBitsStored = AttributeValue(list[TagFromName(BitsStored)]);
 			float vRescaleSlope = AttributeValue(list[TagFromName(RescaleSlope)]);
 			float vRescaleIntercept = AttributeValue(list[TagFromName(RescaleIntercept)]);
@@ -279,6 +317,12 @@ main(int argc, char *argv[])
 			list += new UnsignedShortAttribute(TagFromName(BitsStored),newBitsStored);
 			list += new UnsignedShortAttribute(TagFromName(HighBit),newBitsStored-1);
 			// NB. do not forget to setSuppressScalingOnBitDepthConversion() later, else any switch in bit depth will cause undesirable scaling
+		}
+		else if (operation_invertgrayscale) {
+			Attribute *aBitsStored = list[TagFromName(BitsStored)];
+			Assert(aBitsStored);
+			Uint16 vBitsStored = AttributeValue(aBitsStored);
+			filter = new InvertGrayscaleFilter(vBitsStored);
 		}
 		Assert(filter);
 		
@@ -305,7 +349,7 @@ main(int argc, char *argv[])
 				oPixelData = aPixelData->castToOtherData();
 				Assert(oPixelData);
 				oPixelData->insertPixelPointTransform(filter);
-				oPixelData->setSuppressScalingOnBitDepthConversion(makeidentityrescale);
+				oPixelData->setSuppressScalingOnBitDepthConversion(operation_makeidentityrescale);
 			}
 		}
 		else {

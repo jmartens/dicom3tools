@@ -1,9 +1,10 @@
-.TH DCFILE 1 "6 March 2007" "DICOM PS3" "DICOM PS3 - Describe DICOM file content"
+.TH DCFILE 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Describe DICOM file content"
 .SH NAME
 dcfile \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Describe DICOM file content
 .SH SYNOPSIS
 .HP 10
 .B dcfile
+.so man1/gen.so
 [
 .B \-b|brief
 ]
@@ -129,5 +130,5 @@ DICOM file, no metaheader, Explicit VR Little Endian
 .BR dcdump(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

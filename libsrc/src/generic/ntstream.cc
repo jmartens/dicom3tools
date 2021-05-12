@@ -1,4 +1,4 @@
-static char *CopyrightIdentifier(void) { return "@(#)ntstream.cc 1.00 95/09/21 Copyright (C) 1995. David A. Clunie. All rights reserved."; }
+static const char *CopyrightIdentifier(void) { return "@(#)ntstream.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "ntstream.h"
 
 #include <unistd.h>

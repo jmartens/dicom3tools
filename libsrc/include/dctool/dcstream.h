@@ -1,3 +1,4 @@
+/* dcstream.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_dcstream__
 #define __Header_dcstream__
 
@@ -27,6 +28,7 @@ public:
 	virtual ~DicomInputStream(void);
 
 	void setTransferSyntaxToReadDataSet(TransferSyntax *ts);
+	void guessTransferSyntaxToReadDataSet(bool& setswapped32big);
 	void readingDataSet(void);
 	void readingMetaHeader(void);
 

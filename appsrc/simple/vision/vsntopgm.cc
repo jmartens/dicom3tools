@@ -1,4 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)vsntopgm.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#else
 #include <iostream.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 
@@ -91,7 +100,7 @@ main(int argc,char *argv[])
 	cout << "P2\n" << cols << " " << rows << "\n" << 4095 << "\n";
 #endif /* PNMBIGRAW */
 
-	if (seekword(cin,datablock,0) == OurStreamPos(EOF)) {
+	if (seekword(cin,datablock,0) == OurStreamPos(istream::traits_type::eof())) {
 		cerr << "Image seek failed\n" << flush;
 		return 1;
 	}

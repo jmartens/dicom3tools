@@ -1,3 +1,4 @@
+#  unkelm.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 /^\([0-9A-Fa-fxX]/ {
 
 	element=$1

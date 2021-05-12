@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrseq.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attr.h"
 #include "attrlist.h"
 #include "attrmxls.h"
@@ -114,15 +115,15 @@ bool
 SequenceAttribute::verifyVM(const char *module,const char *element,
 	TextOutputStream& log,
 	ElementDictionary *dict,
-	Uint16 multiplicityMin,Uint16 multiplicityMax,const char *specifiedSource) const
+	Uint32 multiplicityMin,Uint32 multiplicityMax,const char *specifiedSource) const
 {
 	// Sequences always have a VM of 1, by definition
 	// Here we are checking the number of items, not the VM per se.
-	Assert(dict);
-	Tag tag=getTag();
+	//Assert(dict);
+	//Tag tag=getTag();
 	Uint32 nItems = getNumberOfItems();
 //log << "SequenceAttribute::verifyVM(): nItems = " << nItems << endl;
-	Uint16 errmin,errmax;
+	Uint32 errmin,errmax;
 	int err=0;
 	const char *source;
 	if (multiplicityMin != 0 && multiplicityMax != 0) {	// else don't check

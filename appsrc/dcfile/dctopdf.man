@@ -1,9 +1,10 @@
-.TH DCTOPDF 1 "08 October 2005" "DICOM PS3" "DICOM PS3 - Extract DICOM encapsulated PDF"
+.TH DCTOPDF 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Extract DICOM encapsulated PDF"
 .SH NAME
 dctopdf \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Extract DICOM encapsulated PDF
 .SH SYNOPSIS
 .HP 10
 .B dctopdf
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -44,5 +45,5 @@ Display byte offset from file start and message start, in hexadecimal, and dump 
 .BR pdftodc(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

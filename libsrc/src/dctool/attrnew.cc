@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attrnew.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrtype.h"
 #include "attrnew.h"
 #include "attrseq.h"
@@ -123,6 +124,9 @@ newAttribute(const char* vr,Tag tag)
 			break;
 		case 'U':
 			switch (vr[1]) {
+			case 'C':
+				a=new UnlimitedCharactersAttribute(tag);
+				break;
 			case 'I':
 				a=new UIStringAttribute(tag);
 				break;
@@ -131,6 +135,9 @@ newAttribute(const char* vr,Tag tag)
 				break;
 			case 'N':
 				a=new UnknownSmallAttribute(tag);
+				break;
+			case 'R':
+				a=new UniversalResourceAttribute(tag);
 				break;
 			case 'S':
 				a=new UnsignedShortAttribute(tag);

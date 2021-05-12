@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dccp.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "attrseq.h"
 #include "mesgtext.h"
@@ -27,6 +28,88 @@ keepOnlySelectedLUTSequenceItem(AttributeList &list,Tag lutSequenceTag,int which
 	}
 }
 
+// writeTagNumberAndNameToLog is copied from appsrc/dcfile/dciodvfy.cc
+// Similar to TextOutputStream& Tag::write(TextOutputStream& stream,ElementDictionary *dict) in libsrc/src/dctool/attrtag.cc
+// but without the VR
+
+static void writeTagNumberAndNameToLog(Tag tag,ElementDictionary *dict,TextOutputStream &log) {
+	log << "(";
+	writeZeroPaddedHexNumber(log,tag.getGroup(),4);
+	log << ",";
+	writeZeroPaddedHexNumber(log,tag.getElement(),4);
+	log << ")";
+	const char *desc = NULL;
+	if (dict) {
+		desc = dict->getDescription(tag);
+	}
+	if (desc && strlen(desc) > 0 && strcmp(desc,"?") != 0) {
+		log << " " << desc;
+	}
+}
+
+static void writeTagNumberAndNameToLog(Attribute *a,ElementDictionary *dict,TextOutputStream &log) {
+	writeTagNumberAndNameToLog(a->getTag(),dict,log);
+}
+
+// loopOverListsInSequencesWithLog is copied from libsrc/src/dctool/attrmxls.cc
+
+static bool
+loopOverListsInSequencesWithLog(Attribute *a,TextOutputStream &log,
+		bool (*func)(AttributeList &,TextOutputStream &))
+{
+	bool succeeded=true;
+	if (strcmp(a->getVR(),"SQ") == 0) {
+		AttributeList **al;
+		int n;
+		if ((n=a->getLists(&al)) > 0) {
+			int i;
+			for (i=0; i<n; ++i) {
+				if (!(*func)(*al[i],log)) succeeded=false;
+			}
+			delete [] al;
+		}
+	}
+	return succeeded;
+}
+
+static bool
+fixBadDecimalSeparator(AttributeList &list,TextOutputStream &log) {
+	bool success=true;
+	AttributeListIterator listi(list);
+	while (!listi) {
+		Attribute *a=listi();
+		Assert(a);
+		if (strcmp(a->getVR(),"DS") == 0) {
+			int vm = a->getVM();
+			int i;
+			for (i=0; i<vm; ++i) {
+				char *value;
+				a->getValue(i,value);
+				bool changedsomething=false;
+				char *p = value;
+				while (*p != 0) {
+					if (*p == ',') {
+						*p='.';
+						changedsomething=true;
+					}
+					++p;
+				}
+				if (changedsomething) {
+					log << WMsgDC(FixingBadDecimalSeparator) << " in DS VR - ";
+					writeTagNumberAndNameToLog(a,list.getDictionary(),log);
+					log << " - new value " << (i+1) << " is \"" << value << "\"" << endl;
+					a->setValue(i,value);
+				}
+			}
+		}
+		if (!::loopOverListsInSequencesWithLog(a,log,&::fixBadDecimalSeparator)) {
+			success=false;
+		}
+		++listi;
+	}
+	return success;
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -37,6 +120,7 @@ main(int argc, char *argv[])
 	bool verbose=options.get("verbose") || options.get("v");
 	bool ignorereaderrors=options.get("ignorereaderrors");
 	bool removecommandgroup=options.get("removecommandgroup");
+	bool fixbaddecimalseparator=options.get("fixbaddecimalseparator");
 
 	int whichVOILUTitem=0;
 	bool selectVOILUTitem=options.get("selectvoilutitem",whichVOILUTitem);
@@ -69,6 +153,7 @@ main(int argc, char *argv[])
 			<< " [-ignorereaderrors]"
 			<< " [-removecommandgroup]"
 			<< " [-selectvoilutitem 0..n-1]"
+			<< " [-fixbaddecimalseparator]"
 			<< " [" << MMsgDC(InputFile)
 				<< "[" << MMsgDC(OutputFile) << "]]"
 			<< " <" << MMsgDC(InputFile)
@@ -111,6 +196,10 @@ main(int argc, char *argv[])
 		
 		if (selectVOILUTitem) {
 			keepOnlySelectedLUTSequenceItem(list,TagFromName(VOILUTSequence),whichVOILUTitem,log);
+		}
+		
+		if (fixbaddecimalseparator) {
+			fixBadDecimalSeparator(list,log);
 		}
 
 		if (!usualManagedAttributeListWrite(list,dout,

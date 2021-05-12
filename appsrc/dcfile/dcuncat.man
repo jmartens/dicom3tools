@@ -1,9 +1,10 @@
-.TH DCUNCAT 1 "13 December 2011" "DICOM PS3" "DICOM PS3 - Split into concatenation instances"
+.TH DCUNCAT 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Split into concatenation instances"
 .SH NAME
 dcuncat \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Split multiframe image into concatenation
 .SH SYNOPSIS
 .HP 10
 .B dcuncat
+.so man1/gen.so
 .B \-framesper " n "
 [
 .B \-unenhance
@@ -124,7 +125,7 @@ Do not insert concatenation related attributes (always removes old ones whether 
 .BR dcintro(1), 
 .BR dcmulti(1)
 .SH AUTHOR
-Copyright (C) 1993-2011. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 .LP
 The unehance option is supported for copying of CT and MR attributes only at this time.

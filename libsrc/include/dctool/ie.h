@@ -1,3 +1,4 @@
+/* ie.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_ie__
 #define __Header_ie__
 
@@ -11,6 +12,7 @@ enum InformationEntity {
 	FrameOfReferenceIE,
 	HangingProtocolIE,
 	ImageIE,
+	MeasurementsIE,
 	MRSpectroscopyIE,
 	PatientIE,
 	PlanIE,
@@ -28,7 +30,8 @@ enum InformationEntity {
 	CurveIE,
 	ModalityLUTIE,
 	VOILUTIE,
-	ColorPaletteIE
+	ColorPaletteIE,
+	SurfaceIE
 };
 
 InformationEntity getInformationEntityFromDescription(const char *d);

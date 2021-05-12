@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)attr.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attr.h"
 
 Attribute::Attribute(Tag t)
@@ -73,24 +74,24 @@ Attribute::writeBase(DicomOutputStream& stream)
 //cerr << "VR=" << vr << endl;
 		if (vr[0]=='X') {			// we have a problem ... an internal unspecified pseudo-VR is present ... need to override it
 			if (vr[1]=='S') {		// XS is choice between US or SS
-cerr << "Overriding XS with US during write" << endl;
+//cerr << "Overriding XS with US during write" << endl;
 				vr="US";
 			}
 			else if (vr[1]=='O') {		// XO is choice between US or SS or OW
-cerr << "Overriding XO with OW during write" << endl;
+//cerr << "Overriding XO with OW during write" << endl;
 				vr="OW";
 			}
 		}
 		else if (vr[0]=='O' && vr[1]=='X') {	// we have a problem ... an internal unspecified pseudo-VR is present ... need to override it
-cerr << "Overriding OX with OW during write" << endl;
+//cerr << "Overriding OX with OW during write" << endl;
 			vr="OW";
 		}
 		stream << vr;
-		if (vr[0]=='O' && (vr[1]=='B' || vr[1]=='W' || vr[1]=='X' || vr[1]=='F')
-	 	 || vr[0]=='S' &&  vr[1]=='Q'
-	 	 || vr[0]=='U' && (vr[1]=='N' || vr[1]=='T'))
+		if ((vr[0]=='O' && (vr[1]=='B' || vr[1]=='D' || vr[1]=='F' || vr[1]=='L' || vr[1]=='W' || vr[1]=='X'))
+	 	 || (vr[0]=='S' &&  vr[1]=='Q')
+	 	 || (vr[0]=='U' && (vr[1]=='C' || vr[1]=='N' || vr[1]=='R' || vr[1]=='T')))
 		{
-			// Explicit OB,OW,OX,OF,SQ,UN,UT
+			// Explicit OB,OD,OF,OL,OW,OX,SQ,UC,UN,UR,UT
 			stream << Uint16(0) << getVL();
 		}
 		else {
@@ -133,7 +134,7 @@ Attribute::setOutputEncoding(
 		unsigned short,
 		Uint32)
 {
-	Assert(0);
+	// ignore, since may be set for PixelData that we are treating as ordinary attribute, e.g., illegal GE Private Thumbnails (000426)
 }
 
 bool

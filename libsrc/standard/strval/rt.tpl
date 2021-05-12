@@ -57,11 +57,11 @@ StringValues="ApplicatorType"	{
 
 StringValues="IonApplicatorType"	{
 	ION_SQUARE = square ion applicator,
-	ION_RECT = rectangluar ion applicator,
+	ION_RECT = rectangular ion applicator,
 	ION_CIRC = circular ion applicator,
 	ION_SHORT = short ion applicator,
 	ION_OPEN = open (dummy) ion applicator,
-	INTEROPERATIVE = interoperative (custom) applicator,
+	INTRAOPERATIVE = intraoperative (custom) applicator,
 	STEREOTACTIC = stereotactic applicator
 }
 
@@ -98,12 +98,15 @@ StringValues="DoseType"	{
 }
 
 StringValues="DoseSummationType"	{
-	PLAN = dose calculated for entire RT Plan,
-	MULTI_PLAN = dose calculated for 2 or more RT Plans,
-	FRACTION = dose calculated for a single Fraction Group within RT Plan,
-	BEAM = dose calculated for one or more Beams within RT Plan,
-	BRACHY = dose calculated for one or more Brachy Application Setups within RT Plan,
-	CONTROL_POINT = dose calculated for one or more Control Points within a Beam
+	PLAN = dose calculated for entire delivery of all fraction groups of RT Plan,
+	MULTI_PLAN = dose calculated for entire delivery of 2 or more RT Plans,
+	FRACTION = dose calculated for entire delivery of a single Fraction Group within RT Plan,
+	BEAM = dose calculated for entire delivery of one or more Beams within RT Plan,
+	BRACHY = dose calculated for entire delivery of one or more Brachy Application Setups within RT Plan,
+	FRACTION_SESSION = dose calculated for a single session (“fraction”) of a single Fraction Group within RT Plan,
+	BEAM_SESSION = dose calculated for a single session (“fraction”) of one or more Beams within RT Plan,
+	BRACHY_SESSION = dose calculated for a single session (“fraction”) of one or more Brachy Application Setups within RT Plan,
+	CONTROL_POINT = dose calculated for one or more Control Points within a Beam for a single fraction
 }
 
 StringValues="DVHROIContributionType"	{
@@ -271,7 +274,15 @@ StringValues="IonRadiationType"	{
 StringValues="IonScanMode"	{
 	NONE,
 	UNIFORM,
-	MODULATED
+	MODULATED,
+	MODULATED_SPEC
+}
+
+StringValues="ModulatedScanModeType"	{
+	STATIONARY,
+	LEAPING,
+	LINEAR,
+	MIXED
 }
 
 StringValues="TreatmentDeliveryType"	{
@@ -381,7 +392,6 @@ StringValues="ShieldingDeviceType"	{
 }
 
 StringValues="HighDoseTechniqueType"	{
-	NORMAL,
 	TBI,
 	HDR
 }
@@ -547,5 +557,20 @@ StringValues="RTPatientPosition" {
 	SITTING = Sitting
 }
 
+StringValues="BeamDoseMeaning" {
+	BEAM_LEVEL,
+	FRACTION_LEVEL
+}
+
+StringValues="SpatialTransformOfDose" {
+	NONE,
+	RIGID,
+	NON_RIGID
+}
+
+StringValues="BeamDoseType" {
+	PHYSICAL,
+	EFFECTIVE
+}
 
 

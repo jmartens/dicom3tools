@@ -1,4 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)antodc.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <cctype>
+#else
 #include <ctype.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "attrmxls.h"
 #include "attrtype.h"

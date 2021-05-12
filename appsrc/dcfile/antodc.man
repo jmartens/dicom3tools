@@ -1,9 +1,10 @@
-.TH ANTODC 1 "11 January 1999" "DICOM PS3" "DICOM PS3 - Convert ACR-NEMA to DICOM"
+.TH ANTODC 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Convert ACR-NEMA to DICOM"
 .SH NAME
 antodc \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Convert ACR-NEMA to DICOM
 .SH SYNOPSIS
 .HP 10
 .B antodc
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -65,7 +66,7 @@ Display byte offset from file start and message start, in hexadecimal, and dump 
 .BR dcintro(1),
 .BR dccp(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 .LP
 If there are no gantry relative image orientation and position values in

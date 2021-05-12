@@ -56,13 +56,19 @@ DirectoryRecord="IMAGE"			Name="DigitalMammographyXRayImageStorageForPresentatio
 DirectoryRecord="IMAGE"			Name="DigitalMammographyXRayImageStorageForProcessing"		Desc="Digital Mammography X-Ray Image Storage - For Processing"		Uid="1.2.840.10008.5.1.4.1.1.1.2.1"
 DirectoryRecord="IMAGE"			Name="DigitalIntraoralXRayImageStorageForPresentation"		Desc="Digital Intra-oral X-Ray Image Storage - For Presentation"	Uid="1.2.840.10008.5.1.4.1.1.1.3"
 DirectoryRecord="IMAGE"			Name="DigitalIntraoralXRayImageStorageForProcessing"		Desc="Digital Intra-oral X-Ray Image Storage - For Processing"		Uid="1.2.840.10008.5.1.4.1.1.1.3.1"
-DirectoryRecord="IMAGE"			Name="CTImageStorage"						Desc="CT Image Storage"							Uid="1.2.840.10008.5.1.4.1.1.2"
+
+DirectoryRecord="IMAGE"			Name="CTImageStorage"							Desc="CT Image Storage"								Uid="1.2.840.10008.5.1.4.1.1.2"
 DirectoryRecord="IMAGE"			Name="EnhancedCTImageStorage"					Desc="Enhanced CT Image Storage"					Uid="1.2.840.10008.5.1.4.1.1.2.1"
+DirectoryRecord="IMAGE"			Name="LegacyConvertedEnhancedCTImageStorage"	Desc="Legacy Converted Enhanced CT Image Storage"	Uid="1.2.840.10008.5.1.4.1.1.2.2"
+
 DirectoryRecord="IMAGE"			Name="UltrasoundMultiframeImageStorageRetired"			Desc="Ultrasound Multiframe Image Storage - Retired"			Uid="1.2.840.10008.5.1.4.1.1.3"
 DirectoryRecord="IMAGE"			Name="UltrasoundMultiframeImageStorage"				Desc="Ultrasound Multiframe Image Storage"				Uid="1.2.840.10008.5.1.4.1.1.3.1"
-DirectoryRecord="IMAGE"			Name="MRImageStorage"						Desc="MR Image Storage"							Uid="1.2.840.10008.5.1.4.1.1.4"
+
+DirectoryRecord="IMAGE"			Name="MRImageStorage"							Desc="MR Image Storage"								Uid="1.2.840.10008.5.1.4.1.1.4"
 DirectoryRecord="IMAGE"			Name="EnhancedMRImageStorage"					Desc="Enhanced MR Image Storage"					Uid="1.2.840.10008.5.1.4.1.1.4.1"
 DirectoryRecord="IMAGE"			Name="EnhancedMRColorImageStorage"				Desc="Enhanced MR Color Image Storage"				Uid="1.2.840.10008.5.1.4.1.1.4.3"
+DirectoryRecord="IMAGE"			Name="LegacyConvertedEnhancedMRImageStorage"	Desc="Legacy Converted Enhanced MR Image Storage"	Uid="1.2.840.10008.5.1.4.1.1.4.4"
+
 DirectoryRecord="IMAGE"			Name="NuclearMedicineImageStorageRetired"			Desc="Nuclear Medicine Image Storage - Retired"				Uid="1.2.840.10008.5.1.4.1.1.5"
 DirectoryRecord="IMAGE"			Name="UltrasoundImageStorageRetired"				Desc="Ultrasound Image Storage - Retired"				Uid="1.2.840.10008.5.1.4.1.1.6"
 DirectoryRecord="IMAGE"			Name="UltrasoundImageStorage"					Desc="Ultrasound Image Storage"						Uid="1.2.840.10008.5.1.4.1.1.6.1"
@@ -93,6 +99,8 @@ DirectoryRecord="PRESENTATION"		Name="ColorSoftcopyPresentationStateStorage"			D
 DirectoryRecord="PRESENTATION"		Name="PseudoColorSoftcopyPresentationStateStorage"		Desc="Pseudo-Color Softcopy Presentation State Storage"		Uid="1.2.840.10008.5.1.4.1.1.11.3"
 DirectoryRecord="PRESENTATION"		Name="BlendingSoftcopyPresentationStateStorage"			Desc="Blending Softcopy Presentation State Storage"			Uid="1.2.840.10008.5.1.4.1.1.11.4"
 DirectoryRecord="PRESENTATION"		Name="XAXRFGrayscaleSoftcopyPresentationStateStorage"	Desc="XA/XRF Grayscale Softcopy Presentation State Storage"	Uid="1.2.840.10008.5.1.4.1.1.11.5"
+DirectoryRecord="PRESENTATION"		Name="GrayscalePlanarMPRVolumetricPresentationStateStorage"		Desc="Grayscale Planar MPR Volumetric Presentation State Storage"	Uid="1.2.840.10008.5.1.4.1.1.11.6"
+DirectoryRecord="PRESENTATION"		Name="CompositingPlanarMPRVolumetricPresentationStateStorage"	Desc="Compositing Planar MPR Volumetric Presentation State Storage"	Uid="1.2.840.10008.5.1.4.1.1.11.7"
 
 DirectoryRecord="IMAGE"			Name="XRayAngiographicImageStorage"				Desc="X-Ray Angiographic Image Storage"				Uid="1.2.840.10008.5.1.4.1.1.12.1"
 DirectoryRecord="IMAGE"			Name="EnhancedXAImageStorage"					Desc="Enhanced XA Image Storage"					Uid="1.2.840.10008.5.1.4.1.1.12.1.1"
@@ -102,6 +110,8 @@ DirectoryRecord="IMAGE"			Name="XRayAngiographicBiplaneImageStorage"			Desc="X-R
 DirectoryRecord="IMAGE"			Name="XRay3DAngiographicImageStorage"			Desc="X-Ray 3D Angiographic Image Storage"			Uid="1.2.840.10008.5.1.4.1.1.13.1.1"
 DirectoryRecord="IMAGE"			Name="XRay3DCraniofacialImageStorage"			Desc="X-Ray 3D Craniofacial Image Storage"			Uid="1.2.840.10008.5.1.4.1.1.13.1.2"
 DirectoryRecord="IMAGE"			Name="BreastTomosynthesisImageStorage"			Desc="Breast Tomosynthesis Image Storage"			Uid="1.2.840.10008.5.1.4.1.1.13.1.3" 	
+DirectoryRecord="IMAGE"			Name="BreastProjectionXRayImageStorageForPresentation"			Desc="Breast Projection X-Ray Image Storage - For Presentation"			Uid="1.2.840.10008.5.1.4.1.1.13.1.4"
+DirectoryRecord="IMAGE"			Name="BreastProjectionXRayImageStorageForProcessing"			Desc="Breast Projection X-Ray Image Storage - For Processing"			Uid="1.2.840.10008.5.1.4.1.1.13.1.5"
 
 DirectoryRecord="IMAGE"			Name="NuclearMedicineImageStorage"							Desc="Nuclear Medicine Image Storage"								Uid="1.2.840.10008.5.1.4.1.1.20"
 
@@ -114,31 +124,43 @@ DirectoryRecord="IMAGE"			Name="VideoMicroscopicImageStorage"							Desc="Video 
 DirectoryRecord="IMAGE"			Name="VisibleLightSlideCoordinatesMicroscopicImageStorage"	Desc="Visible Light Slide Coordinates Microscopic Image Storage"	Uid="1.2.840.10008.5.1.4.1.1.77.1.3"
 DirectoryRecord="IMAGE"			Name="VisibleLightPhotographicImageStorage"					Desc="Visible Light Photographic Image Storage"						Uid="1.2.840.10008.5.1.4.1.1.77.1.4"
 DirectoryRecord="IMAGE"			Name="VideoPhotographicImageStorage"						Desc="Video Photographic Image Storage"								Uid="1.2.840.10008.5.1.4.1.1.77.1.4.1"
+
 DirectoryRecord="IMAGE"			Name="OphthalmicPhotography8BitImageStorage"				Desc="Ophthalmic Photography 8 Bit Image Storage"					Uid="1.2.840.10008.5.1.4.1.1.77.1.5.1"
 DirectoryRecord="IMAGE"			Name="OphthalmicPhotography16BitImageStorage"				Desc="Ophthalmic Photography 16 Bit Image Storage"					Uid="1.2.840.10008.5.1.4.1.1.77.1.5.2"
 DirectoryRecord="STEREOMETRIC"	Name="StereometricRelationshipStorage"						Desc="Stereometric Relationship Storage"							Uid="1.2.840.10008.5.1.4.1.1.77.1.5.3"
 DirectoryRecord="IMAGE"			Name="OphthalmicTomographyImageStorage"						Desc="Ophthalmic Tomography Image Storage"							Uid="1.2.840.10008.5.1.4.1.1.77.1.5.4"
+DirectoryRecord="IMAGE"			Name="WideFieldOphthalmicPhotographyStereographicProjectionImageStorage"	Desc="Wide Field Ophthalmic Photography Stereographic Projection Image Storage"	Uid="1.2.840.10008.5.1.4.1.1.77.1.5.5"
+DirectoryRecord="IMAGE"			Name="WideFieldOphthalmicPhotography3DCoordinatesImageStorage"				Desc="Wide Field Ophthalmic Photography 3D Coordinates Image Storage"			Uid="1.2.840.10008.5.1.4.1.1.77.1.5.6"
+
 DirectoryRecord="IMAGE"			Name="VLWholeSlideMicroscopyImageStorage"					Desc="VL Whole Slide Microscopy Image Storage"						Uid="1.2.840.10008.5.1.4.1.1.77.1.6"
+
+DirectoryRecord="IMAGE"			Name="IVOCTImageStorageForPresentation"						Desc="Intravascular OCT Image Storage - For Presentation"			Uid="1.2.840.10008.5.1.4.1.1.14.1"
+DirectoryRecord="IMAGE"			Name="IVOCTImageStorageForProcessing"						Desc="Intravascular OCT Image Storage - For Processing"				Uid="1.2.840.10008.5.1.4.1.1.14.2"
 
 DirectoryRecord="SR DOCUMENT"		Name="BasicTextSRStorage"					Desc="Basic Text SR Storage"					Uid="1.2.840.10008.5.1.4.1.1.88.11"
 DirectoryRecord="SR DOCUMENT"		Name="EnhancedSRStorage"					Desc="Enhanced SR Storage"					Uid="1.2.840.10008.5.1.4.1.1.88.22"
 DirectoryRecord="SR DOCUMENT"		Name="ComprehensiveSRStorage"					Desc="Comprehensive SR Storage"					Uid="1.2.840.10008.5.1.4.1.1.88.33"
+DirectoryRecord="SR DOCUMENT"		Name="Comprehensive3DSRStorage"					Desc="Comprehensive 3D SR Storage"					Uid="1.2.840.10008.5.1.4.1.1.88.34"
+DirectoryRecord="SR DOCUMENT"		Name="ExtensibleSRStorage"						Desc="Extensible SR Storage"						Uid="1.2.840.10008.5.1.4.1.1.88.35"
 DirectoryRecord="SR DOCUMENT"		Name="MammographyCADSRStorage"					Desc="Mammography CAD SR Storage"				Uid="1.2.840.10008.5.1.4.1.1.88.50"
 DirectoryRecord="SR DOCUMENT"		Name="ChestCADSRStorage"					Desc="Chest CAD SR Storage"					Uid="1.2.840.10008.5.1.4.1.1.88.65"
 DirectoryRecord="SR DOCUMENT"		Name="ProcedureLogStorage"					Desc="Procedure Log Storage"					Uid="1.2.840.10008.5.1.4.1.1.88.40"
 DirectoryRecord="SR DOCUMENT"		Name="XRayRadiationDoseSRStorage"					Desc="X-Ray Radiation Dose SR Storage"					Uid="1.2.840.10008.5.1.4.1.1.88.67"
+DirectoryRecord="SR DOCUMENT"		Name="RadiopharmaceuticalRadiationDoseSRStorage"	Desc="Radiopharmaceutical Radiation Dose SR Storage"	Uid="1.2.840.10008.5.1.4.1.1.88.68"
 DirectoryRecord="SR DOCUMENT"		Name="ColonCADSRStorage"					Desc="Colon CAD SR Storage"					Uid="1.2.840.10008.5.1.4.1.1.88.69"
 DirectoryRecord="SR DOCUMENT"		Name="ImplantationPlanSRStorage"			Desc="Implantation Plan SR Storage"			Uid="1.2.840.10008.5.1.4.1.1.88.70"
+DirectoryRecord="SR DOCUMENT"		Name="AcquisitionContextSRStorage"			Desc="Acquisition Context SR Storage"			Uid="1.2.840.10008.5.1.4.1.1.88.71"
 DirectoryRecord="SR DOCUMENT"		Name="MacularGridThicknessAndVolumeReportStorage"					Desc="Macular Grid Thickness and Volume Report Storage"					Uid="1.2.840.10008.5.1.4.1.1.79.1"
-	
+
 DirectoryRecord="KEY OBJECT DOC"	Name="KeyObjectSelectionDocumentStorage"			Desc="Key Object Selection Document Storage"			Uid="1.2.840.10008.5.1.4.1.1.88.59"
 
 DirectoryRecord="ENCAP DOC"		Name="EncapsulatedPDFStorage"					Desc="Encapsulated PDF Storage"					Uid="1.2.840.10008.5.1.4.1.1.104.1"
 DirectoryRecord="ENCAP DOC"		Name="EncapsulatedCDAStorage"					Desc="Encapsulated CDA Storage"					Uid="1.2.840.10008.5.1.4.1.1.104.2"
 
-DirectoryRecord="IMAGE"			Name="PETImageStorage"						Desc="Positron Emission Tomography Image Storage"		Uid="1.2.840.10008.5.1.4.1.1.128"
-DirectoryRecord="CURVE"			Name="StandalonePETCurveStorage"				Desc="Standalone PET Curve Storage"				Uid="1.2.840.10008.5.1.4.1.1.129"
-DirectoryRecord="IMAGE"			Name="EnhancedPETImageStorage"						Desc="Enhanced PET Image Storage"		Uid="1.2.840.10008.5.1.4.1.1.130"
+DirectoryRecord="IMAGE"			Name="PETImageStorage"							Desc="Positron Emission Tomography Image Storage"		Uid="1.2.840.10008.5.1.4.1.1.128"
+DirectoryRecord="IMAGE"			Name="LegacyConvertedEnhancedPETImageStorage"	Desc="Legacy Converted Enhanced PET Image Storage"		Uid="1.2.840.10008.5.1.4.1.1.128.1"
+DirectoryRecord="CURVE"			Name="StandalonePETCurveStorage"				Desc="Standalone PET Curve Storage"						Uid="1.2.840.10008.5.1.4.1.1.129"
+DirectoryRecord="IMAGE"			Name="EnhancedPETImageStorage"					Desc="Enhanced PET Image Storage"						Uid="1.2.840.10008.5.1.4.1.1.130"
 
 DirectoryRecord="IMAGE"			Name="RTImageStorage"						Desc="RT Image Storage"						Uid="1.2.840.10008.5.1.4.1.1.481.1"
 DirectoryRecord="RT DOSE"		Name="RTDoseStorage"						Desc="RT Dose Storage"						Uid="1.2.840.10008.5.1.4.1.1.481.2"
@@ -165,10 +187,10 @@ DirectoryRecord="PLAN"		Name="RTBeamsDeliveryInstructionStorage"		Desc="RT Beams
 
 					Name="ModalityWorklistInformationModelFind"			Desc="Modality Worklist Information Model Find"			Uid="1.2.840.10008.5.1.4.31"
 
-					Name="GeneralPurposeWorklistInformationModelFind"		Desc="General Purpose Worklist Information Model Find"		Uid="1.2.840.10008.5.1.4.32.1"
-DirectoryRecord="STUDY COMPONENT"	Name="GeneralPurposeScheduledProcedureStep"			Desc="General Purpose Scheduled Procedure Step"			Uid="1.2.840.10008.3.1.4.32.2"
-DirectoryRecord="STUDY COMPONENT"	Name="GeneralPurposePerformedProcedureStep"			Desc="General Purpose Performed Procedure Step"			Uid="1.2.840.10008.3.1.4.32.3"
-					Name="GeneralPurposeWorklistManagementMeta"			Desc="General Purpose Worklist Management Meta"			Uid="1.2.840.10008.5.1.1.32"
+					Name="GeneralPurposeWorklistInformationModelFindRetired"					Desc="General Purpose Worklist Information Model Find (Retired)"	Uid="1.2.840.10008.5.1.4.32.1"
+DirectoryRecord="STUDY COMPONENT"	Name="GeneralPurposeScheduledProcedureStepRetired"			Desc="General Purpose Scheduled Procedure Step (Retired)"			Uid="1.2.840.10008.3.1.4.32.2"
+DirectoryRecord="STUDY COMPONENT"	Name="GeneralPurposePerformedProcedureStepRetired"			Desc="General Purpose Performed Procedure Step (Retired)"			Uid="1.2.840.10008.3.1.4.32.3"
+					Name="GeneralPurposeWorklistManagementMetaRetired"							Desc="General Purpose Worklist Management Meta (Retired)"			Uid="1.2.840.10008.5.1.1.32"
 
 DirectoryRecord="IMAGE"			Name="GE_PrivateDicomMRImageInfoObject"				Desc="GE Private Dicom MR Image Info Object"			Uid="1.2.840.113619.4.2"
 DirectoryRecord="IMAGE"			Name="GE_PrivateDicomCTImageInfoObject"				Desc="GE Private Dicom CT Image Info Object"			Uid="1.2.840.113619.4.3"
@@ -193,8 +215,12 @@ DirectoryRecord="REGISTRATION"		Name="SpatialRegistrationStorage"				Desc="Spati
 DirectoryRecord="FIDUCIAL"		Name="SpatialFiducialsStorage"					Desc="Spatial Fiducials Storage"				Uid="1.2.840.10008.5.1.4.1.1.66.2"
 DirectoryRecord="REGISTRATION"		Name="DeformableSpatialRegistrationStorage"				Desc="Deformable Spatial Registration Storage"				Uid="1.2.840.10008.5.1.4.1.1.66.3"
 
-DirectoryRecord="IMAGE"		Name="SegmentationStorage"				Desc="Segmentation Storage"				Uid="1.2.840.10008.5.1.4.1.1.66.4"
-DirectoryRecord="IMAGE"		Name="SurfaceSegmentationStorage"		Desc="Surface Segmentation Storage"		Uid="1.2.840.10008.5.1.4.1.1.66.5"
+DirectoryRecord="IMAGE"			Name="SegmentationStorage"				Desc="Segmentation Storage"				Uid="1.2.840.10008.5.1.4.1.1.66.4"
+DirectoryRecord="SURFACE"		Name="SurfaceSegmentationStorage"		Desc="Surface Segmentation Storage"		Uid="1.2.840.10008.5.1.4.1.1.66.5"
+DirectoryRecord="TRACT"			Name="TractographyResultsStorage"		Desc="Tractography Results Storage"		Uid="1.2.840.10008.5.1.4.1.1.66.6"
+
+DirectoryRecord="SURFACE"		Name="SurfaceScanMeshStorage"			Desc="Surface Scan Mesh Storage"		Uid="1.2.840.10008.5.1.4.1.1.68.1"
+DirectoryRecord="SURFACE"		Name="SurfaceScanPointCloudStorage"		Desc="Surface Scan Point Cloud Storage"	Uid="1.2.840.10008.5.1.4.1.1.68.2"
 
 DirectoryRecord="HANGING PROTOCOL"	Name="HangingProtocolStorage"					Desc="Hanging Protocol Storage"					Uid="1.2.840.10008.5.1.4.38.1"
 					Name="HangingProtocolInformationModelFind"			Desc="Hanging Protocol Information Model Find"			Uid="1.2.840.10008.5.1.4.38.2"
@@ -202,7 +228,7 @@ DirectoryRecord="HANGING PROTOCOL"	Name="HangingProtocolStorage"					Desc="Hangi
 					Name="HangingProtocolInformationModelGet"			Desc="Hanging Protocol Information Model Get"			Uid="1.2.840.10008.5.1.4.38.4"
 DirectoryRecord="VALUE MAP"		Name="RealWorldValueMappingStorage"				Desc="Real World Value Mapping Storage"			Uid="1.2.840.10008.5.1.4.1.1.67"
 
-DirectoryRecord="IMAGE"			Name="BasicStructuredDisplayStorage"			Desc="Basic Structured Display Storage"				Uid="1.2.840.10008.5.1.4.1.1.131"
+DirectoryRecord="PRESENTATION"	Name="BasicStructuredDisplayStorage"			Desc="Basic Structured Display Storage"				Uid="1.2.840.10008.5.1.4.1.1.131"
 
 DirectoryRecord="MEASUREMENT"	Name="LensometryMeasurementsStorage"			Desc="Lensometry Measurements Storage"				Uid="1.2.840.10008.5.1.4.1.1.78.1"
 DirectoryRecord="MEASUREMENT"	Name="AutorefractionMeasurementsStorage"		Desc="Autorefraction Measurements Storage"			Uid="1.2.840.10008.5.1.4.1.1.78.2"
@@ -216,6 +242,9 @@ DirectoryRecord="MEASUREMENT"	Name="IntraocularLensCalculationsStorage"		Desc="I
 DirectoryRecord="MEASUREMENT"	Name="OphthalmicVisualFieldStaticPerimetryMeasurementsStorage"	Desc="Ophthalmic Visual Field Static Perimetry Measurements Storage"	Uid="1.2.840.10008.5.1.4.1.1.80.1"
 
 DirectoryRecord="IMAGE"			Name="OphthalmicThicknessMapStorage"	Desc="Ophthalmic Thickness Map Storage"	Uid="1.2.840.10008.5.1.4.1.1.81.1"
+DirectoryRecord="IMAGE"			Name="CornealTopographyMapStorage"		Desc="Corneal Topography Map Storage"	Uid="1.2.840.10008.5.1.4.1.1.82.1"
+
+DirectoryRecord="IMAGE"			Name="ParametricMapStorage"				Desc="Parametric Map Storage"	Uid="1.2.840.10008.5.1.4.1.1.30"
 
 DirectoryRecord="PALETTE"		Name="ColorPaletteStorage"				Desc="Color Palette Storage"				Uid="1.2.840.10008.5.1.4.39.1"
 								Name="ColorPaletteInformationModelFind"	Desc="Color Palette Information Model Find"	Uid="1.2.840.10008.5.1.4.39.2"
@@ -226,7 +255,16 @@ DirectoryRecord="IMAGE"			Name="DICOSCTImageStorage"							Desc="DICOS CT Image 
 DirectoryRecord="IMAGE"			Name="DICOSDigitalXRayImageStorageForPresentation"	Desc="DICOS Digital X-Ray Image Storage - For Presentation"	Uid="1.2.840.10008.5.1.4.1.1.501.2.1"
 DirectoryRecord="IMAGE"			Name="DICOSDigitalXRayImageStorageForProcessing"	Desc="DICOS Digital X-Ray Image Storage - For Processing"	Uid="1.2.840.10008.5.1.4.1.1.501.2.2"
 DirectoryRecord="IMAGE"			Name="DICOSThreatDetectionReportStorage"			Desc="DICOS Threat Detection Report Storage"				Uid="1.2.840.10008.5.1.4.1.1.501.3"
+DirectoryRecord="IMAGE"			Name="DICOS2DAITStorage"							Desc="DICOS 2D AIT Storage"									Uid="1.2.840.10008.5.1.4.1.1.501.4"
+DirectoryRecord="IMAGE"			Name="DICOS3DAITStorage"							Desc="DICOS 3D AIT Storage"									Uid="1.2.840.10008.5.1.4.1.1.501.5"
+DirectoryRecord="IMAGE"			Name="DICOSQuadrupoleResonanceStorage"				Desc="DICOS Quadrupole Resonance Storage"					Uid="1.2.840.10008.5.1.4.1.1.501.6"
 
 DirectoryRecord="IMPLANT"			Name="GenericImplantTemplateStorage"			Desc="Generic Implant Template Storage"						Uid="1.2.840.10008.5.1.4.43.1"
 DirectoryRecord="IMPLANT ASSY"		Name="ImplantAssemblyTemplateStorage"			Desc="Implant Assembly Template Storage"					Uid="1.2.840.10008.5.1.4.44.1"
 DirectoryRecord="IMPLANT GROUP"		Name="ImplantTemplateGroupStorage"				Desc="Implant Template Group Storage"						Uid="1.2.840.10008.5.1.4.45.1"
+
+DirectoryRecord="IMAGE"			Name="PrivatePixelMedLegacyConvertedEnhancedCTImageStorage"		Desc="Private PixelMed Legacy Converted Enhanced CT Image Storage"	Uid="1.3.6.1.4.1.5962.301.1"
+DirectoryRecord="IMAGE"			Name="PrivatePixelMedLegacyConvertedEnhancedMRImageStorage"		Desc="Private PixelMed Legacy Converted Enhanced MR Image Storage"	Uid="1.3.6.1.4.1.5962.301.2"
+DirectoryRecord="IMAGE"			Name="PrivatePixelMedLegacyConvertedEnhancedPETImageStorage"	Desc="Private PixelMed Legacy Converted Enhanced PET Image Storage"	Uid="1.3.6.1.4.1.5962.301.3"
+DirectoryRecord="IMAGE"			Name="PrivatePixelMedLegacyFloatingPointImageStorage"			Desc="Private PixelMed Floating Point Image Storage"				Uid="1.3.6.1.4.1.5962.301.9"
+

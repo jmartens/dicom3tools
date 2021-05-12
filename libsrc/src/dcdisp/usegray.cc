@@ -1,5 +1,15 @@
+static const char *CopyrightIdentifier(void) { return "@(#)usegray.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>	// only for debugging
+#include <iomanip>	// only for debugging
+#else
 #include <iostream.h>	// only for debugging
 #include <iomanip.h>	// only for debugging
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;	// only for debugging
+#endif
 
 #include "basetype.h"
 #include "usegray.h"

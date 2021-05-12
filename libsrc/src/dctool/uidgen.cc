@@ -1,22 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)uidgen.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iomanip>
+#else
 #include <iomanip.h>
+#endif
 
-#ifdef CRAP
-#include <time.h>
-
-#ifdef __MWERKS__
-#include <time.h>
-#else /* __MWERKS__ */
-#ifdef __SC__
-#include <types.h>
-#include <time.h>
-#else /* __SC__ */
-#include <sys/types.h>
-#include <sys/time.h>
-#include <unistd.h>
-//long gethostid(void);
-#endif /* __SC__ */
-#endif /* __MWERKS__ */
-#endif /* CRAP */
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "basetype.h"
 #include "uidgen.h"

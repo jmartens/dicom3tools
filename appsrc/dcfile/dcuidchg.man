@@ -1,10 +1,11 @@
-.TH DCUIDCHG 1 "11 March 2007" "DICOM PS3" "DICOM PS3 - Change UIDs"
+.TH DCUIDCHG 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Change UIDs"
 .SH NAME
 dcuidchg \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Change UIDs consistently
 .SH SYNOPSIS
 .HP 10
 .B dcuidchg
 " inputfile1 [ inputfile2 ... ]"
+.so man1/gen.so
 .B \-outdir " dirname"
 [
 .B \-v|verbose|vv|veryverbose
@@ -107,7 +108,7 @@ IMAGES/IM0002
 .BR dcintro(1), 
 .BR dcdtchg(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 .LP
 There is a fixed length of buffer used for reading each line from the list of filenames file.

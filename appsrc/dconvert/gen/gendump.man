@@ -1,9 +1,10 @@
-.TH GENDUMP 1 "05 April 1998" "DICOM PS3" "Genesis dump"
+.TH GENDUMP 1 "06 March 2014" "DICOM PS3" "Genesis dump"
 .SH NAME
 gendump \- ACR/NEMA DICOM PS3 ... Genesis dump contents
 .SH SYNOPSIS
 .HP 10
 .B gendump
+.so man1/gen.so
 [
 .B \-ximg|\-dat|\-tape|\-offset " filehdr suitehdr examhdr serieshdr imghdr [\-lengthpresent]"
 ]
@@ -65,5 +66,5 @@ The image pixel data is preceded by a 4 byte length field that should be skipped
 .BR gawtodc(1) ,
 .BR gawdump(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

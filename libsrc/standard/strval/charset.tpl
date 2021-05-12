@@ -26,7 +26,13 @@ StringValues="SpecificCharacterSet" {
 	ISO 2022 IR 87  =       Code extension Multi byte Japanese Kanji,
 	ISO 2022 IR 159 =       Code extension Multi byte Japanese Supplementary Kanji,
 	ISO 2022 IR 149 =       Code extension Multi byte Korean,
+	ISO 2022 IR 58 =        Code extension Multi byte Simplified Chinese,
 	ISO_IR 192 =	Unicode UTF-8,
-	GB18030 =	Chinese
+	GB18030 =	Chinese,
+	GBK =	Simplified Chinese
+}
+
+StringValues="SpecificCharacterSetISOIR100" {
+	ISO_IR 100 =	Latin alphabet No. 1
 }
 

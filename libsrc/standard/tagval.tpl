@@ -65,3 +65,15 @@ TagValues="XAFrameDimensionPointerValues" {
 	0x0018,0x2002 = Frame Label Vector
 }
 
+TagValues="QTUSDimensionOrganization3DDimensionIndexPointerValues" {
+	0x0020,0x930D = Temporal Position Time Offset,
+	0x0020,0x9301 = Image Position (Volume),
+	0x0018,0x9808 = Data Type,
+}
+
+TagValues="QTUSDimensionOrganization3DFunctionalGroupPointerValues" {
+	0x0020,0x9310 = Temporal Position Sequence,
+	0x0020,0x930E = Plane Position (Volume) Sequence,
+	0x0018,0x9807 = Image Data Type Sequence,
+}
+

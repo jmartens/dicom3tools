@@ -1,9 +1,10 @@
-.TH GAWDUMP 1 "05 April 1998" "DICOM PS3" "GE Advantage Windows to DICOM"
+.TH GAWDUMP 1 "06 March 2014" "DICOM PS3" "GE Advantage Windows to DICOM"
 .SH NAME
 gawdump \- ACR/NEMA DICOM PS3 ... GE Advantage Windows to DICOM
 .SH SYNOPSIS
 .HP 10
 .B gawdump
+.so man1/gen.so
 [
 .B \-awmr|\-awct|\-offset " filehdr suitehdr examhdr serieshdr imghdr [\-lengthpresent]"
 ]
@@ -65,6 +66,6 @@ The image pixel data is preceded by a 4 byte length field that should be skipped
 .BR gendump(1) ,
 .BR gentodc(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 The header layout was derived by guesswork by comparing the known Genesis layout to the similar Advantage Windows layout, but may not be reliable.

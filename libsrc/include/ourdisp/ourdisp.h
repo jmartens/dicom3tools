@@ -1,3 +1,4 @@
+/* ourdisp.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #ifndef __Header_ourdisp__
 #define __Header_ourdisp__
 

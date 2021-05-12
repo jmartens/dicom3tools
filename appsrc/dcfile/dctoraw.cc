@@ -1,5 +1,7 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dctoraw.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "attrothr.h"
+#include "attrval.h"
 #include "mesgtext.h"
 #include "ioopt.h"
 #include "dcopt.h"
@@ -68,6 +70,103 @@ main(int argc, char *argv[])
 		log << EMsgDC(DatasetReadFailed) << endl;
 		success=false;
 	}
+	
+	// Most of this is copied from dctopnm ... should refactor :(
+
+	Uint16 vRows = 0;
+	Attribute *aRows = list[TagFromName(Rows)];
+	if (!aRows)
+		log << WMsgDC(MissingAttribute)
+		    << " - \"Rows\""
+		    << endl;
+	else
+		vRows=AttributeValue(aRows);
+
+	Uint16 vColumns = 0;
+	Attribute *aColumns = list[TagFromName(Columns)];
+	if (!aColumns)
+		log << WMsgDC(MissingAttribute)
+		    << " - \"Columns\""
+		    << endl;
+	else
+		vColumns=AttributeValue(aColumns);
+
+	Uint16 vNumberOfFrames = 0;
+	Attribute *aNumberOfFrames = list[TagFromName(NumberOfFrames)];
+	if (aNumberOfFrames)	// optional
+		vNumberOfFrames=AttributeValue(aNumberOfFrames);
+
+	if (vNumberOfFrames == 0) {
+		vNumberOfFrames = 1;	// need to treat it as 1 if missing for later byteCount calculation
+	}
+
+	char *vPhotometricInterpretation = 0;
+	Attribute *aPhotometricInterpretation = list[TagFromName(PhotometricInterpretation)];
+	if (!aPhotometricInterpretation)
+		log << WMsgDC(MissingAttribute)
+		    << " - \"PhotometricInterpretation\""
+		    << endl;
+	else
+		vPhotometricInterpretation=AttributeValue(aPhotometricInterpretation);
+
+	Uint16 vSamplesPerPixel = 0;
+	Attribute *aSamplesPerPixel = list[TagFromName(SamplesPerPixel)];
+	if (!aSamplesPerPixel)
+		log << WMsgDC(MissingAttribute)
+		    << " - \"SamplesPerPixel\""
+		    << endl;
+	else
+		vSamplesPerPixel=AttributeValue(aSamplesPerPixel);
+
+	Uint16 vBitsAllocated = 0;
+	Attribute *aBitsAllocated = list[TagFromName(BitsAllocated)];
+	if (!aBitsAllocated)
+		log << WMsgDC(MissingAttribute)
+		    << " - \"BitsAllocated\""
+		    << endl;
+	else
+		vBitsAllocated=AttributeValue(aBitsAllocated);
+
+	Uint16 vBitsStored = 0;
+	Attribute *aBitsStored = list[TagFromName(BitsStored)];
+	if (!aBitsStored)
+		log << WMsgDC(MissingAttribute)
+		    << " - \"BitsStored\""
+		    << endl;
+	else
+		vBitsStored=AttributeValue(aBitsStored);
+
+	Uint16 vHighBit = 0;
+	Attribute *aHighBit = list[TagFromName(HighBit)];
+	if (!aHighBit)
+		log << WMsgDC(MissingAttribute)
+		    << " - \"HighBit\""
+		    << endl;
+	else
+		vHighBit=AttributeValue(aHighBit);
+
+	Uint16 vPixelRepresentation = 0xffff;
+	Attribute *aPixelRepresentation = list[TagFromName(PixelRepresentation)];
+	if (!aPixelRepresentation)
+		log << WMsgDC(MissingAttribute)
+		    << " - \"PixelRepresentation\""
+		    << endl;
+	else
+		vPixelRepresentation=AttributeValue(aPixelRepresentation);
+
+	Uint16 vPlanarConfiguration = 0xffff;
+	Attribute *aPlanarConfiguration = list[TagFromName(PlanarConfiguration)];
+	if (vSamplesPerPixel > 1 && !aPlanarConfiguration)
+		log << WMsgDC(MissingAttribute)
+		    << " - \"PlanarConfiguration\""
+		    << endl;
+	else
+		vPlanarConfiguration=AttributeValue(aPlanarConfiguration);
+
+	Uint32 byteCount = ((Uint32)vRows) * vColumns * vNumberOfFrames * vSamplesPerPixel * ((vBitsAllocated-1)/8 + 1);
+
+	TransferSyntax *ts=din.getTransferSyntaxToReadDataSet();
+	Assert(ts);
 
 	Attribute *apixeldata=list[TagFromName(PixelData)];
 	if (!apixeldata) {
@@ -80,6 +179,7 @@ main(int argc, char *argv[])
 	}
 	else {
 		if (!quiet) {
+			// this is now redundant with the explicit retrieval of values above, but keep this redundant dump in case anyone used these in scripts ...
 			log << "******** Parameters ... ********" << endl; 
 			ElementDictionary *dict=list.getDictionary();
 			Attribute *a;
@@ -104,7 +204,22 @@ main(int argc, char *argv[])
 			a=list[TagFromName(HighBit)];
 			if (a) { a->write(log,dict); log << endl; }
 
-			TransferSyntax *ts=din.getTransferSyntaxToReadDataSet();
+			log << "\tRows = " << dec << vRows << endl;
+			log << "\tColumns = " << dec << vColumns << endl;
+			log << "\tNumberOfFrames = " << dec << vNumberOfFrames << endl;
+			log << "\tPhotometricInterpretation = "
+				<< (vPhotometricInterpretation ? vPhotometricInterpretation : "")
+				<< endl;
+			log << "\tSamplesPerPixel = " << dec << vSamplesPerPixel << endl;
+			log << "\tBitsAllocated = " << dec << vBitsAllocated << endl;
+			log << "\tBitsStored = " << dec << vBitsStored << endl;
+			log << "\tHighBit = " << dec << vHighBit << endl;
+			log << "\tPixelRepresentation = " << dec << vPixelRepresentation << endl;
+			log << "\tPlanarConfiguration = " << hex << vPlanarConfiguration << dec << endl;
+			log << "\tRows*Columns*vNumberOfFrames*SamplesPerPixel*((vBitsAllocated-1)/8+1) = "
+				<< hex << byteCount
+				<< dec << " (" << byteCount << " dec)" << endl;
+
 			dumpTransferSyntaxEncapsulation(ts);
 			dumpTransferSyntaxByteOrder(ts);
 		}
@@ -113,8 +228,20 @@ main(int argc, char *argv[])
 			opixeldata = apixeldata->castToOtherData();
 		Assert(opixeldata);
 
-		opixeldata->writeRaw(out);
-
+		if (ts->isEncapsulated()) {
+			if (!quiet) log << "Writing encapsulated Transfer Syntax ..." << endl;
+			opixeldata->writeRaw(out);
+		}
+		else if (byteCount == 0) {
+			// do it the "old" way, if for some reason we could not find a suitable value for something that contributes to the desired count; should never happen
+			if (!quiet) log << "Writing VL " << dec << opixeldata->getVL() << " (dec) bytes ..." << endl;
+			opixeldata->writeRaw(out);
+		}
+		else {
+			if (!quiet) log << "Writing unpadded " << dec << byteCount << " (dec) bytes ..." << endl;
+			opixeldata->writeRaw(out,0/*byte offset*/,byteCount);
+		}
+		
 		if (!out.good()) {
 			log << EMsgDC(Writefailed) << endl;
 			success=false;

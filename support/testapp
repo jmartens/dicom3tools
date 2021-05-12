@@ -96,9 +96,9 @@ do
 	then
 		if [ "$mode" = "create" ]
 		then
-			stdout="$testlogdir/$logname.$role.stdout"
-			stderr="$testlogdir/$logname.$role.stderr"
-			outfile="$testlogdir/$logname.$role.outfile"
+			stdout="$testlogdir/$logname.$baseappname.$role.stdout"
+			stderr="$testlogdir/$logname.$baseappname.$role.stderr"
+			outfile="$testlogdir/$logname.$baseappname.$role.outfile"
 		else
 			stdout="$TMPROOT.stdout"
 			stderr="$TMPROOT.stderr"
@@ -116,8 +116,8 @@ do
 
 		if [ "$role" = "filter" ]
 		then
-			#echo $appname $options '<'$usefullname $outused '>'$stdout '2>'$stderr
-			if $appname $options <$usefullname $outused >$stdout 2>$stderr
+			# grep out unnecessary extra assertion message that has been seen with Apple LLVM version 5.0, which interferes with comparison with previous logs :(
+			if $appname $options <$usefullname $outused 2>&1 >$stdout | fgrep -v 'Assertion failed: (libcompiler_rt abort)' >$stderr
 			then
 				echo "$baseappname:   succeeded"
 				success="true"
@@ -126,8 +126,7 @@ do
 				success="false"
 			fi
 		else
-			#echo $appname $options $usefullname $outused '>'$stdout '2>'$stderr
-			if $appname $options $usefullname $outused >$stdout 2>$stderr
+			if $appname $options $usefullname $outused 2>&1 >$stdout | fgrep -v 'Assertion failed: (libcompiler_rt abort)' >$stderr
 			then
 				echo "$baseappname:   succeeded"
 				success="true"
@@ -141,10 +140,10 @@ do
 		then
 			if [ "$role" = "cp" -o "$role" = "todc" -o "$role" = "ancp" ]
 			then
-				if [ -f $testlogdir/$logname.$role.outfile ]
+				if [ -f $testlogdir/$logname.$baseappname.$role.outfile ]
 				then
 					echo "$baseappname:   comparing outfile"
-					if cmp -s $outfile $testlogdir/$logname.$role.outfile
+					if cmp -s $outfile $testlogdir/$logname.$baseappname.$role.outfile
 					then
 						true
 					else
@@ -154,12 +153,12 @@ do
 					echo "$baseappname:     nothing stored  to compare ($outfile)"
 				fi
 			fi
-			if [ -f $testlogdir/$logname.$role.stdout ]
+			if [ -f $testlogdir/$logname.$baseappname.$role.stdout ]
 			then
 				echo "$baseappname:   comparing stdout"
 				#ls -l $stdout
-				if cmp -s $stdout $testlogdir/$logname.$role.stdout
-				#if diff $stdout $testlogdir/$logname.$role.stdout
+				if cmp -s $stdout $testlogdir/$logname.$baseappname.$role.stdout
+				#if diff $stdout $testlogdir/$logname.$baseappname.$role.stdout
 				then
 					true
 				else
@@ -168,10 +167,10 @@ do
 			else
 				echo "$baseappname:     nothing stored  to compare (stdout)"
 			fi
-			if [ -f $testlogdir/$logname.$role.stderr ]
+			if [ -f $testlogdir/$logname.$baseappname.$role.stderr ]
 			then
 				echo "$baseappname:   comparing stderr"
-				if diff $stderr $testlogdir/$logname.$role.stderr
+				if diff $stderr $testlogdir/$logname.$baseappname.$role.stderr
 				then
 					true
 				else

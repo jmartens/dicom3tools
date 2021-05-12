@@ -55,7 +55,8 @@ if [ -z "$frames" ]; then frames=1; fi
 #echo 1>&2 "columns=$columns"
 #echo 1>&2 "frames=$frames"
 
-vl=`$DC <<EOF
+#numberOfPixels may be odd
+numberOfPixels=`$DC <<EOF
 16
 o
 $rows
@@ -65,11 +66,41 @@ $frames
 *
 p
 EOF`
+#echo 1>&2 "numberOfPixels(hex)=$numberOfPixels"
+
+# VL is rounded up to next even number if odd ...
+vl=`$DC <<EOF
+16
+o
+$rows
+$columns
+$frames
+*
+*
+1
++
+2
+/
+2
+*
+p
+EOF`
 #echo 1>&2 "vl(hex)=$vl"
+
+#isOdd will be 0 if even, 1 if odd
+isOdd=`$DC <<EOF
+16
+i
+$vl
+$numberOfPixels
+-
+p
+EOF`
+#echo 1>&2 "isOdd=$isOdd"
 
 echo "(0x7fe0,0x0010) OX Pixel Data 	 VR=<OB>   VL=<0x$vl> []" | "$ANCREATE" -e > "$TMPROOT.pixelhead"
  
-"$DCTOPNM" -quiet "$1" "$TMPROOT.ppm" 2>/dev/null
+"$DCTOPNM" -quiet "$1" "$TMPROOT.ppm"
 
 # Note that ppmtopgm is documented (“http://netpbm.sourceforge.net/doc/ppmtopgm.html”) to use “gray = .299 r + .587 g + .114 b” as the conversion formula
 # (NTSC luminance weighting “http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html#RTFToC11”), but the net effect
@@ -82,6 +113,12 @@ rm "$TMPROOT.pgm"
 
 "$DCCP" "$1" "$TMPROOT.nopixels" -d PixelData -d DataSetTrailingPadding -d DigitalSignaturesSequence $dccpoptions -r PhotometricInterpretation MONOCHROME2 -r SamplesPerPixel 1 -d PlanarConfiguration
 cat "$TMPROOT.nopixels" "$TMPROOT.pixelhead" "$TMPROOT.raw" > "$2"
+
+if [ ${isOdd} = 1 ]
+then
+	# add single padding byte to make even and match VL
+	dd if=/dev/zero bs=1 count=1 >>"$2" 2>/dev/null
+fi
 
 rm "$TMPROOT.nopixels" "$TMPROOT.pixelhead" "$TMPROOT.raw"
 

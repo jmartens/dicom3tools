@@ -1,5 +1,4 @@
-//#include <iostream.h>	// for debugging only
-
+static const char *CopyrightIdentifier(void) { return "@(#)shimhdrc.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "ptyhdr.h"
 #include "shimptrs.h"
 #include "shimhdrm.h"

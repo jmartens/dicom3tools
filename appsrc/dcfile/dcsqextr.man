@@ -1,9 +1,10 @@
-.TH DCSQEXTR 1 "05 April 1998" "DICOM PS3" "DICOM PS3 - Extract Papyrus images"
+.TH DCSQEXTR 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Extract Papyrus images"
 .SH NAME
 dcsqextr \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Extract Papyrus images
 .SH SYNOPSIS
 .HP 10
 .B dcsqextr
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -63,5 +64,5 @@ MR2images.64.572.218.916.1
 .BR dccp(1) ,
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

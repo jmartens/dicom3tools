@@ -1,10 +1,11 @@
-.TH DCMULTI 1 "5 March 2005" "DICOM PS3" "DICOM PS3 - Make multiframe image"
+.TH DCMULTI 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Make multiframe image"
 .SH NAME
 dcmulti \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Make multiframe image from single frames
 .SH SYNOPSIS
 .HP 10
 .B dcmulti
 " inputfile1 [ inputfile2 ... ]"
+.so man1/gen.so
 [
 .B \-v|verbose|vv|veryverbose|vvv|veryveryverbose
 ]
@@ -435,7 +436,7 @@ wrote frame 1 from filename <IMAGES/1>
 .BR dcmerge(1), 
 .BR dctable(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 .LP
 Data Set Trailing Padding is explicitly removed from the input images,

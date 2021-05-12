@@ -1,3 +1,4 @@
+#  modtype.awk Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 # create list of composite iod elements by module 
 
 NR==1	{

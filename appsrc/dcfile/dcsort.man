@@ -1,10 +1,11 @@
-.TH DCSORT 1 "22 December 2006" "DICOM PS3" "DICOM PS3 - Make sorted list of images"
+.TH DCSORT 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Make sorted list of images"
 .SH NAME
 dcsort \- ACR/NEMA DICOM PS3 ... DICOM PS3 - Make sorted list of images
 .SH SYNOPSIS
 .HP 10
 .B dcsort
 " inputfile1 [ inputfile2 ... ]"
+.so man1/gen.so
 [
 .B \-v|verbose
 ]
@@ -117,5 +118,5 @@ Specify attributename as the sort key.
 .SH SEE ALSO
 .BR dcintro(1)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS

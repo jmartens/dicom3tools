@@ -1,7 +1,17 @@
+static const char *CopyrightIdentifier(void) { return "@(#)andump.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <iostream>
+#include <iomanip>
+#include <cctype>
+#else
 #include <iostream.h>
 #include <iomanip.h>
-#include <string.h>
 #include <ctype.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #ifdef POWINTEGEREXPONENTTYPE
 #define	powi(m,e)	pow(m,(POWINTEGEREXPONENTTYPE)(e))
@@ -32,40 +42,11 @@
 #include "elmconst.h"
 #include "elmdict.h"
 #include "mesgtext.h"
+#include "vr.h"
 
 #ifndef MAXVLTODUMP
 #define MAXVLTODUMP 32768
 #endif
-
-static bool
-isOtherByteOrWordVR(const char *vr)
-{
-	return vr && vr[0]=='O' && (vr[1]=='B' || vr[1]=='W' || vr[1]=='X');
-}
-
-static bool
-isOtherByteOrWordOrFloatVR(const char *vr)
-{
-	return vr && vr[0]=='O' && (vr[1]=='B' || vr[1]=='F'  || vr[1]=='W' || vr[1]=='X');
-}
-
-static bool
-isSequenceVR(const char *vr)
-{
-	return vr && vr[0]=='S' &&  vr[1]=='Q';
-}
-
-static bool
-isUnknownVR(const char *vr)
-{
-	return vr && vr[0]=='U' &&  vr[1]=='N';
-}
-
-static bool
-isUnlimitedTextVR(const char *vr)
-{
-	return vr && vr[0]=='U' &&  vr[1]=='T';
-}
 
 static TextOutputStream& 
 writebase(TextOutputStream& stream,ElementDictionary& dict,const Tag tag,const char *vr,Uint32 vl)
@@ -76,90 +57,6 @@ writebase(TextOutputStream& stream,ElementDictionary& dict,const Tag tag,const c
 	writeZeroPaddedHexNumber(stream,vl,4);
 	stream << ">  " << flush;
 	return stream;
-}
-
-static bool
-isStringVR(const char *vr)
-{
-	return vr &&
-		(  strcmp(vr,"AE") == 0
-		|| strcmp(vr,"AS") == 0
-		|| strcmp(vr,"CS") == 0
-		|| strcmp(vr,"DA") == 0
-		|| strcmp(vr,"DT") == 0
-		|| strcmp(vr,"DS") == 0
-		|| strcmp(vr,"IS") == 0
-		|| strcmp(vr,"LO") == 0
-		|| strcmp(vr,"LT") == 0
-		|| strcmp(vr,"PN") == 0
-		|| strcmp(vr,"SH") == 0
-		|| strcmp(vr,"ST") == 0
-		|| strcmp(vr,"TM") == 0
-		|| strcmp(vr,"UI") == 0
-		|| strcmp(vr,"UT") == 0);
-}
-
-static bool
-isNumericVR(const char *vr)
-{
-	return vr &&
-		(  strcmp(vr,"OB") == 0
-		|| strcmp(vr,"OW") == 0
-		|| strcmp(vr,"OX") == 0
-		|| strcmp(vr,"SL") == 0
-		|| strcmp(vr,"SS") == 0
-		|| strcmp(vr,"UL") == 0
-		|| strcmp(vr,"US") == 0
-		|| strcmp(vr,"XL") == 0
-		|| strcmp(vr,"XS") == 0);
-}
-
-static bool
-isFloatVR(const char *vr)
-{
-	return vr &&
-		(  strcmp(vr,"FL") == 0
-		|| strcmp(vr,"FD") == 0);
-}
-
-static bool
-isTagVR(const char *vr)
-{
-	return vr && strcmp(vr,"AT") == 0;
-}
-
-static size_t
-sizeofNumericVR(const char *vr)
-{
-	if (     strcmp(vr,"OB") == 0
-	      || strcmp(vr,"OX") == 0)
-		return 1;
-	else if (strcmp(vr,"OW") == 0
-	      || strcmp(vr,"US") == 0
-	      || strcmp(vr,"SS") == 0
-	      || strcmp(vr,"XS") == 0)
-		return 2;
-	else if (strcmp(vr,"SL") == 0
-	      || strcmp(vr,"UL") == 0
-	      || strcmp(vr,"XL") == 0)
-		return 4;
-	else {
-		Assert(0);
-	}
-	return 0;	// never gets here but prevents warning
-}
-
-static size_t
-sizeofFloatVR(const char *vr)
-{
-	if (     strcmp(vr,"FL") == 0)
-		return 4;
-	else if (strcmp(vr,"FD") == 0)
-		return 8;
-	else {
-		Assert(0);
-	}
-	return 0;	// never gets here but prevents warning
 }
 
 static TextOutputStream&
@@ -367,7 +264,7 @@ readAll(DicomInputStream& stream,TextOutputStream& log,ElementDictionary& dict,b
 	bool lastwasencapOXorItem=false;
 	bool donewithmetaheader=false;
 	Tag *siemensCSAHeaderInfoTag = NULL;
-	while (stream.peek() != EOF && (length == 0xffffffff || n < length)) {
+	while (stream.peek() != istream::traits_type::eof() && (length == 0xffffffff || n < length)) {
 		if (showoffset) {
 			log << "@";
 			writeZeroPaddedNumber(log,n,showoffsetbase,8);
@@ -387,9 +284,7 @@ readAll(DicomInputStream& stream,TextOutputStream& log,ElementDictionary& dict,b
 		n+=4;
 
 		if (!donewithmetaheader && !tag.isMetaheaderGroup()) {
-			if (stream.getTransferSyntaxToReadDataSet()) {
-				stream.readingDataSet();
-				donewithmetaheader=true;
+			{
 				// backup and read again in case endian changed ...
 #ifdef CHECKFORSGINATIVECCSEEKBUG
 log << endl << "Before endian check backup @";
@@ -412,15 +307,18 @@ writeZeroPaddedHexNumber(log,stream.rdbuf()->PubSeekOff(0,ios::cur),8);
 log << ")"
     << ": " << endl;
 #endif
+				if (!stream.getTransferSyntaxToReadDataSet()) {
+					cerr << EMsgDC(NoTransferSyntaxInMetaHeader) << endl;
+					bool setswapped32big;
+					stream.guessTransferSyntaxToReadDataSet(setswapped32big);		// always guesses something
+				}
+				stream.readingDataSet();
+				donewithmetaheader=true;
 				stream >> tag;
 				if (stream.fail()) {
 					cerr << EMsgDC(TagReadFailed) << endl;
 					return false;
 				}
-			}
-			else {
-				cerr << EMsgDC(NoTransferSyntaxInMetaHeader) << endl;
-				return false;
 			}
 		}
 
@@ -448,7 +346,17 @@ log << ")"
 					cerr << EMsgDC(VRReadFailed) << endl;
 					return false;
 				}
-				if (vre[0] < 'A' || vre[1] < 'A') {		// DicomWorks bug ... occasional implicit VR attribute even though explicit transfer syntax
+				if (vre[0] == '-' && vre[1] == '-') {			// illegal proprietary equivalent of UN VR used by Australian Central Data Networks (CDN) PACS
+					vr="UN";
+					vl=stream.read16();
+					n+=2;
+				}
+				else if (vre[0] == 0 && vre[1] == 0) {			// illegal two bytes of zero VR encountered in Sante de-identifier output (followed by two byte length)
+					vr="UN";
+					vl=stream.read16();
+					n+=2;
+				}
+				else if (vre[0] < 'A' || vre[1] < 'A') {		// DicomWorks bug ... occasional implicit VR attribute even though explicit transfer syntax
 					//cerr << EMsgDC(TagReadFailed) << " - " << MMsgDC(ImplicitVREncodingWhenExplicitRequired) << endl;
 					vr="UN";
 					stream.seekg(-2l,ios::cur);
@@ -463,12 +371,7 @@ log << ")"
 					n+=2;
 					vre[2]=0;
 					vr=vre;
-					if (isOtherByteOrWordOrFloatVR(vr) || isSequenceVR(vr)) {
-						(void)stream.read16();	// "Reserved"
-						stream >> vl;
-						n+=6;
-					}
-					else if (isUnlimitedTextVR(vr) || isUnknownVR(vr)) {
+					if (isUniversalResourceVR(vr) || isUnlimitedCharactersVR(vr) || isUnlimitedTextVR(vr) || isUnknownVR(vr)) {
 						// should be long form, but check for bad implementations that use short form ...
 						vl=stream.read16();
 						n+=2;
@@ -477,8 +380,13 @@ log << ")"
 							n+=4;
 						}
 						else {
-							cerr << EMsgDC(IncorrectShortVLForUTOrUN) << endl;
+							cerr << EMsgDC(IncorrectShortVLForUROrUCOrUTOrUN) << endl;
 						}
+					}
+					else if (isLongValueLengthInExplicitValueRepresentation(vr)) {	// some of these already handled above
+						(void)stream.read16();	// "Reserved"
+						stream >> vl;
+						n+=6;
 					}
 					else {
 						vl=stream.read16();
@@ -553,7 +461,7 @@ log << ")"
 						}
 					}
 				}
-				else if (isTagVR(vr))
+				else if (isAttributeTagVR(vr))
 					doTagValues(stream,log,vl);
 				else if (isNumericVR(vr)) {
 					Uint32 ival;
@@ -589,7 +497,7 @@ log << ")"
 			n+=vl;
 		}
 		lastwasencapOXorItem=
-			(isOtherByteOrWordVR(vr)
+			(isOtherByteOrWordOrUnspecifiedVR(vr)
 			 || tag == TagFromName(Item)
 			 || tag == TagFromName(ItemDelimitationItem)
 			) && stream.getTransferSyntaxInUse()->isEncapsulated();

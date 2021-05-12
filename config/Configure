@@ -6,7 +6,7 @@ TMPROOT="/tmp/$0.$$"
 if [ -f generic.cf ]; then mv generic.cf generic.cf.bak; fi
 
 echo  >generic.cf "/* Automagically generated - edits will be lost */"
-echo              '/* Configure last updated $Date: 2008/09/02 17:18:15 $ */' | sed -e 's/[$]//g' -e 's/Date: //' >>generic.cf
+echo              '/* Configure last updated $Date: 2015/11/18 23:39:08 $ */' | sed -e 's/[$]//g' -e 's/Date: //' >>generic.cf
 echo >>generic.cf "/* This file created      "`date +'%Y/%m/%d %H:%M:%S'`" */"
 if [ ! -z "$BASH_VERSION" ]
 then
@@ -356,7 +356,7 @@ then
 		echo 1>&2 "Configure: using $usegcc version $gccversion"
 		if gplusplusversion=`getVersion "$usegpp -v" | grep -v 'Configured with:' | grep -i version`
 		then
-			gplusplussubversion=`echo "$gplusplusversion" | sed -e 's/egcs-//' -e 's/Apple Computer.* based on //'`
+			gplusplussubversion=`echo "$gplusplusversion" | sed -e 's/egcs-//' -e 's/Apple Computer.* based on //' -e 's/Apple LLVM version/LLVM version/'`
 			gplusplusmajorversion=`echo "$gplusplussubversion" | awk '{print $3}' | sed 's/[.]/ /g' | awk '{print $1}'`
 			gplusplusminorversion=`echo "$gplusplussubversion" | awk '{print $3}' | sed 's/[.]/ /g' | awk '{print $2}'`
 			gplusplustinyversion=` echo "$gplusplussubversion" | awk '{print $3}' | sed 's/[.]/ /g' | awk '{print $3}'`
@@ -402,6 +402,16 @@ then
 				echo >>generic.cf "#endif"
 			fi
 
+			if [ "$gplusplusmajorversion" -gt 4 -o \( "$gplusplusmajorversion" -eq 4 -a "$gplusplusminorversion" -ge 3 \) ]
+			then
+				echo >>generic.cf "#ifndef UseStandardHeadersWithoutExtension"
+				echo >>generic.cf "#define UseStandardHeadersWithoutExtension 1"
+				echo >>generic.cf "#endif"
+				echo >>generic.cf "#ifndef EmitUsingStdNameSpace"
+				echo >>generic.cf "#define EmitUsingStdNameSpace 1"
+				echo >>generic.cf "#endif"
+			fi
+
 			echo >>generic.cf "#ifndef AnsiCUnoptimizedDebugFlags"
 			echo >>generic.cf "#define AnsiCUnoptimizedDebugFlags NeedMissingPrototypes"
 			echo >>generic.cf "#endif"
@@ -420,31 +430,33 @@ then
 				| awk '{print $4}' \
 				| sed 's/\/specs$//'`
 			
-			cpptouse="$gccpath/cpp"
-			if [ ! -f "$cpptouse" ]
+			if [ ! -z "$gccpath" ]
 			then
-				cpptouse="$gccpath/cpp0"
-			fi
-			if [ ! -f "$cpptouse" ]
-			then
-				cpptouse="$gccpath/cpp*"
-			fi
-			echo 1>&2 "Configure: using cpp to build include paths: $cpptouse"
+				cpptouse="$gccpath/cpp"
+				if [ ! -f "$cpptouse" ]
+				then
+					cpptouse="$gccpath/cpp0"
+				fi
+				if [ ! -f "$cpptouse" ]
+				then
+					cpptouse="$gccpath/cpp*"
+				fi
+				echo 1>&2 "Configure: using cpp to build include paths: $cpptouse"
 
-
-			echo >>generic.cf "#ifndef AnsiCDependIncludePath"
-			echo >>generic.cf "#define AnsiCDependIncludePath " \
-				`$cpptouse -v -lang-c 2>&1 </dev/null \
-				| sed -e '1,/#include </d' -e '/^End of search list/,$d' \
-				| sed -e 's/^[ 	]*/\"-I/' -e 's/$/\"/'`
-			echo >>generic.cf "#endif"
+				echo >>generic.cf "#ifndef AnsiCDependIncludePath"
+				echo >>generic.cf "#define AnsiCDependIncludePath " \
+					`$cpptouse -v -lang-c 2>&1 </dev/null \
+					| sed -e '1,/#include </d' -e '/^End of search list/,$d' \
+					| sed -e 's/^[ 	]*/\"-I/' -e 's/$/\"/'`
+				echo >>generic.cf "#endif"
 		
-			echo >>generic.cf "#ifndef CPlusPlusDependIncludePath"
-			echo >>generic.cf "#define CPlusPlusDependIncludePath " \
-				`$cpptouse -v -lang-c++ 2>&1 </dev/null \
-				| sed -e '1,/#include </d' -e '/^End of search list/,$d' \
-				| sed -e 's/^[ 	]*/\"-I/' -e 's/$/\"/'`
-			echo >>generic.cf "#endif"
+				echo >>generic.cf "#ifndef CPlusPlusDependIncludePath"
+				echo >>generic.cf "#define CPlusPlusDependIncludePath " \
+					`$cpptouse -v -lang-c++ 2>&1 </dev/null \
+					| sed -e '1,/#include </d' -e '/^End of search list/,$d' \
+					| sed -e 's/^[ 	]*/\"-I/' -e 's/$/\"/'`
+				echo >>generic.cf "#endif"
+			fi
 
 			if [ "$osname" = "SunOS" -a "$osmajorversion" = 4 ]
 			then
@@ -452,6 +464,8 @@ then
 				echo >>generic.cf "#define NeedMissingPrototypes -DNEEDMISSINGPROTOTYPES"
 				echo >>generic.cf "#endif"
 			fi
+		else
+			echo 1>&2 "Configure: g++ not available :("
 		fi
 	else
 		echo 1>&2 "Configure: gcc not available :("
@@ -681,7 +695,7 @@ then
 	fi
 fi
 
-if [ "$osname" = "Linux" ]
+if [ "$osname" = "Linux" -o "$osname" = "GNU/kFreeBSD" -o "$osname" = "GNU" ]
 then
 	echo 1>&2 "Configure: we are on $osname"
 
@@ -689,11 +703,48 @@ then
 
 	# X11LibraryPath may already have been overridden, but ...
 
-	if [ -f /usr/lib64/libX11.a ]		# They changed it in FC5
+	if [ -f /usr/lib64/libX11.a -o -f /usr/lib64/libX11.so ]
 	then
 		echo >>generic.cf "#ifndef X11LibraryPath"
 		echo >>generic.cf "#define X11LibraryPath /usr/lib64"
 		echo >>generic.cf "#endif"
+		if [ ! -f /usr/lib64/libXext.a ]
+		then
+			echo >>generic.cf "#ifndef DisplayLoadFlags"
+			echo >>generic.cf "#define DisplayLoadFlags Concat(-L,\$(X11LIBRARYPATH)) -lX11"
+			echo >>generic.cf "#endif"
+			echo >>generic.cf "#ifndef DisplayDependFlags"
+			echo >>generic.cf "#define DisplayDependFlags Concat(\$(X11LIBRARYPATH),/libX11.a)"
+			echo >>generic.cf "#endif"
+		fi
+	elif [ -f /usr/lib/libX11.a -o -f /usr/lib/libX11.so ]
+	then
+		echo >>generic.cf "#ifndef X11LibraryPath"
+		echo >>generic.cf "#define X11LibraryPath /usr/lib"
+		echo >>generic.cf "#endif"
+		if [ ! -f /usr/lib/libXext.a ]
+		then
+			echo >>generic.cf "#ifndef DisplayLoadFlags"
+			echo >>generic.cf "#define DisplayLoadFlags Concat(-L,\$(X11LIBRARYPATH)) -lX11"
+			echo >>generic.cf "#endif"
+			echo >>generic.cf "#ifndef DisplayDependFlags"
+			echo >>generic.cf "#define DisplayDependFlags Concat(\$(X11LIBRARYPATH),/libX11.a)"
+			echo >>generic.cf "#endif"
+		fi
+	elif [ -f /usr/lib/x86_64-linux-gnu/libX11.a -o -f /usr/lib/x86_64-linux-gnu/libX11.so ]	# Found on Ubuntu 14.04
+	then
+		echo >>generic.cf "#ifndef X11LibraryPath"
+		echo >>generic.cf "#define X11LibraryPath /usr/lib/x86_64-linux-gnu"
+		echo >>generic.cf "#endif"
+		if [ ! -f /usr/lib/libXext.a ]
+		then
+			echo >>generic.cf "#ifndef DisplayLoadFlags"
+			echo >>generic.cf "#define DisplayLoadFlags Concat(-L,\$(X11LIBRARYPATH)) -lX11"
+			echo >>generic.cf "#endif"
+			echo >>generic.cf "#ifndef DisplayDependFlags"
+			echo >>generic.cf "#define DisplayDependFlags Concat(\$(X11LIBRARYPATH),/libX11.a)"
+			echo >>generic.cf "#endif"
+		fi
 	elif [ -d /usr/X11R6/lib64 ]		# Found on AMD x86_64 platforms eg. FC3
 	then
 		echo >>generic.cf "#ifndef X11LibraryPath"
@@ -782,14 +833,31 @@ if [ "$osname" = "Darwin" ]
 then
 	echo 1>&2 "Configure: we are on $osname ($osmajorversion.$osminorversion)"
 
-	if [ -d /usr/X11R6/lib ]
+	if [ -f /opt/X11/bin/makedepend ]
+	then
+		echo >>generic.cf "#ifndef MakedependCmd"
+		echo >>generic.cf "#define MakedependCmd /opt/X11/bin/makedepend"
+		echo >>generic.cf "#endif"
+	fi
+
+	if [ -d /opt/X11/lib ]
+	then
+		echo >>generic.cf "#ifndef X11LibraryPath"
+		echo >>generic.cf "#define X11LibraryPath /opt/X11/lib"
+		echo >>generic.cf "#endif"
+	elif [ -d /usr/X11R6/lib ]
 	then
 		echo >>generic.cf "#ifndef X11LibraryPath"
 		echo >>generic.cf "#define X11LibraryPath /usr/X11R6/lib"
 		echo >>generic.cf "#endif"
 	fi
 
-	if [ -d /usr/X11R6/include ]
+	if [ -d /opt/X11/include ]
+	then
+		echo >>generic.cf "#ifndef X11IncludePath"
+		echo >>generic.cf "#define X11IncludePath /opt/X11/include"
+		echo >>generic.cf "#endif"
+	elif [ -d /usr/X11R6/include ]
 	then
 		echo >>generic.cf "#ifndef X11IncludePath"
 		echo >>generic.cf "#define X11IncludePath /usr/X11R6/include"
@@ -811,16 +879,35 @@ then
 	echo >>generic.cf "#define UseGlibcTimezone 1"
 	echo >>generic.cf "#endif"
 	
-	if [ "$gplusplusmajorversion" -ge 4 -a `uname -p` = 'i386' ]
+	instructionsetarchitecture=`uname -p`
+	machinearchitecture=`uname -m`
+	if [ "$gplusplusmajorversion" -ge 4 -a $instructionsetarchitecture = 'i386' ]
 	then
-		echo 1>&2 "Configure: building Darwin universal binaries for intel and ppc"
+		echo 1>&2 "Configure: building Darwin for intel only"
 		echo >>generic.cf "#ifndef CPlusPlusDefaultOptions"
-		echo >>generic.cf "#define CPlusPlusDefaultOptions -force_cpusubtype_ALL -arch 'i386' -arch 'ppc' -mmacosx-version-min=10.0"
+		echo >>generic.cf "#define CPlusPlusDefaultOptions -force_cpusubtype_ALL -arch $machinearchitecture -mmacosx-version-min=10.0"
 		echo >>generic.cf "#endif"
 	
 		echo >>generic.cf "#ifndef AnsiCDefaultOptions"
-		echo >>generic.cf "#define AnsiCDefaultOptions -force_cpusubtype_ALL -arch 'i386' -arch 'ppc' -mmacosx-version-min=10.0"
+		echo >>generic.cf "#define AnsiCDefaultOptions -force_cpusubtype_ALL -arch $machinearchitecture -mmacosx-version-min=10.0"
 		echo >>generic.cf "#endif"
+	fi
+
+	cppVersionIsBadApple=`cpp -v < /dev/null 2>&1 | grep 'Apple LLVM version 5'`
+	if [ ! -z "$cppVersionIsBadApple" ]
+	then
+		echo 1>&2 "Configure: The default Apple LLVM version 5.x cpp will fail to execute imake"
+		if getIsPresent llvm-cpp-4.2
+		then
+			if [ -z "$IMAKECPP" ]
+			then
+				echo 1>&2 "Configure: Set the environment variable IMAKECPP to llvm-cpp-4.2 before running imake or make"
+			else
+				echo 1>&2 "Configure: Already have the correct environment variable IMAKECPP set to llvm-cpp-4.2"
+			fi
+		else
+			echo 1>&2 "Configure: You need to port install llvm-gcc42 before running imake"
+		fi
 	fi
 fi
 
@@ -833,7 +920,7 @@ echo >>generic.cf "#define NeedMissingPrototypes"
 echo >>generic.cf "#endif"
 
 echo >>generic.cf "#ifndef UseXMitShmExtension"
-echo >>generic.cf "#define UseXMitShmExtension 1"
+echo >>generic.cf "#define UseXMitShmExtension 0"
 echo >>generic.cf "#endif"
 
 echo >>generic.cf "#ifndef HasGetHostID"
@@ -842,6 +929,14 @@ echo >>generic.cf "#endif"
 
 echo >>generic.cf "#ifndef HasStdNameSpaceForStreamPos"
 echo >>generic.cf "#define HasStdNameSpaceForStreamPos 0"
+echo >>generic.cf "#endif"
+
+echo >>generic.cf "#ifndef UseStandardHeadersWithoutExtension"
+echo >>generic.cf "#define UseStandardHeadersWithoutExtension 0"
+echo >>generic.cf "#endif"
+
+echo >>generic.cf "#ifndef EmitUsingStdNameSpace"
+echo >>generic.cf "#define EmitUsingStdNameSpace 0"
 echo >>generic.cf "#endif"
 
 echo >>generic.cf "#ifndef SystemIncludeOption"

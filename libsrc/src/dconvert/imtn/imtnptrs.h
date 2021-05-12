@@ -1,3 +1,4 @@
+/* imtnptrs.h Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved. */
 #define	IMTN_Offset_MAINHDR_ptr	0
 
 // note the comma preceeding the constructor args ...

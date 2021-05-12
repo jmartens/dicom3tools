@@ -1,4 +1,13 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcuidchg.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
+#if USESTANDARDHEADERSWITHOUTEXTENSION == 1
+#include <fstream>
+#else
 #include <fstream.h>
+#endif
+
+#if EMITUSINGSTDNAMESPACE == 1
+using namespace std;
+#endif
 
 #include "attrmxls.h"
 #include "attrtype.h"
@@ -392,7 +401,7 @@ main(int argc, char *argv[])
 			bad=true;
 		}
 		else {
-			while (flfstr->peek() != EOF) {
+			while (flfstr->peek() != istream::traits_type::eof()) {
 				const int lineBufferSize=2048;
 				char lineBuffer[lineBufferSize];
 				flfstr->getline(lineBuffer,2048);

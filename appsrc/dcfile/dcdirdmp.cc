@@ -1,3 +1,4 @@
+static const char *CopyrightIdentifier(void) { return "@(#)dcdirdmp.cc Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved."; }
 #include "attrmxls.h"
 #include "mesgtext.h"
 #include "dcopt.h"
@@ -72,7 +73,10 @@ main(int argc, char *argv[])
 	//log << list;
 	//list.write(log,veryverbose);
 
-	success=success&&parseDicomdir(list,log,verbose,veryverbose,showrecordinfo,showabstract,showpaths,showdescription);
+	{
+		bool parseSuccess = parseDicomdir(list,log,verbose,veryverbose,showrecordinfo,showabstract,showpaths,showdescription);		// parse regardless of read success or failure
+		success=success&&parseSuccess;
+	}
 
 	return success ? 0 : 1;
 }

@@ -1,9 +1,10 @@
-.TH ANCREATE 1 "19 Jan 2007" "DICOM PS3" "DICOM PS3 - Create dicom file"
+.TH ANCREATE 1 "6 March 2014" "DICOM PS3" "DICOM PS3 - Create dicom file"
 .SH NAME
 ancreate \- ACR/NEMA DICOM PS3 ... Create dicom file
 .SH SYNOPSIS
 .HP 10
 .B ancreate
+.so man1/gen.so
 [
 .B \-b|big
 ]
@@ -252,7 +253,7 @@ Should be able to find no differences:
 .BR dcintro(3) ,
 .BR dcintro(5)
 .SH AUTHOR
-Copyright (C) 1993-2010. David A. Clunie DBA PixelMed Publishing. All rights reserved.
+Copyright (c) 1993-2015, David A. Clunie DBA PixelMed Publishing. All rights reserved.
 .SH BUGS
 In the attribute descriptions, the group, element, value length, and values are always in hexadecimal format, whether a leading "0x" is present or not. This is because dcdump adopts such a convention, with slightly different output on different platforms and compilers. In particular lib-g++ does not output the "x" in hexadecimal formats :(
 .LP

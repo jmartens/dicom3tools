@@ -167,12 +167,28 @@ NR==1	{
 			RLENGTH-length("ElementPresentInPathFromRoot=\"")-1);
 	}
 
+	sequencepresentinpathhasitems=0
+	sequencepresentinpathfromroothasitems=""
+	if (match($0,"SequencePresentInPathFromRootHasItems=\"[^\"]*\"")) {
+		sequencepresentinpathhasitems=1;
+		sequencepresentinpathfromroothasitems=substr($0,RSTART+length("SequencePresentInPathFromRootHasItems=\""),
+			RLENGTH-length("SequencePresentInPathFromRootHasItems=\"")-1);
+	}
+
 	elementpresentinpathfirstitem=0
 	elementpresentinpathfromrootfirstitem=""
 	if (match($0,"ElementPresentInPathFromRootFirstItem=\"[^\"]*\"")) {
 		elementpresentinpathfirstitem=1;
 		elementpresentinpathfromrootfirstitem=substr($0,RSTART+length("ElementPresentInPathFromRootFirstItem=\""),
 			RLENGTH-length("ElementPresentInPathFromRootFirstItem=\"")-1);
+	}
+
+	sequencepresentinpathfirstitemhasitems=0
+	sequencepresentinpathfromrootfirstitemhasitems=""
+	if (match($0,"SequencePresentInPathFromRootFirstItemHasItems=\"[^\"]*\"")) {
+		sequencepresentinpathfirstitem=1;
+		sequencepresentinpathfromrootfirstitem=substr($0,RSTART+length("SequencePresentInPathFromRootFirstItemHasItems=\""),
+			RLENGTH-length("SequencePresentInPathFromRootFirstItemHasItems=\"")-1);
 	}
 
 	grouppresent=0;
@@ -318,7 +334,6 @@ NR==1	{
 			}
 		}
 		if (elementpresentinpath) {
-			# For now we only support descending from root into items of a top level sequence
 			if (length(elementpresentinpathfromroot) > 0) {
 				print "\tcondition" nestinglevel " " operator "=" modifier "(ElementPresentInPathFromRoot(rootlist,TagFromName(" element "),TagFromName(" elementpresentinpathfromroot "))?1:0);"
 			}
@@ -326,13 +341,28 @@ NR==1	{
 				print "Error - Must specify sequence attribute argument for ElementPresentInPathFromRoot " FNR >"/dev/tty"
 			}
 		}
+		if (sequencepresentinpathhasitems) {
+			if (length(sequencepresentinpathfromroothasitems) > 0) {
+				print "\tcondition" nestinglevel " " operator "=" modifier "(SequencePresentInPathFromRootHasItems(rootlist,TagFromName(" element "),TagFromName(" sequencepresentinpathfromroothasitems "))?1:0);"
+			}
+			else {
+				print "Error - Must specify sequence attribute argument for SequencePresentInPathFromRootHasItems " FNR >"/dev/tty"
+			}
+		}
 		if (elementpresentinpathfirstitem) {
-			# For now we only support descending from root into items of a top level sequence
 			if (length(elementpresentinpathfromrootfirstitem) > 0) {
 				print "\tcondition" nestinglevel " " operator "=" modifier "(ElementPresentInPathFromRootFirstItem(rootlist,TagFromName(" element "),TagFromName(" elementpresentinpathfromrootfirstitem "))?1:0);"
 			}
 			else {
 				print "Error - Must specify sequence attribute argument for ElementPresentInPathFromRoot " FNR >"/dev/tty"
+			}
+		}
+		if (sequencepresentinpathfirstitemhasitems) {
+			if (length(sequencepresentinpathfromrootfirstitemhasitems) > 0) {
+				print "\tcondition" nestinglevel " " operator "=" modifier "(SequencePresentInPathFromRootFirstItemHasItems(rootlist,TagFromName(" element "),TagFromName(" sequencepresentinpathfromrootfirstitemhasitems "))?1:0);"
+			}
+			else {
+				print "Error - Must specify sequence attribute argument for SequencePresentInPathFromRootFirstItemHasItems " FNR >"/dev/tty"
 			}
 		}
 		if (elementpresentinroot) {

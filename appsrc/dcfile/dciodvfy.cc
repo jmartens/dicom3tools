@@ -2174,6 +2174,133 @@ checkInstanceReferencesAreIncludedInHierarchicalEvidenceSequences(AttributeList 
 	return success;
 }
 
+static bool
+checkConsistencyOfTiledImageGeometry(AttributeList &list,TextOutputStream &log) {
+//cerr << "checkConsistencyOfTiledImageGeometry():" << endl;
+	bool success=true;
+
+	char *vSOPClassUID;
+	Attribute *aSOPClassUID=list[TagFromName(SOPClassUID)];
+	if (aSOPClassUID && aSOPClassUID->getValue(0,vSOPClassUID) && strcmp(vSOPClassUID,VLWholeSlideMicroscopyImageStorageSOPClassUID) == 0) {
+//cerr << "checkConsistencyOfTiledImageGeometry(): is WSI so perform check" << endl;
+		Uint32 vNumberOfFrames = 1;
+		{
+			Attribute *aNumberOfFrames=list[TagFromName(NumberOfFrames)];
+			if (aNumberOfFrames) {
+				(void)aNumberOfFrames->getValue(0,vNumberOfFrames);
+			}
+		}
+		
+		int nPerFrameFunctionalGroupsSequenceItems = 0;
+		{
+			Attribute *aPerFrameFunctionalGroupsSequence = list[TagFromName(PerFrameFunctionalGroupsSequence)];
+			if (aPerFrameFunctionalGroupsSequence && aPerFrameFunctionalGroupsSequence->isSequence()) {
+				AttributeList **aPerFrameFunctionalGroupsSequenceLists;
+				nPerFrameFunctionalGroupsSequenceItems=aPerFrameFunctionalGroupsSequence->getLists(&aPerFrameFunctionalGroupsSequenceLists);
+			}
+		}
+		
+		// do not need to check vNumberOfFrames == nPerFrameFunctionalGroupsSequenceItems if latter not 0, already done by checkCountPerFrameFunctionalGroupsMatchesNumberOfFrames()
+		
+		bool isTiledFull = false;
+		{
+			Attribute *aDimensionOrganizationType=list[TagFromName(DimensionOrganizationType)];
+			char *vDimensionOrganizationType = NULL;
+			if (aDimensionOrganizationType && aDimensionOrganizationType->getValue(0,vDimensionOrganizationType) && strcmp(vDimensionOrganizationType,"TILED_FULL") == 0) {
+				isTiledFull = true;
+			}
+		}
+		
+		Uint32 vNumberOfOpticalPaths = 1;
+		{
+			Attribute *aNumberOfOpticalPaths=list[TagFromName(NumberOfOpticalPaths)];
+			if (aNumberOfOpticalPaths) {
+				(void)aNumberOfOpticalPaths->getValue(0,vNumberOfOpticalPaths);
+			}
+		}
+		
+		Uint32 vColumns = 0;
+		{
+			Attribute *aColumns=list[TagFromName(Columns)];
+			if (aColumns) {
+				(void)aColumns->getValue(0,vColumns);
+			}
+		}
+		
+		Uint32 vTotalPixelMatrixColumns = 0;
+		{
+			Attribute *aTotalPixelMatrixColumns=list[TagFromName(TotalPixelMatrixColumns)];
+			if (aTotalPixelMatrixColumns) {
+				(void)aTotalPixelMatrixColumns->getValue(0,vTotalPixelMatrixColumns);
+			}
+		}
+		
+		Uint32 numberOfColumnsOfTiles = vTotalPixelMatrixColumns / vColumns;
+		
+		if (vTotalPixelMatrixColumns % vColumns != 0) {
+			// do not emit a warning - occurs commonly and is not illegal or bad practice ...
+			//log << WMsgDC(TotalPixelMatrixColumnsNotAnExactMultipleOfColumns)
+			//	<< " TotalPixelMatrixColumns = " << vTotalPixelMatrixColumns
+			//	<< " Columns =  " << vColumns
+			//	<< endl;
+			++numberOfColumnsOfTiles;
+		}
+		
+		Uint32 vRows = 0;
+		{
+			Attribute *aRows=list[TagFromName(Rows)];
+			if (aRows) {
+				(void)aRows->getValue(0,vRows);
+			}
+		}
+		
+		Uint32 vTotalPixelMatrixRows = 0;
+		{
+			Attribute *aTotalPixelMatrixRows=list[TagFromName(TotalPixelMatrixRows)];
+			if (aTotalPixelMatrixRows) {
+				(void)aTotalPixelMatrixRows->getValue(0,vTotalPixelMatrixRows);
+			}
+		}
+		
+		Uint32 numberOfRowsOfTiles = vTotalPixelMatrixRows / vRows;
+		
+		if (vTotalPixelMatrixRows % vRows != 0) {
+			// do not emit a warning - occurs commonly and is not illegal or bad practice ...
+			//log << WMsgDC(TotalPixelMatrixRowsNotAnExactMultipleOfRows)
+			//	<< " TotalPixelMatrixRows = " << vTotalPixelMatrixRows
+			//	<< " Rows =  " << vRows
+			//	<< endl;
+			++numberOfRowsOfTiles;
+		}
+		
+		Uint32 vTotalPixelMatrixFocalPlanes = 1;
+		{
+			Attribute *aTotalPixelMatrixFocalPlanes=list[TagFromName(TotalPixelMatrixFocalPlanes)];
+			if (aTotalPixelMatrixFocalPlanes) {
+				(void)aTotalPixelMatrixFocalPlanes->getValue(0,vTotalPixelMatrixFocalPlanes);
+			}
+		}
+		
+		Uint32 expectedNumberOfFrames = vNumberOfOpticalPaths * vTotalPixelMatrixFocalPlanes * numberOfRowsOfTiles * numberOfColumnsOfTiles;
+		
+		if (isTiledFull || nPerFrameFunctionalGroupsSequenceItems == vNumberOfFrames) {
+			if (expectedNumberOfFrames != vNumberOfFrames) {
+				log << EMsgDC(NumberOfFramesDoesNotMatchExpectedValueForTiledTotalPixelMatrix)
+				<< " got " << vNumberOfFrames
+				<< " expected " << expectedNumberOfFrames
+				<< " for " << vNumberOfOpticalPaths << " optical paths"
+				<< ", " << vTotalPixelMatrixFocalPlanes << " focal planes"
+				<< ", " << numberOfRowsOfTiles << " rows of tiles"
+				<< ", " << numberOfColumnsOfTiles << " columns of tiles"
+				<< endl;
+				success=false;
+			}
+		}
+	}
+
+	return success;
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -2304,6 +2431,8 @@ main(int argc, char *argv[])
 	if (!checkSegmentNumbersMonotonicallyIncreasingFromOneByOne(list,log)) success = false;
 	
 	if (!checkReferencedSegmentNumbersHaveTarget(list,log)) success = false;
+	
+	if (!checkConsistencyOfTiledImageGeometry(list,log)) success = false;
 
 	if (!list.validatePrivate(log)) success = false;
 	

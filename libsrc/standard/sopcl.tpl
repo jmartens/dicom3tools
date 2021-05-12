@@ -146,6 +146,7 @@ DirectoryRecord="IMAGE"			Name="OphthalmicOpticalCoherenceTomographyEnFaceImageS
 DirectoryRecord="IMAGE"			Name="OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage"		Desc="Ophthalmic Optical Coherence Tomography B-scan Volume Analysis Storage"	Uid="1.2.840.10008.5.1.4.1.1.77.1.5.8"
 
 DirectoryRecord="IMAGE"			Name="VLWholeSlideMicroscopyImageStorage"					Desc="VL Whole Slide Microscopy Image Storage"						Uid="1.2.840.10008.5.1.4.1.1.77.1.6"
+DirectoryRecord="IMAGE"			Name="DermoscopicPhotographyImageStorage"					Desc="Dermoscopic Photography Image Storage"						Uid="1.2.840.10008.5.1.4.1.1.77.1.7"
 
 DirectoryRecord="IMAGE"			Name="IVOCTImageStorageForPresentation"						Desc="Intravascular OCT Image Storage - For Presentation"			Uid="1.2.840.10008.5.1.4.1.1.14.1"
 DirectoryRecord="IMAGE"			Name="IVOCTImageStorageForProcessing"						Desc="Intravascular OCT Image Storage - For Processing"				Uid="1.2.840.10008.5.1.4.1.1.14.2"

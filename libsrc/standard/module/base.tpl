@@ -497,6 +497,23 @@ DefineMacro="UDIMacro" InformationEntity="Equipment"
 	Name="DeviceDescription"								Type="3"
 MacroEnd
 
+DefineMacro="DeviceIdentificationMacro"
+	Sequence="DeviceTypeCodeSequence"						Type="1"	VM="1"
+		InvokeMacro="CodeSequenceMacro"
+	SequenceEnd
+	Name="DeviceLabel"										Type="1"
+	Name="LongDeviceDescription"							Type="3"
+	Name="DeviceSerialNumber"								Type="2"
+	Name="SoftwareVersions"									Type="2"
+	Sequence="UDISequence"									Type="3"	VM="1"
+		InvokeMacro="UDIMacro"
+	SequenceEnd
+	Name="ManufacturerDeviceIdentifier"						Type="2"
+	Name="DeviceAlternateIdentifier"						Type="2"
+	Name="DeviceAlternateIdentifierType"					Type="1C"	Condition="DeviceAlternateIdentifierPresent"
+	Name="DeviceAlternateIdentifierFormat"					Type="1C"	Condition="DeviceAlternateIdentifierPresent"
+MacroEnd
+
 Module="Patient"
 	Name="PatientName"						Type="2"
 	Name="PatientID"						Type="2"
@@ -1911,6 +1928,9 @@ Module="USImage"
 	Name="LesionNumber"								Type="3"
 	Name="OutputPower"								Type="3"
 	Name="TransducerData"							Type="3"
+	Sequence="TransducerIdentificationSequence"		Type="3"	VM="1"
+		InvokeMacro="DeviceIdentificationMacro"
+	SequenceEnd
 	Name="TransducerType"							Type="3"	StringDefinedTerms="USTransducerType"
 	Name="FocusDepth"								Type="3"
 	Name="ProcessingFunction"						Type="3"
@@ -2345,17 +2365,19 @@ Module="CommonInstanceReference"
 	# do not use SeriesAndInstanceReferenceMacro, but conditional inclusion instead, per CP 926
 	# cannot actually check whether instances that are referenced are in this study or another study
 	# may be present otherwise because cannot check whether or not both sequences are needed
-	Sequence="ReferencedSeriesSequence"								Type="1C"	VM="1-n"	Condition="InstancesAreReferencedAndStudiesContainingOtherReferencedInstancesSequenceAbsent" mbpo="true"
+	Sequence="ReferencedSeriesSequence"								Type="1C"	VM="1-n"	Condition="StudiesContainingOtherReferencedInstancesSequenceAbsentAndInstanceReferencesInstances" mbpo="true"
 		Name="SeriesInstanceUID"									Type="1"
 		Verify="StudyInstanceUID"															Condition="StudyInstanceUIDIsPresent"	ThenErrorMessage="StudyInstanceUID should not be present in ReferencedSeriesSequence in CommonInstanceReference Module - use StudiesContainingOtherReferencedInstancesSequence if not the same Study"
 		Sequence="ReferencedInstanceSequence"						Type="1"	VM="1-n"
 			InvokeMacro="SOPInstanceReferenceMacro"
 		SequenceEnd
 	SequenceEnd
-	Sequence="StudiesContainingOtherReferencedInstancesSequence"	Type="1C"	VM="1-n"	Condition="InstancesAreReferencedAndReferencedSeriesSequenceAbsent" mbpo="true"
+	Verify="ReferencedSeriesSequence"														Condition="ReferencedSeriesSequencePresentAndInstanceDoesNotReferencesInstances"			ThenErrorMessage="ReferencedSeriesSequence present but Instance does not reference Instances"
+	Sequence="StudiesContainingOtherReferencedInstancesSequence"	Type="1C"	VM="1-n"	Condition="ReferencedSeriesSequenceAbsentAndInstanceReferencesInstances" mbpo="true"
 		Name="StudyInstanceUID"										Type="1"
 		InvokeMacro="SeriesAndInstanceReferenceMacro"
 	SequenceEnd
+	Verify="StudiesContainingOtherReferencedInstancesSequence"								Condition="StudiesContainingOtherReferencedInstancesSequencePresentAndInstanceDoesNotReferencesInstances"			ThenErrorMessage="StudiesContainingOtherReferencedInstancesSequence present but Instance does not reference Instances"
 ModuleEnd
 
 Module="SegmentationSeries"
@@ -2963,7 +2985,7 @@ Module="MultiFrameFunctionalGroupsForParametricMap"
 		InvokeMacro="ReferencedImageMacro"					Condition="ReferencedImageMacroOKInSharedFunctionalGroupSequence"
 		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInSharedFunctionalGroupSequence"
 		InvokeMacro="CardiacSynchronizationMacro"			Condition="CardiacSynchronizationMacroOKInSharedFunctionalGroupSequence"
-		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceNotInPerFrameFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceOKInSharedFunctionalGroupSequence"
 		InvokeMacro="IdentityPixelValueTransformationMacro"	Condition="PixelValueTransformationSequenceNotInPerFrameFunctionalGroupSequence"
 		InvokeMacro="FrameVOILUTWithLUTMacro"				Condition="FrameVOILUTMacroOKInSharedFunctionalGroupSequence"
 		InvokeMacro="RealWorldValueMappingMacro"			Condition="RealWorldValueMappingSequenceNotInPerFrameFunctionalGroupSequence"
@@ -2981,7 +3003,7 @@ Module="MultiFrameFunctionalGroupsForParametricMap"
 		InvokeMacro="DerivationImageMacro"					Condition="DerivationImageMacroOKInPerFrameFunctionalGroupSequence"
 		InvokeMacro="FrameContentMacro"
 		InvokeMacro="CardiacSynchronizationMacro"			Condition="CardiacSynchronizationMacroOKInPerFrameFunctionalGroupSequence"
-		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceNotInSharedFunctionalGroupSequence"
+		InvokeMacro="FrameAnatomyMacro"						Condition="FrameAnatomySequenceOKInPerFrameSharedFunctionalGroupSequence"
 		InvokeMacro="IdentityPixelValueTransformationMacro"	Condition="PixelValueTransformationSequenceNotInSharedFunctionalGroupSequence"
 		InvokeMacro="FrameVOILUTWithLUTMacro"				Condition="FrameVOILUTMacroOKInPerFrameFunctionalGroupSequence"
 		InvokeMacro="RealWorldValueMappingMacro"			Condition="RealWorldValueMappingSequenceNotInSharedFunctionalGroupSequence"

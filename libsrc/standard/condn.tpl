@@ -505,6 +505,22 @@ Condition="NeedModuleCommonInstanceReference"
 	Element="StudiesContainingOtherReferencedInstancesSequence"		ElementPresent=""
 ConditionEnd
 
+Condition="DerivationImageFunctionalGroupOrNeedModuleCommonInstanceReference"
+	Element="DerivationImageSequence"							ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="DerivationImageSequence"							ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="ReferencedSeriesSequence"							ElementPresent=""
+	Element="StudiesContainingOtherReferencedInstancesSequence"	ElementPresent=""
+ConditionEnd
+
+Condition="ReferencedOrDerivationImageFunctionalGroupOrNeedModuleCommonInstanceReference"
+	Element="ReferencedImageSequence"							ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="ReferencedImageSequence"							ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="DerivationImageSequence"							ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="DerivationImageSequence"							ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="ReferencedSeriesSequence"							ElementPresent=""
+	Element="StudiesContainingOtherReferencedInstancesSequence"	ElementPresent=""
+ConditionEnd
+
 Condition="NeedModuleAcquisitionContext"
 	Element="AcquisitionContextSequence"		ElementPresent=""
 ConditionEnd
@@ -4650,6 +4666,16 @@ Condition="CardiacSynchronizationMacroOKInPerFrameFunctionalGroupSequence"
 	Element="CardiacSynchronizationSequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 ConditionEnd
 
+Condition="FrameAnatomySequenceOKInSharedFunctionalGroupSequence"
+	Element="FrameAnatomySequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+	Element="FrameAnatomySequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+ConditionEnd
+
+Condition="FrameAnatomySequenceOKInPerFrameSharedFunctionalGroupSequence"
+	Element="FrameAnatomySequence"				Modifier="Not"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
+	Element="FrameAnatomySequence"				Operator="And"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
+ConditionEnd
+
 Condition="FramePixelShiftMacroOKInSharedFunctionalGroupSequence"
 	Element="FramePixelShiftSequence"				Modifier="Not"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
 	Element="FramePixelShiftSequence"				Operator="And"	ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
@@ -5893,6 +5919,15 @@ Condition="ViewCodeSequenceAbsentOrEmptyButViewPositionHasValue"
 	Element="ViewCodeSequence"						Operator="And" Modifier="Not" SequenceHasItems=""
 ConditionEnd
 
+Condition="ViewModifierCodeSequenceEmptyAndNotMammography"
+	(
+		Element="ViewModifierCodeSequence"			ElementPresent=""
+		Element="ViewModifierCodeSequence"			Operator="And" Modifier="Not" SequenceHasItems=""
+	) Operator="And"
+	Element="SOPClassUID"							Operator="And" Modifier="Not" StringConstantFromRootAttribute="DigitalMammographyXRayImageStorageForPresentationSOPClassUID"
+	Element="SOPClassUID"							Operator="And" Modifier="Not" StringConstantFromRootAttribute="DigitalMammographyXRayImageStorageForProcessingSOPClassUID"
+ConditionEnd
+
 Condition="InstanceIsNotAnImage"
 	Element="PixelData"								Modifier="Not" ElementPresent=""
 	Element="PixelDataProviderURL"					Operator="And" Modifier="Not" ElementPresent=""
@@ -5914,30 +5949,149 @@ Condition="SegmentAlgorithmTypeIsNotManual"
 	Element="SegmentAlgorithmType"					Modifier="Not" StringValue="MANUAL"
 ConditionEnd
 
-Condition="InstancesAreReferencedAndStudiesContainingOtherReferencedInstancesSequenceAbsent"
-	Element="StudiesContainingOtherReferencedInstancesSequence"		Modifier="Not" ElementPresent=""
+Condition="ReferencedSeriesSequenceAbsentAndInstanceReferencesInstances"
+	Element="ReferencedSeriesSequence"				Modifier="Not" ElementPresent=""
 	(
-		Element="ReferencedSOPInstanceUID"							ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="StereoPairsSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="RegistrationSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="DeformableRegistrationSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="FiducialSetSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="ReferencedImageRealWorldValueMappingSequence"
+		Element="SourceImageSequence"							SequenceHasItems=""
+		Element="SourceImageSequence"			Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="SourceImageSequence"			Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="SourceInstanceSequence"		Operator="Or"	SequenceHasItems=""
+		Element="SourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="SourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="ReferencedImageSequence"		Operator="Or"	SequenceHasItems=""
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="RegistrationSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="DeformableRegistrationSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="FiducialSetSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="ReferencedImageRealWorldValueMappingSequence"
+
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequenceHasItems=""
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="SegmentSurfaceSourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SegmentSequence"
+
+		Element="ReferencedSOPInstanceUID"		Operator="Or"	SequencePresentInPathFromRootHasItems="SegmentSequence"
 	) Operator="And"
 ConditionEnd
 
-Condition="InstancesAreReferencedAndReferencedSeriesSequenceAbsent"
-	Element="ReferencedSeriesSequence"								Modifier="Not" ElementPresent=""
+Condition="StudiesContainingOtherReferencedInstancesSequenceAbsentAndInstanceReferencesInstances"
+	Element="StudiesContainingOtherReferencedInstancesSequence"		Modifier="Not" ElementPresent=""
 	(
-		Element="ReferencedSOPInstanceUID"							ElementPresentInPathFromRoot="SharedFunctionalGroupsSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRootFirstItem="PerFrameFunctionalGroupsSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="StereoPairsSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="RegistrationSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="DeformableRegistrationSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="FiducialSetSequence"
-		Element="ReferencedSOPInstanceUID"			Operator="Or"	ElementPresentInPathFromRoot="ReferencedImageRealWorldValueMappingSequence"
+		Element="SourceImageSequence"							SequenceHasItems=""
+		Element="SourceImageSequence"			Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="SourceImageSequence"			Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="SourceInstanceSequence"		Operator="Or"	SequenceHasItems=""
+		Element="SourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="SourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="ReferencedImageSequence"		Operator="Or"	SequenceHasItems=""
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="RegistrationSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="DeformableRegistrationSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="FiducialSetSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="ReferencedImageRealWorldValueMappingSequence"
+
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequenceHasItems=""
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="SegmentSurfaceSourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SegmentSequence"
+
+		Element="ReferencedSOPInstanceUID"		Operator="Or"	SequencePresentInPathFromRootHasItems="SegmentSequence"
 	) Operator="And"
+ConditionEnd
+
+Condition="ReferencedSeriesSequencePresentAndInstanceDoesNotReferencesInstances"
+	Element="ReferencedSeriesSequence"			ElementPresent=""
+	(
+		Element="SourceImageSequence"							SequenceHasItems=""
+		Element="SourceImageSequence"			Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="SourceImageSequence"			Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="SourceInstanceSequence"		Operator="Or"	SequenceHasItems=""
+		Element="SourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="SourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="ReferencedImageSequence"		Operator="Or"	SequenceHasItems=""
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="RegistrationSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="DeformableRegistrationSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="FiducialSetSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="ReferencedImageRealWorldValueMappingSequence"
+
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequenceHasItems=""
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="SegmentSurfaceSourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SegmentSequence"
+
+		Element="ReferencedSOPInstanceUID"		Operator="Or"	SequencePresentInPathFromRootHasItems="SegmentSequence"
+	) Operator="And" Modifier="Not"
+ConditionEnd
+
+Condition="StudiesContainingOtherReferencedInstancesSequencePresentAndInstanceDoesNotReferencesInstances"
+	Element="StudiesContainingOtherReferencedInstancesSequence"			ElementPresent=""
+	(
+		Element="SourceImageSequence"							SequenceHasItems=""
+		Element="SourceImageSequence"			Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="SourceImageSequence"			Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="SourceInstanceSequence"		Operator="Or"	SequenceHasItems=""
+		Element="SourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="SourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="ReferencedImageSequence"		Operator="Or"	SequenceHasItems=""
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="RegistrationSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="DeformableRegistrationSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="FiducialSetSequence"
+		Element="ReferencedImageSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="ReferencedImageRealWorldValueMappingSequence"
+
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequenceHasItems=""
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+		Element="ReferencedInstanceSequence"	Operator="Or"	SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+		Element="SegmentSurfaceSourceInstanceSequence"		Operator="Or"	SequencePresentInPathFromRootHasItems="SegmentSequence"
+
+		Element="ReferencedSOPInstanceUID"		Operator="Or"	SequencePresentInPathFromRootHasItems="SegmentSequence"
+	) Operator="And" Modifier="Not"
+ConditionEnd
+
+Condition="InstanceReferencesInstancesOrNeedModuleCommonInstanceReference"
+	Element="ReferencedSeriesSequence"							SequenceHasItems=""
+	Element="StudiesContainingOtherReferencedInstancesSequence"	SequenceHasItems=""
+
+	Element="SourceImageSequence"								SequenceHasItems=""
+	Element="SourceImageSequence"								SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+	Element="SourceImageSequence"								SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+	Element="SourceInstanceSequence"							SequenceHasItems=""
+	Element="SourceInstanceSequence"							SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+	Element="SourceInstanceSequence"							SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+	Element="ReferencedImageSequence"							SequenceHasItems=""
+	Element="ReferencedImageSequence"							SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+	Element="ReferencedImageSequence"							SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+	Element="ReferencedImageSequence"							SequencePresentInPathFromRootHasItems="RegistrationSequence"
+	Element="ReferencedImageSequence"							SequencePresentInPathFromRootHasItems="DeformableRegistrationSequence"
+	Element="ReferencedImageSequence"							SequencePresentInPathFromRootHasItems="FiducialSetSequence"
+	Element="ReferencedImageSequence"							SequencePresentInPathFromRootHasItems="ReferencedImageRealWorldValueMappingSequence"
+
+	Element="ReferencedInstanceSequence"						SequenceHasItems=""
+	Element="ReferencedInstanceSequence"						SequencePresentInPathFromRootHasItems="SharedFunctionalGroupsSequence"
+	Element="ReferencedInstanceSequence"						SequencePresentInPathFromRootFirstItemHasItems="PerFrameFunctionalGroupsSequence"
+
+	Element="SegmentSurfaceSourceInstanceSequence"				SequencePresentInPathFromRootHasItems="SegmentSequence"
+
+	Element="ReferencedSOPInstanceUID"							SequencePresentInPathFromRootHasItems="SegmentSequence"
 ConditionEnd
 
 Condition="NotSecondaryCaptureSOPClass"
@@ -7249,3 +7403,6 @@ Condition="ContentSequencePresent"
 	Element="ContentSequence"				ElementPresent=""
 ConditionEnd
 
+Condition="DeviceAlternateIdentifierPresent"
+	Element="DeviceAlternateIdentifier"				ElementPresent=""
+ConditionEnd

@@ -192,12 +192,13 @@ Module="DXPositioning"
 	Verify="ViewPosition"											Condition="IsAnimal"	StringDefinedTerms="ViewPositionAnimal"
 	Sequence="ViewCodeSequence"							Type="3"	VM="1"
 		InvokeMacro="CodeSequenceMacro"								BaselineContextID="4010"
-		Sequence="ViewModifierCodeSequence"				Type="3"	VM="1-n"
+		Sequence="ViewModifierCodeSequence"				Type="3"	VM="0-n"
 			InvokeMacro="CodeSequenceMacro"							BaselineContextID="4011"
 		SequenceEnd
+		Verify="ViewModifierCodeSequence"							Condition="ViewModifierCodeSequenceEmptyAndNotMammography"	ThenErrorMessage="Bad Sequence number of Items 0 (1-n Required by Module definition) and not Mammography Image"
 	SequenceEnd
 	Verify="ViewCodeSequence"										Condition="ViewCodeSequenceAbsentOrEmptyButViewPositionHasValue"	ThenWarningMessage="ViewCodeSequence is empty or absent, but view is known since ViewPosition has a value"
-	Sequence="ViewModifierCodeSequence"					Type="1C"	VM="1-n"	Condition="Never"
+	Sequence="ViewModifierCodeSequence"					Type="1C"	VM="0-n"	Condition="Never"
 	SequenceEnd
 	Sequence="PatientOrientationCodeSequence"			Type="3"	VM="1"
 		InvokeMacro="CodeSequenceMacro"								BaselineContextID="19"

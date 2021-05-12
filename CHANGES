@@ -1,3 +1,32 @@
+
+201208:	appsrc/dcfile/dciodvfy.cc: Check sanity of tile dimensions and number of frames in whole slide images (000553)
+
+201208: libsrc/standard/elmdict/other.tpl: Add more observed 3DHISTECH private data elements
+
+201208: libsrc/standard/condn.tpl: Do not report zero length ViewModifierCodeSequence error for non Mammo DX when ViewModifierCodeSequence not present (regression caused by 000549) (000552)
+
+201208: libsrc/standard/condn.tpl: Do not complain about presence of ReferencedSeriesSequence or StudiesContainingOtherReferencedInstancesSequence (Common Instance Reference Module) if SegmentSurfaceSourceInstanceSequence is present (000551)
+
+201208: libsrc/src/dctool/condn.cc,standard/condn.tpl,support/condn.awk: Do not complain about absence of ReferencedSeriesSequence and StudiesContainingOtherReferencedInstancesSequence (Common Instance Reference Module) when valid empty (no item) ReferencedImageSequence (000550)
+
+201205: libsrc/standard/condn.tpl,module/dx.tpl: Do not report error on zero length ViewModifierCodeSequence if Mammo, since Type 2 specializes DX Positioning Module Type 3 (regression caused by change on 2013/06/26) (000549)
+
+201117:	libsrc/standard/elmdict/dicom3.tpl: Add OV, SV and UV Selector Attributes (CP 2042)
+
+201117:	libsrc/standard/elmdict/dicom3.tpl: SR Table data elements (CP 2041)
+
+201115:	libsrc/standard/sopcl.tpl,elmdict/dicom3.tpl: Dermoscopy data elements (Sup 221)
+
+200920:	standard/module/base.tpl,module/base.tpl: Make Frame Anatomy in Parametric Map Optional (CP 2004)
+
+200919:	libsrc/standard/condn.tpl,elmdict/dicom3.tpl,module/base.tpl,us.tpl: Add ultrasound Probe ID in Transducer Identification Sequence (CP 1951); depended on adding Device Identification Sequence Macro (from Sup 147)
+
+200915:	libsrc/standard/elmdict/other.tpl: Update PixelMed private WSI bulk annotation data elements (supnnn_05_WSIAnnotations)
+
+200829:	libsrc/standard/condn.tpl,iodcomp,module/base.tpl: Check CommonInstanceReference Module presence conditional on references being present (000547) and attributes only present when references are present (000548)
+
+200822:	libsrc/standard/elmdict/dicom3.tpl: Render MakeNote as string even though OB
+
 200806:	standard/condn.tpl,module/base.tpl,mr.tpl,vl.tpl: Do not complain about YBR_RCT for .90 Transfer Syntax (000546)
 
 200726:	libsrc/standard/strval/vl.tpl: Correct NUMERIC value type in Acquisition Context (000545)

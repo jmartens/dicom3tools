@@ -158,6 +158,9 @@ Module="EnhancedUSImage"
 		InvokeMacro="IconImageSequenceMacro"
 	SequenceEnd
 	Name="TransducerData"									Type="3"
+	Sequence="TransducerIdentificationSequence"				Type="3"	VM="1"
+		InvokeMacro="DeviceIdentificationMacro"
+	SequenceEnd
 	Sequence="TransducerScanPatternCodeSequence"			Type="1"	VM="1"
 		InvokeMacro="CodeSequenceMacro"									DefinedContextID=12032"
 	SequenceEnd

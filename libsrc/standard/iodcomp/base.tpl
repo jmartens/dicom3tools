@@ -622,11 +622,11 @@ CompositeIOD="Segmentation"				Condition="SegmentationInstance"
 		Module="GeneralReference"								Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="ImagePixel"										Usage="M"
 		Module="SegmentationImage"								Usage="M"
-		Module="CommonInstanceReference"						Usage="C"	Condition="DerivationImageFunctionalGroupPresent"
 		Module="MultiFrameFunctionalGroupsCommon"				Usage="M"
 		Module="MultiFrameFunctionalGroupsForSegmentation"		Usage="M"
 		Module="MultiFrameDimension"							Usage="M"
 		Module="Specimen"										Usage="U"	Condition="NeedModuleSpecimen"
+		Module="CommonInstanceReference"						Usage="C"	Condition="DerivationImageFunctionalGroupOrNeedModuleCommonInstanceReference"
 		Module="SOPCommon"										Usage="M"
 		Module="FrameExtraction"								Usage="C"	Condition="NeedModuleFrameExtraction"
 		# how to forbid presence of VOI LUT Module and Overlay Module :( ?
@@ -661,7 +661,7 @@ CompositeIOD="SurfaceSegmentation"				Condition="SurfaceSegmentationInstance"
 	InformationEntity="Surface"
 		Module="SurfaceSegmentation"					Usage="M"
 		Module="SurfaceMesh"							Usage="M"
-		Module="CommonInstanceReference"				Usage="C"	Condition="NeedModuleCommonInstanceReference"
+		Module="CommonInstanceReference"				Usage="C"	Condition="InstanceReferencesInstancesOrNeedModuleCommonInstanceReference"
 		Module="GeneralReference"						Usage="U"	Condition="NeedModuleGeneralReference"
 		Module="SOPCommon"								Usage="M"
 	InformationEntityEnd
@@ -847,7 +847,7 @@ CompositeIOD="EncapsulatedSTL"					Condition="EncapsulatedSTLInstance"
 		Module="EncapsulatedDocumentSTLPseudo"	Usage="M"
 		Module="Manufacturing3DModel"			Usage="M"
 		Module="SOPCommon"						Usage="M"
-		Module="CommonInstanceReference"		Usage="C"	Condition="NeedModuleCommonInstanceReference"	# really should check if contained references are present :(
+		Module="CommonInstanceReference"		Usage="C"	Condition="InstanceReferencesInstancesOrNeedModuleCommonInstanceReference"
 	InformationEntityEnd
 CompositeIODEnd
 
@@ -968,7 +968,7 @@ CompositeIOD="ParametricMap" Condition="ParametricMapInstance"
 		Module="AcquisitionContext"										Usage="M"
 		Module="Device"													Usage="U"	Condition="NeedModuleDevice"
 		Module="Specimen"												Usage="U"	Condition="NeedModuleSpecimen"
-		Module="CommonInstanceReference"								Usage="C"	Condition="NeedModuleCommonInstanceReference"	# really should check if contained references are present :(
+		Module="CommonInstanceReference"								Usage="C"	Condition="ReferencedOrDerivationImageFunctionalGroupOrNeedModuleCommonInstanceReference"
 		Module="SOPCommon"												Usage="M"
 		Module="FrameExtraction"										Usage="C"	Condition="NeedModuleFrameExtraction"
 	InformationEntityEnd

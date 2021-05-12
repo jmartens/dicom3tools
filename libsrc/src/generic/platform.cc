@@ -4,4 +4,4 @@
 
 #include "platform.h"
 
-const char* dicom3tools_platform_string = "Darwin graythin-1.home 17.7.0 Darwin Kernel Version 17.7.0: Wed May 27 17:00:02 PDT 2020; root:xnu-4570.71.80.1~1/RELEASE_X86_64 x86_64";
+const char* dicom3tools_platform_string = "Darwin graythin-1.home 17.7.0 Darwin Kernel Version 17.7.0: Mon Aug 31 22:11:23 PDT 2020; root:xnu-4570.71.82.6~1/RELEASE_X86_64 x86_64";

@@ -434,6 +434,7 @@
 	<DataElementIE><Name>LesionNumber</Name><IE>INSTANCE</IE></DataElementIE>
 	<DataElementIE><Name>OutputPower</Name><IE>INSTANCE</IE></DataElementIE>
 	<DataElementIE><Name>TransducerData</Name><IE>INSTANCE</IE></DataElementIE>
+	<DataElementIE><Name>TransducerIdentificationSequence</Name><IE>INSTANCE</IE></DataElementIE>
 	<DataElementIE><Name>TransducerType</Name><IE>INSTANCE</IE></DataElementIE>
 	<DataElementIE><Name>FocusDepth</Name><IE>INSTANCE</IE></DataElementIE>
 	<DataElementIE><Name>MechanicalIndex</Name><IE>INSTANCE</IE></DataElementIE>

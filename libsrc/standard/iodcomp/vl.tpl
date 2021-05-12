@@ -135,6 +135,7 @@ CompositeIOD="VLPhotographicImage"		Condition="VisibleLightPhotographicImageInst
 	InformationEntityEnd
 	InformationEntity="Equipment"
 		Module="GeneralEquipment"			Usage="M"
+		Module="VLPhotographicEquipment"	Usage="U"
 	InformationEntityEnd
 	InformationEntity="Image"
 		Module="GeneralImage"				Usage="M"
@@ -144,6 +145,8 @@ CompositeIOD="VLPhotographicImage"		Condition="VisibleLightPhotographicImageInst
 		Module="Device"						Usage="U"	Condition="NeedModuleDevice"
 		Module="Specimen"					Usage="C"	Condition="NeedModuleSpecimen"	# real-world "is a specimen"
 		Module="VLImage"					Usage="M"
+		Module="VLPhotographicAcquisition"	Usage="U"
+		Module="VLPhotographicGeolocation"	Usage="U"
 		Module="OverlayPlane"				Usage="U"	Condition="NeedModuleOverlayPlane"
 		Module="ICCProfile"					Usage="U"	Condition="NeedModuleICCProfile"
 		Module="CheckSingleFramePseudo"		Usage="M"
@@ -703,6 +706,47 @@ CompositeIOD="OphthalmicVisualFieldStaticPerimetryMeasurements" Condition="Ophth
 		Module="VisualFieldStaticPerimetryTestResults"						Usage="M"
 		Module="OphthalmicPatientClinicalInformationandTestLensParameters"	Usage="U"
 		Module="SOPCommon"													Usage="M"
+	InformationEntityEnd
+CompositeIODEnd
+
+CompositeIOD="DermoscopicPhotographyImage"		Condition="DermoscopicPhotographyImageInstance"
+	InformationEntity="File"
+		Module="FileMetaInformation"		Usage="C"	Condition="NeedModuleFileMetaInformation"
+	InformationEntityEnd
+	InformationEntity="Patient"
+		Module="Patient"					Usage="M"
+		Module="ClinicalTrialSubject"		Usage="U"	Condition="NeedModuleClinicalTrialSubject"
+	InformationEntityEnd
+	InformationEntity="Study"
+		Module="GeneralStudy"				Usage="M"
+		Module="PatientStudy"				Usage="U"	# no condition ... all attributes type 3
+		Module="ClinicalTrialStudy"			Usage="U"	Condition="NeedModuleClinicalTrialStudy"
+	InformationEntityEnd
+	InformationEntity="Series"
+		Module="GeneralSeries"				Usage="M"
+		Module="DermoscopyPhotographySeriesPseudo"	Usage="M"	# not in standard ... use to check conditions
+		Module="ClinicalTrialSeries"		Usage="U"	Condition="NeedModuleClinicalTrialSeries"
+	InformationEntityEnd
+	InformationEntity="FrameOfReference"
+		Module="FrameOfReference"			Usage="U"
+	InformationEntityEnd
+	InformationEntity="Equipment"
+		Module="GeneralEquipment"			Usage="M"
+		Module="EnhancedGeneralEquipment"	Usage="M"
+		Module="VLPhotographicEquipment"	Usage="U"
+	InformationEntityEnd
+	InformationEntity="Image"
+		Module="GeneralImage"				Usage="M"
+		Module="GeneralReference"			Usage="U"	Condition="NeedModuleGeneralReference"
+		Module="ImagePixel"					Usage="M"
+		Module="AcquisitionContext"			Usage="M"	# not check for baseline CIDs yet
+		Module="VLImage"					Usage="M"
+		Module="VLPhotographicAcquisition"	Usage="U"
+		Module="DermoscopicImage"			Usage="M"
+		Module="ICCProfile"					Usage="U"	Condition="NeedModuleICCProfile"
+		Module="CheckSingleFramePseudo"		Usage="M"
+		Module="SOPCommon"					Usage="M"
+		Module="CommonInstanceReference"	Usage="U"	Condition="NeedModuleCommonInstanceReference"
 	InformationEntityEnd
 CompositeIODEnd
 

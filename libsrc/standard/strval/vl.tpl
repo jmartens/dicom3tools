@@ -18,6 +18,10 @@ StringValues="VLPhotographyModality" {
 	XC
 }
 
+StringValues="DermoscopyPhotographyModality" {
+	DMS
+}
+
 StringValues="VLImageType3" {
 	STEREO L,
 	STEREO R,
@@ -247,3 +251,67 @@ StringValues="VisualFieldShape" {
 StringValues="OphthalmicVisualFieldModality" {
 	OPV
 }
+
+StringValues="LightSourcePolarization" {
+	POLARIZED,
+	NON_POLARIZED
+}
+
+StringValues="ContactMethod" {
+	CONTACT,
+	NON_CONTACT
+}
+
+StringValues="ImmersionMedia" {
+	ULTRASOUND_GEL,
+	ALCOHOL,
+	WATER,
+	MINERAL_OIL,
+	PLASTIC_CAP
+}
+
+StringValues="InteroperabilityIndex" {
+	R98,
+	THM,
+	R03
+}
+
+StringValues="LatitudeRef" {
+	N,
+	S
+}
+
+StringValues="LongitudeRef" {
+	E,
+	W
+}
+
+StringValues="GPSStatus" {
+	A,
+	V
+}
+
+StringValues="GPSMeasureMode" {
+	2,
+	3
+}
+
+StringValues="GPSSpeedUnits" {
+	K,
+	M,
+	N
+}
+
+StringValues="GPSDirection" {
+	T,
+	M
+}
+
+
+StringValues="GPSDistanceUnits" {
+	K,
+	M,
+	N
+}
+
+

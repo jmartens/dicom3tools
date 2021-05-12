@@ -1,3 +1,16 @@
+210306:	libsrc/standard/condn.tpl,iodcomp,module,strval/vl.tpl: Add Dermoscopic Photography Image (Sup 221)
+
+210306:	libsrc/standard/binval.tpl,iodcomp,module,strval/vl.tpl: Add Visible Light Photography Attributes corresponding to EXIF 2.31 and TIFF/EP (CP 1736)
+
+210206:	libsrc/standard/condn.tpl: Include SCT codes when determining Laterality Required, using 2021a as refernce, including some updated codes (000555)
+
+210121:	libsrc/standard/elmdict/dicom3.tpl: Add new data elements for XA Protocol (Sup 212)
+
+210119:	libsrc/standard/elmdict/dicom3.tpl: Add new data elements (CPACK 109)
+
+210104:	libsrc/standard/elmdict/other.tpl: Update PixelMed private WSI bulk annotation data elements with Annotation Group UID (sup222_08_WSIAnnotations)
+
+210102:	libsrc/standard/elmdict/dicom3.tpl,module/rt.tpl: Source Pixel Plane Characteristics for Contours (CP 2006); Extend RT Structure Set ROI Color (CP 1395)
 
 201208:	appsrc/dcfile/dciodvfy.cc: Check sanity of tile dimensions and number of frames in whole slide images (000553)
 

@@ -1724,6 +1724,7 @@
 (0061,0016) VERS="PMP" VR="SQ"   VM="1"		Owner="PixelMed Publishing"							Keyword="AnnotationPropertyCategoryCodeSequence"			Name="Annotation Property Category Code Sequence"
 (0061,0017) VERS="PMP" VR="SQ"   VM="1"		Owner="PixelMed Publishing"							Keyword="AnnotationPropertyTypeCodeSequence"				Name="Annotation Property Type Code Sequence"
 (0061,0018) VERS="PMP" VR="SQ"   VM="1"		Owner="PixelMed Publishing"							Keyword="AnnotationPropertyTypeModifierCodeSequence"		Name="Annotation Property Type Modifier Code Sequence"
+(0061,0019) VERS="PMP" VR="UI"   VM="1"		Owner="PixelMed Publishing"							Keyword="AnnotationGroupUID"								Name="Annotation Group UID"
 
 (7FDF,0001) VERS="PMP" VR="SQ"   VM="1"		Owner="PixelMed Publishing"							Keyword="PyramidData"											Name="Pyramid Data"
 

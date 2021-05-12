@@ -1,6 +1,10 @@
 # Conditions to detect Composite IOD presence ...
 #
 
+Condition="DermoscopicPhotographyImageInstance"
+	Element="SOPClassUID"		StringConstantFromRootAttribute="DermoscopicPhotographyImageStorageSOPClassUID"
+ConditionEnd
+
 Condition="TractographyResultsInstance"
 	Element="SOPClassUID"		StringConstantFromRootAttribute="TractographyResultsStorageSOPClassUID"
 ConditionEnd
@@ -5724,8 +5728,8 @@ Condition="LateralityRequired"
 	) Operator="And" Modifier="Not"
 	(
 		(
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	              StringValue="T-D4000"	# Abdomen
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="R-FAB57"	# Abdomen and Pelvis
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	              StringValue="T-D4000"	# Abdomen (obsolete)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="R-FAB57"	# Abdomen and Pelvis (obsolete)
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-42500"	# Abdominal aorta
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-41070"	# Abdominal aorta and its branches
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-59490"	# Anus, rectum and sigmoid colon
@@ -5743,10 +5747,12 @@ Condition="LateralityRequired"
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-11501"	# Cervical spine
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D00F7"	# Cervico-thoracic spine
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-83200"	# Cervix
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D3000"	# Chest
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D3000"	# Chest (obsolete)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D3200"	# Chest (replacement)
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="R-FAB55"	# Chest and Abdomen
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="R-FAB56"	# Chest, Abdomen and Pelvis
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-45526"	# Circle of Willis
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-45526"	# Circle of Willis (obsolete - entire)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-45520"	# Circle of Willis (replacement)
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-11BF0"	# Coccyx
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-59300"	# Colon
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-42400"	# Descending aorta
@@ -5754,7 +5760,7 @@ Condition="LateralityRequired"
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D0010"	# Entire body
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-56000"	# Esophagus
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-DD163"	# Esophagus, stomach and duodenum
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-63000"	# Gall  bladder
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-63000"	# Gallbladder
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D1100"	# Head
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D1000"	# Head and Neck
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-32000"	# Heart
@@ -5767,7 +5773,7 @@ Condition="LateralityRequired"
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D00F9"	# Lumbo-sacral spine
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-28000"	# Lung
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D3300"	# Mediastinum
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-2300C"	# Naso pharynx 
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-2300C"	# Nasopharynx
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D1600"	# Neck
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="R-FAB52"	# Neck and Chest 
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="R-FAB53"	# Neck, Chest and Abdomen
@@ -5776,13 +5782,15 @@ Condition="LateralityRequired"
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-65000"	# Pancreas
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-65010"	# Pancreatic duct
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-65600"	# Pancreatic duct and bile duct systems
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D6000"	# Pelvis
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D6000"	# Pelvis (obsolete)
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="R-FAB58"	# Pelvis and lower extremeties
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-91000"	# Penis
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D2700"	# Perineum
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-55002"	# Pharynx
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-55002"	# Pharynx (obsolete - entire)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-55000"	# Pharynx (replacement)
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-20101"	# Pharynx and larynx
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-9200B"	# Prostate
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-9200B"	# Prostate (obsolete - entire)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-92000"	# Prostate (replacement)
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-59600"	# Rectum
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D4900"	# Retroperitoneum
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-11AD0"	# Sacrum
@@ -5793,7 +5801,8 @@ Condition="LateralityRequired"
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-11100"	# Skull
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-58000"	# Small intestine
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-A7010"	# Spinal cord
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D0146"	# Spine
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D0146"	# Spine (obsolete - inactive)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D04FF"	# Spine (replacement)
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-C3000"	# Spleen
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-46460"	# Splenic artery
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-48890"	# Splenic vein
@@ -5803,7 +5812,7 @@ Condition="LateralityRequired"
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-42070"	# Thoracic aorta
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-11502"	# Thoracic spine
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D00F8"	# Thoraco-lumbar spine
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D3000"	# Thorax
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D3000"	# Thorax (obsolete)
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-C8000"	# Thymus
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-B6000"	# Thyroid
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-53000"	# Tongue
@@ -5811,7 +5820,8 @@ Condition="LateralityRequired"
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-DD006"	# Trachea and bronchus
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-F1810"	# Umbilical artery
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-D4230"	# Umbilical region
-			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-48817"	# Umbilical vein
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-48817"	# Umbilical vein (obsolete - entire)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-48832"	# Umbilical vein (replacement)
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-75000"	# Urethra
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-83000"	# Uterus
 			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="T-88920"	# Uterus and fallopian tubes
@@ -5822,6 +5832,116 @@ Condition="LateralityRequired"
 			Element="CodingSchemeDesignator"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="SRT"
 			Element="CodingSchemeDesignator"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="SNM3"
 			Element="CodingSchemeDesignator"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="99SDM"
+		) Operator="And"
+	) Operator="And" Modifier="Not"
+	(
+		(
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	              StringValue="113345001"	# Abdomen (obsolete)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="818981001"	# Abdomen (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="416949008"	# Abdomen and Pelvis (obsolete)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="818982008"	# Abdomen and Pelvis (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="7832008"		# Abdominal aorta
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="360524005"	# Abdominal aorta and its branches
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="110612005"	# Anus, rectum and sigmoid colon
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="15825003"	# Aorta
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="57034009"	# Aortic arch
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="128564006"	# Apex of left ventricle
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="128565007"	# Apex of right ventricle
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="54247002"	# Ascending aorta
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="77568009"	# Back
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="28273000"	# Bile duct
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="89837001"	# Bladder
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="110837003"	# Bladder and urethra
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="12738006"	# Brain
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="34411009"	# Broad ligament
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="122494005"	# Cervical spine
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="297171002"	# Cervico-thoracic spine
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="71252005"	# Cervix
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="51185008"	# Chest (obsolete)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="43799004"	# Chest (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="416550000"	# Chest and Abdomen
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="416775004"	# Chest, Abdomen and Pelvis
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="362047009"	# Circle of Willis (obsolete - entire)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="11279006"	# Circle of Willis (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="64688005"	# Coccyx
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="71854001"	# Colon
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="32672002"	# Descending aorta
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="38848004"	# Duodenum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="38266002"	# Entire body
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="32849002"	# Esophagus
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="110861005"	# Esophagus, stomach and duodenum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="28231008"	# Gallbladder
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="69536005"	# Head
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="774007"		# Head and Neck
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="80891009"	# Heart
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="34516001"	# Ileum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="21306003"	# Jejunum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="14742008"	# Large intestine
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="4596009"		# Larynx
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="10200004"	# Liver
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="122496007"	# Lumbar spine
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="297173004"	# Lumbo-sacral spine
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="39607008"	# Lung
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="72410000"	# Mediastinum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="360955006"	# Nasopharynx
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="45048000"	# Neck
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="417437006"	# Neck and Chest
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="416152001"	# Neck, Chest and Abdomen
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="416319003"	# Neck, Chest, Abdomen and Pelvis
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="45206002"	# Nose
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="15776009"	# Pancreas
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="69930009"	# Pancreatic duct
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="110621006"	# Pancreatic duct and bile duct systems
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="12921003"	# Pelvis (obsolete)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="816092008"	# Pelvis (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="416631005"	# Pelvis and lower extremeties
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="18911002"	# Penis
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="38864007"	# Perineum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="181211006"	# Pharynx (obsolete)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="54066008"	# Pharynx (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="312535008"	# Pharynx and larynx
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="181422007"	# Prostate (obsolete - entire)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="41216001"	# Prostate (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="34402009"	# Rectum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="82849001"	# Retroperitoneum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="54735007"	# Sacrum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="41695006"	# Scalp
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="42575006"	# Sella turcica
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="60184004"	# Sigmoid colon
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="113192009"	# Skeletal system structure (not in DICOM PS 3.16, but Siemens uses for bone scans)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="89546000"	# Skull
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="30315005"	# Small intestine
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="2748008"		# Spinal cord
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="280717001"	# Spine (obsolete - inactive)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="421060004"	# Spine (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="78961009"	# Spleen
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="22083002"	# Splenic artery
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="35819009"	# Splenic vein
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="56873002"	# Sternum
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="69695003"	# Stomach
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="26493002"	# Suprasternal notch
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="113262008"	# Thoracic aorta
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="122495006"	# Thoracic spine
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="297172009"	# Thoraco-lumbar spine
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="51185008"	# Thorax (obsolete)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="43799004"	# Thorax (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="9875009"		# Thymus
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="69748006"	# Thyroid
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="21974007"	# Tongue
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="44567001"	# Trachea
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="110726009"	# Trachea and bronchus
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="50536004"	# Umbilical artery
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="90290004"	# Umbilical region
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="61660003"	# Umbilical vein (obsolete - entire)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="284639000"	# Umbilical vein (replacement)
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="13648007"	# Urethra
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="35039007"	# Uterus
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="110639002"	# Uterus and fallopian tubes
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="76784001"	# Vagina
+			Element="CodeValue"	ElementPresentWithin="AnatomicRegionSequence"	Operator="Or" StringValue="45292006"	# Vulva
+		)
+		(
+			Element="CodingSchemeDesignator"	ElementPresentWithin="AnatomicRegionSequence"	StringValue="SCT"
 		) Operator="And"
 	) Operator="And" Modifier="Not"
 ConditionEnd
@@ -7405,4 +7525,8 @@ ConditionEnd
 
 Condition="DeviceAlternateIdentifierPresent"
 	Element="DeviceAlternateIdentifier"				ElementPresent=""
+ConditionEnd
+
+Condition="ContactMethodIsContact"
+	Element="ContactMethod"				StringValue="CONTACT"
 ConditionEnd
